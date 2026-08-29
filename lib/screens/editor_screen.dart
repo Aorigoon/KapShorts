@@ -2753,7 +2753,7 @@ class _CaptionOverlay extends StatelessWidget {
         : 1.0;
     Widget wordAt(int index, {double sizeMultiplier = 1}) {
       final isActive = index == selectedWordIndex;
-      final word = _CaptionWord(
+      final word = CaptionWord(
         text: design.uppercase
             ? group[index].text.toUpperCase()
             : group[index].text,

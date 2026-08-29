@@ -254,8 +254,8 @@ String _normaliseCaptionText(String value) =>
 
 
 
-class _CaptionWord extends StatelessWidget {
-  const _CaptionWord({
+class CaptionWord extends StatelessWidget {
+  const CaptionWord({
     required this.text,
     required this.style,
     required this.isActive,
