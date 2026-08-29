@@ -1,0 +1,398 @@
+# Project TODO
+
+- [x] Flutter/Dart project ke liye app ka maqsad aur screens finalize karna
+- [x] Android APK build aur runtime reliability requirements define karna
+- [x] Minimal-dependency Flutter foundation banana
+- [ ] Release APK build aur install/run readiness verify karna
+- [x] Black-and-white premium Projects dashboard aur floating navigation banana
+- [x] Device video import aur new-project flow implement karna
+- [x] Caption editor, transcript, template gallery aur customization interface banana
+- [x] Gemini API key setup aur transcribing state ka secure user flow banana
+- [x] Local project persistence aur export-ready UI implement karna
+- [x] SubReel ke liye mobile-first black-and-white design system document karna
+- [x] SubReel ke liye mobile-first black-and-white design system document karna
+- [x] Projects dashboard, floating navigation, new project sheet aur import interaction banana
+- [x] Editor, template gallery, transcript panel, export aur settings screens ka functional UI banana
+- [x] Local project persistence aur eight caption template selections implement karna
+- [x] Secure Gemini key validation, caption JSON service aur ASS/SRT/VTT export foundation add karna
+- [x] Android API 37 ke saath debug APK build aur install-ready artifact verify karna
+- [ ] Groq Whisper transcription aur Llama 8B cleanup pipeline ka provider decision finalize karna
+- [ ] Gemini aur Groq transcription ki per-video cost comparison finalize karna
+- [ ] Cloudflare Worker Gemini proxy aur retry fallback behavior define karna
+- [ ] Modern Flutter home screen aur video upload flow complete karna
+- [ ] Cloudflare Worker ko account connection ke baad deploy karna
+- [ ] Flutter app ko deployed Worker endpoint se connect karna
+- [ ] Signed Android release APK build aur validation complete karna
+- [x] Cloudflare Worker Gemini proxy aur retry fallback behavior define karna
+- [x] Modern Flutter home screen aur video upload flow complete karna
+- [x] Cloudflare Worker ko temporary account par deploy karna
+- [x] Flutter app ko deployed Worker endpoint se connect karna
+- [x] Signed Android release APK build aur signature validation complete karna
+- [x] Flutter ko direct Gemini key se hata kar secure Worker URL configuration par move karna
+- [x] Cloudflare Worker Gemini upload, structured transcription aur fallback source code banana
+- [x] Deployed Cloudflare Worker ko Flutter video upload aur transcript editor flow ke saath connect karna
+- [ ] Universal APK ka exact native library size breakdown nikalna
+- [ ] Deployed Worker URL ko app mein hardcode kar ke Worker settings UI remove karna
+- [ ] Projects title, profile action, refined thin font aur English upload copy implement karna
+- [ ] Project card long-press delete bottom sheet aur navigation back controls implement karna
+- [ ] Per-ABI lightweight release APKs build karna
+- [x] Universal APK ka exact native library size breakdown nikalna
+- [x] Per-ABI lightweight release APKs build aur signature verification complete karna
+- [ ] Google Play on-demand export feature delivery ki Flutter feasibility evaluate karna
+- [ ] Deployed Worker ke Gemini transcription failure ka root cause aur fix verify karna
+- [ ] Projects hero, tagline, All projects removal aur profile avatar refinement implement karna
+- [ ] Updated modern ARM64 APK build aur device-ready verification complete karna
+- [x] Updated modern ARM64 APK build aur v2 signature verification complete karna
+- [ ] Installed ARM64 app ke Worker response failure ka exact root cause fix karna
+- [ ] Projects empty-state ka unwanted artwork remove karna
+- [x] Release manifest Internet permission aur generic upload MIME handling se Worker request path fix karna
+- [x] Projects empty-state ka unwanted artwork remove karna
+- [x] Corrected ARM64 APK build, v2 signature aur Internet permission verify karna
+- [ ] Real uploaded video player aur playback controls implement karna
+- [ ] Gemini transcript ko project ke saath persist aur editor mein display karna
+- [ ] Working caption font, size, position aur color customization implement karna
+- [ ] Functional editor flow ke saath updated ARM64 APK verify karna
+- [x] Real uploaded video player aur playback controls implement karna
+- [x] Gemini transcript ko project ke saath persist aur editor mein display karna
+- [x] Working caption font, size, position aur color customization implement karna
+- [x] Functional editor flow ke saath updated ARM64 APK build aur v2 signature verify karna
+- [x] Timeline-based editor layout aur playback transport implement karna
+- [x] Templates, Effects, Subtitles, Video aur B-roll tool rail implement karna
+- [x] Har editor tool ke liye contextual bottom-sheet workflow implement karna
+- [x] Timeline redesign ke saath ARM64 APK build aur verify karna
+- [x] Har caption template ka distinct preview style aur persistent selection implement karna
+- [x] Template visual update ke saath ARM64 APK build aur verify karna
+- [x] Supplied web source ke advanced blink-caption template patterns analyze karna
+- [x] Advanced multi-line Flutter caption templates aur content behavior implement karna
+- [x] Advanced template update ke saath ARM64 APK build aur verify karna
+- [x] Voice-timing adaptive captions bana kar hard 3-word chunks aur visible gaps remove karna
+- [x] Worker transcription response mein optional word-level timing add karna
+- [x] Video ko fixed top preview aur playback workspace mein convert karna
+- [x] CapCut-style multi-track timeline, playhead aur persistent bottom editing rail implement karna
+- [x] Fixed-preview editor redesign ke saath ARM64 APK build aur verify karna
+- [x] Supplied interaction recording ke mutabiq preview-first layout proportions refine karna
+- [x] Video preview ko bada aur multi-track timeline ko compact karna
+- [x] Smooth caption animation aur editing feedback refine karna
+- [x] Preview-first refinement ke saath ARM64 APK build aur verify karna
+- [ ] Editor preview se rounded card/box styling remove karke clean workspace video surface banana
+- [ ] Clean preview treatment ke saath ARM64 APK build aur verify karna
+- [x] Compact lower timeline mein aligned Video, Audio aur Captions tracks banana
+- [x] Lower editor se extra side controls aur khaali space remove karna
+- [x] Compact three-track timeline ke saath ARM64 APK build aur verify karna
+- [x] Lower timeline ka outer rounded box aur border remove karna
+- [x] Container-free timeline ke saath ARM64 APK build aur verify karna
+- [x] Connected small video thumbnail reel, thin audio row aur captions row implement karna
+- [x] Timeline se left/right rails, top divider aur oversized gray blocks remove karna
+- [x] Slim reel timeline ke saath ARM64 APK build aur verify karna
+- [x] Imported video ko app-controlled storage mein copy karke missing-video failure fix karna
+- [x] Video preview ko larger square-corner surface aur bottom rail ko screen bottom par restore karna
+- [x] Durable video playback fix ke saath ARM64 APK build aur verify karna
+- [x] Timeline se upar redundant time/slider transport line remove karna
+- [x] Recovered space video preview ko de kar timeline ko upar shift karna
+- [x] Simplified editor ke saath ARM64 APK build aur verify karna
+- [x] Timeline mein real video frame thumbnails aur thin seconds ruler show karna
+- [x] Video thumbnail fallback icons remove karna
+- [x] Frame timeline update ke saath ARM64 APK build aur verify karna
+- [x] Actual video duration ke mutabiq dynamic timeline seconds/minutes ruler implement karna
+- [x] Temporary audio lane remove karna
+- [x] Multiple caption/tag rows ke liye timeline-local vertical scrolling implement karna
+- [x] Duration-aware timeline update ke saath ARM64 APK build aur verify karna
+- [x] Har second ke marks wali horizontally scrollable precision ruler implement karna
+- [x] Video reel aur caption timing ko one-second scale par align karna
+- [x] One-second precision timeline ke saath ARM64 APK build aur verify karna
+- [x] Timeline ko center playhead se start aur current time ke saath centered rakhna
+- [x] Compact gray floating play, fullscreen, undo aur redo controls add karna
+- [x] Centered crisp timeline editor ke saath ARM64 APK build aur verify karna
+- [x] Separate chips ko ek long horizontal gray floating control bar se replace karna
+- [x] Control bar ke neeche timeline ko requested compact height par adjust karna
+- [x] Unified control bar editor ke saath ARM64 APK build aur verify karna
+- [x] Long control bar remove karke individual CapCut-style preview icons add karna
+- [x] Current aur total video duration display add karna
+- [x] Drag handle se timeline section ko resize karna
+- [x] Resizable editor update ke saath ARM64 APK build aur verify karna
+- [x] Timeline frame thumbnail blur quality improve karna
+- [x] Seconds ruler ko readable 4–5 second spacing par set karna
+- [x] Fullscreen preview aur reliable large timeline resize handle implement karna
+- [x] Corrected editor ke saath ARM64 APK build aur verify karna
+- [x] Timeline section ka resize drag handle remove karna
+- [x] Word-by-word caption activation ko real speech timing ke saath correct karna
+- [x] Word-synced subtitle update ke saath ARM64 APK build aur verify karna
+- [x] Playback ke dauran timeline horizontal jitter/flicker remove karna
+- [x] Stable smooth playhead follow behavior implement karna
+- [x] Stabilized timeline ke saath ARM64 APK build aur verify karna
+- [x] Fullscreen preview mein timed captions render karna aur redundant center overlay remove karna
+- [x] Pencil/pop-up subtitle editing hata kar inline word-level edit mode banana
+- [x] Transparent video preview ke saath per-second word timing editor implement karna
+- [x] Advanced caption editor ke saath ARM64 APK build aur verify karna
+- [x] Caption tap ko simple selection/seek par restore karna aur inline panel remove karna
+- [x] Editor tool rail mein alag Add Text action add karna
+- [x] Add Text se transparent live video preview aur timestamped caption rows wala dedicated editor kholna
+- [x] Caption row tap par sirf keyboard spelling edit flow aur persistent save implement karna
+- [x] Blink-inspired caption workflow ke saath ARM64 APK build aur verify karna
+- [ ] Deterministic sample transcript ke saath Add Text timestamp seek aur save flow test karna
+- [ ] Caption row keyboard focus aur edited text persistence ki automated validation add karna
+- [ ] Sample flow test outcome document karna
+- [x] Word strip ko video reel aur caption blocks ke shared horizontal timeline canvas mein third track banana
+- [x] Third word track ki scroll/playhead alignment validate karna aur ARM64 APK build verify karna
+- [x] Shared third word track mein har caption word ko poora readable dikhana
+- [x] Readable word chips ke saath alignment validate aur ARM64 APK build verify karna
+- [x] Third shared track mein har word ko full readable chip ke taur par show karna
+- [x] Third word track ki denser visual time scale validate aur ARM64 APK build verify karna
+- [x] Third word track ke full word chips ke darmiyan visible black gutters add karna
+- [x] Spaced word chips ke saath shared alignment validate aur ARM64 APK build verify karna
+- [x] Third word track ka extra gutter reduce karke readable per-word flow tune karna
+- [x] Projects cards mein uploaded video ka real cover frame preview dikhana
+- [x] Tightened word track aur project covers ke saath ARM64 APK build verify karna
+- [x] Video reel aur segment-caption row ko original normal scale par restore karna
+- [x] Sirf third word row ke liye accelerated visual scale aur small chip gaps implement karna
+- [x] Row-specific timeline scale ke saath ARM64 APK build verify karna
+- [x] Main editor se third word timeline row remove karna
+- [x] Add Text transparent canvas ko poore preview box mein fill karna aur horizontal caption layout restore karna
+- [x] Subtitle paragraph par direct double-tap se word-by-word keyboard edit mode implement karna
+- [x] Rebuilt Add Text editor ke saath ARM64 APK build aur verify karna
+- [x] Add Text preview ko rounded solid green-gray background mein change karna
+- [x] Duration row mein playback time ke paas Word-by-Word mode control add karna
+- [x] Normal paragraph edit aur transcript-wide Word-by-Word modes implement karna
+- [x] Finalized Add Text workflow ke saath ARM64 APK build aur verify karna
+- [x] Add Text preview canvas ko green se neutral gray mein change karna
+- [x] Style sheet ke blue press/highlight effect ko neutral interaction style mein replace karna
+- [x] Hex input aur preview ke saath Custom Color bottom sheet add karna
+- [x] Color customization ke saath ARM64 APK build aur verify karna
+- [x] Custom text button ko rainbow color-wheel swatch se replace karna
+- [x] Existing Customize captions sheet ke andar back navigation ke saath Custom Color page implement karna
+- [x] Visual picker, hue slider, hex input aur live caption preview ko custom color state se wire karna
+- [x] In-sheet color picker ke saath ARM64 APK build aur verify karna
+- [x] Custom color saturation canvas ke corners rounded karna
+- [x] Custom color page ki height normal Customize captions sheet ke qareeb compact karna
+- [x] Compact rounded picker ke saath ARM64 APK build aur verify karna
+- [x] Custom caption color ko active/current caption word par visibly apply karna
+- [x] Rainbow picker ke paas four-slot rotating recent color swatches implement karna
+- [x] Rotating custom color swatches ke saath ARM64 APK build aur verify karna
+- [x] Custom Color page ko normal Style sheet ki same compact height ke qareeb tune karna
+- [x] Color picker canvas bada, HEX field rounded aur redundant Caption preview bar remove karna
+- [x] Picker aur HEX changes ke waqt original caption ko live update karna aur back par safe revert dena
+- [x] Batched color picker refinements validate karna bina nayi APK banaye
+- [x] Supplied reference recording se template aur Style workflow map karna
+- [x] Style changes ka main preview par immediate application fix karna
+- [x] Templates ko Style se alag vertically-scrollable caption gallery banana
+- [x] Editor tool rail ka Style/Templates/Add Text order update karna
+- [x] Template aur Style workflow validate karna bina nayi APK banaye
+- [x] Accumulated SubReel editor changes ko release build ke liye finalize karna
+- [x] Current batch ka signed ARM64 APK build aur verify karna
+- [x] Complete Flutter source code ko downloadable ZIP mein package karna
+- [x] Editor rail labels ko Customize, Edit Text aur Style mein update karna
+- [x] Rail icons ko modern purple-accent visual treatment dena
+- [x] Style presets ko two-column vertically-scrollable caption sample grid banana
+- [x] Style card samples mein expressive color, outline, bent aur rotated text treatment add karna
+- [x] Rail aur Style preset grid validate karna bina nayi APK banaye
+- [x] Current Customize, Edit Text aur Style grid batch ka signed ARM64 APK build aur verify karna
+- [x] Supplied template library aur reference videos se animated style behavior map karna
+- [x] Editor rail icons ko white par restore aur Style sheet ki unwanted bottom strip remove karna
+- [x] Caption rendering ko staggered, left-stack, glow aur multi-line word-group style variants ke liye expand karna
+- [x] 20–25 animated caption presets ke saath Style grid populate karna
+- [x] Animated Style system validate aur signed ARM64 APK build verify karna
+- [x] Style gallery viewport ko adjust karke aakhri presets poore accessible banana
+- [x] 20–25 naye font-led animated caption presets aur visual card samples add karna
+- [x] Expanded typography Style gallery validate aur signed ARM64 APK build verify karna
+- [x] Supplied interaction recording se Font sheet, Style demo aur Word-by-Word behavior map karna
+- [x] Editor rail mein Font action aur visible typeface card gallery add karna
+- [x] Style cards ko short animated caption demonstration previews mein convert karna
+- [x] Word-by-Word caption preview aur selection feedback refine karna
+- [x] Font aur animated template tools ka ARM64 APK build aur v2 signature verify karna
+- [x] AutoCap public template gallery se reusable animation patterns analyze karna
+- [x] AutoCap-inspired caption behavior ko SubReel Flutter Style system ke liye map karna
+- [x] Selected AutoCap-inspired animation patterns aur previews implement karna
+- [x] AutoCap-inspired Style update ka ARM64 APK build aur v2 signature verify karna
+- [x] Style bottom sheet ko chaar complete cards visible honay wali compact height par tune karna
+- [x] Font gallery ko slim full-name Google Fonts card layout mein redesign karna
+- [x] Compact Style aur Font sheet update ka ARM64 APK build aur v2 signature verify karna
+- [x] Font sheet ko paanch slim rows ke qareeb compact karna aur white selection treatment dena
+- [x] Style sheet ko sirf chaar complete cards visible honay wali aur chhoti height par set karna
+- [x] Compact monochrome Font aur Style sheets ka ARM64 APK build aur v2 signature verify karna
+- [x] Font sheet ko measured five-row viewport aur minimal sixth-row peek par set karna
+- [x] Style sheet ko measured two-row, four-complete-card viewport par set karna
+- [x] Editor header se help action remove kar ke thin Export button aur back control refine karna
+- [x] Rounded video preview ko gap removal ke saath expand aur compact transport strip add karna
+- [x] Real preview speed sheet, previous/next seek aur fullscreen controls wire karna
+- [x] Editor transport/layout update ka ARM64 APK build aur v2 signature verify karna
+- [x] Unwanted transport chip remove karke simple prior preview-control layout restore karna
+- [x] Timeline ko prior position par rakh kar sirf timeline aur bottom rail ka excess gap remove karna
+- [x] Export ke paas requested top arrow controls add karna aur bottom rail/Trim positioning restore karna
+- [x] Corrected editor layout ka ARM64 APK build aur v2 signature verify karna
+- [x] Video preview ko controls tak expand karke upper editor gap remove aur side coverage improve karna
+- [x] Top undo/redo ko curved glass-style arrow controls mein refine karna
+- [x] Expanded preview aur glass controls ka ARM64 APK build aur v2 signature verify karna
+- [x] Timeline ke missing visible video reel frames restore karna
+- [x] Back, curved undo/redo aur thin Export controls ko compact video overlay mein move karna
+- [x] Restored timeline reel aur video-overlay controls ka ARM64 APK build aur v2 signature verify karna
+- [x] Original video ratio ko editor preview ka default restore karna
+- [x] Functional preview aspect-ratio state aur selector options implement karna
+- [x] Aspect Ratio rail action aur compact bottom-sheet picker add karna
+- [x] Aspect Ratio update ka ARM64 APK build aur v2 signature verify karna
+- [x] Aspect Ratio options ke liye asli proportion wale frame previews add karna
+- [x] Aspect Ratio sheet ka horizontal side-scroll aur selection treatment refine karna
+- [x] Proportional Aspect Ratio sheet ka ARM64 APK build aur v2 signature verify karna
+- [x] Editor tool rail ko roomy frame-style items aur horizontal side scrolling ke saath restore karna
+- [x] Aspect Ratio bottom sheet ko compact non-scrolling row aur reduced gaps par set karna
+- [x] Scrollable tool rail aur compact ratio sheet ka ARM64 APK build aur v2 signature verify karna
+- [x] Aspect Ratio selector ke equal slots aur balanced frame weights set karna
+- [x] 16:9 YouTube frame ko thicker readable preview par tune karna
+- [x] Balanced Aspect Ratio sheet ka ARM64 APK build aur v2 signature verify karna
+- [x] Aspect Ratio sheet se nested/double frame design remove karna
+- [x] Simple single-frame ratio cards aur balanced gaps restore karna
+- [x] Simplified Aspect Ratio sheet ka ARM64 APK build aur v2 signature verify karna
+- [x] Selected aspect ratio frames mein missing/cropped captions ka root cause trace karna
+- [x] Har aspect ratio ke visible preview frame mein caption overlay render karna
+- [x] Aspect-aware caption rendering ka ARM64 APK build aur v2 signature verify karna
+- [x] Video-overlay header controls ko remove karke clean top header build karna
+- [x] Top header mein compact glass U-turn control aur thin Export button add karna
+- [x] Video aur caption-file export choices ko dedicated export flow mein clear banana
+- [x] Header aur export update ka ARM64 APK build aur v2 signature verify karna
+- [x] Single top U-turn control ko glass Undo/Redo arrow pair se replace karna
+- [x] Paired Undo/Redo header ka ARM64 APK build aur v2 signature verify karna
+- [x] User-supplied reply SVG ko app asset bana kar header icon pair mein use karna
+- [x] Doosre header arrow ko code se horizontally flip karna
+- [x] Custom SVG arrow header ka ARM64 APK build aur v2 signature verify karna
+- [x] Desktop web scope aur reusable SubReel editor flows map karna
+- [x] HTML/CSS/JavaScript desktop shell aur mobile-style bottom navigation build karna
+- [x] Browser-based local video import, playback aur timeline interaction implement karna
+- [x] Captions, font/style/aspect tools aur caption-file export port karna
+- [x] Desktop web build validate aur live preview share karna
+- [x] Current SubReel editor ka web preview run aur share karna
+- [x] Flutter upload multipart MIME aur clear English Worker failure feedback fix karna
+- [x] Deployed Worker ke invalid Gemini request ka root cause fix aur live multipart test verify karna
+- [x] Projects hero, tagline, All projects removal aur colored profile avatar refinement implement karna
+- [x] Deployed Worker URL ko app mein hardcode kar ke Worker settings UI remove karna
+- [x] Projects title, profile action, refined thin font aur English upload copy implement karna
+- [x] Project card long-press delete bottom sheet aur navigation back controls implement karna
+- [x] Android API 37 ke saath debug APK build aur install-ready artifact verify karna
+- [x] SubReel Flutter Source Code ka clean separate ZIP package banana
+- [x] Flutter source archive aur desktop web preview link ko requested naming ke saath share karna
+- [x] Current Flutter UI aur editor interaction map ko desktop web parity ke liye extract karna
+- [x] Existing separate desktop UI ko Flutter-style Projects aur Editor design se replace karna
+- [x] Flutter jaisay bottom sheets, timeline aur caption tools ko web preview mein port karna
+- [x] Web parity preview validate karna bina Flutter implementation files change kiye
+- [x] Desktop web se outer mobile-frame border remove karke full-page layout karna
+- [x] Borderless full-page Projects preview visually verify karna
+- [x] Full-page desktop ko preserve karke compact centered mobile-size bottom sheets restore karna
+- [x] Compact New Project sheet ko browser mein visually verify karna
+- [x] Compact New Project sheet mein Choose a video box ko poori horizontal width dena
+- [x] Empty Projects state mein clear New Project icon restore karna
+- [x] Full-width chooser aur empty-state icon ko browser preview mein verify karna
+- [x] Desktop Projects grid ke liye balanced non-stretched card proportions set karna
+- [x] Desktop card layout aur mobile two-column behavior ko browser preview mein verify karna
+- [x] Browser IndexedDB mein selected local video files persist karna
+- [x] Video ke usable frame se reliable project cover extract karna
+- [x] Saved project ko local persisted video ke saath dobara kholna bina re-upload ke
+- [x] Local video reopen aur cover frame browser mein verify karna
+- [x] New Project sheet ke andar Gemini caption processing progress show karna
+- [x] Run in Background action aur ongoing project processing status add karna
+- [x] Foreground aur background-navigation processing flows browser mein verify karna
+- [x] Desktop video timeline ko patla aur compact editor strip banana
+- [x] Upload processing mein model ka naam hata kar animated percentage presentation banana
+- [x] Progress ke saath blurred uploaded-video preview aur colorful motion layer show karna
+- [x] Compact timeline aur processing animation browser preview mein verify karna
+- [x] Run in Background control aur uske helper note ko processing sheet se remove karna
+- [x] Stars hata kar simple rotating loader aur Creating captions/Video magic timeline tags add karna
+- [x] Simplified blurred-color processing sheet browser preview mein verify karna
+- [x] Flutter New Project sheet ko single Choose a video box aur in-box service message tak simplify karna
+- [x] Web New Project sheet ko matching single informative Choose a video box tak simplify karna
+- [x] Web processing background ka automatic color motion rakhna aur video reveal 50 percent se start karna
+- [x] Flutter checks aur web simplified upload/processing presentation verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [x] Flutter Transcribing status se provider ka naam remove karke neutral caption status dikhana
+- [x] Flutter source checks aur latest source archive ko provider-name removal ke baad refresh karna
+- [x] Flutter New Project sheet mein horizontal Upload video aur Video link switching restore karna
+- [x] Flutter selected-video processing ko automatic full-screen animated page par move karna
+- [x] Web New Project sheet mein horizontal Upload video aur Video link switching restore karna
+- [x] Web selected-video processing ko automatic full-page animated presentation par move karna
+- [x] Flutter checks aur dedicated web processing page behavior verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [x] Flutter processing page par 21 percent se selected video reveal aur magic-pencil progress ring add karna
+- [x] Flutter chips ko line-wise timeline/caption progress steps se replace karna
+- [x] Web processing page par 21 percent transition, cursor-reactive plus automatic liquid dots aur magic-pencil ring add karna
+- [x] Web chips ko line-wise timeline/caption progress steps se replace karna
+- [x] Flutter checks aur web 21 percent processing visual verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [x] Flutter processing page mein dense liquid dots ke bajaye calm fixed dots aur sirf smooth moving colors banana
+- [x] Flutter magic-pencil ring, percentage badge aur checkbox progress steps hata kar simple magic-brush visual aur single Creating captions copy banana
+- [x] Web processing page mein calm fixed dots aur smooth moving colors banana, soft video reveal ko unchanged rakhna
+- [x] Web magic-pencil ring, percentage badge aur checkbox progress steps hata kar simple magic-brush visual aur single Creating captions copy banana
+- [x] Simplified Flutter aur web processing state, including preserved soft video reveal, verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [x] Flutter processing tagline ko 25 percent tak Trimming your video, phir Creating captions aur Improving captions mein stage-wise change karna
+- [x] Flutter magic-brush icon ko clearer bana kar sirf outer circle border ko 45 degree turn dena, percentage ko static rakhna
+- [x] Web processing tagline ko 25 percent tak Trimming your video, phir Creating captions aur Improving captions mein stage-wise change karna
+- [x] Web magic-brush icon ko clearer bana kar sirf outer circle border ko 45 degree turn dena, percentage ko static rakhna
+- [x] Flutter aur web stage transitions, static percentage aur 21 percent video reveal verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [x] Flutter processing page se centre edit-pencil circle poora remove karna
+- [x] Web processing page se centre edit-pencil circle poora remove karna
+- [x] Video preview aur processing copy ko preserve karte hue simplified page verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [x] Flutter progress ko 78 percent par stall hone se rok kar result aane tak naturally aage chalana
+- [x] Flutter improvement phase mein multiple rotating caption taglines add karna
+- [x] Web progress ko 78 percent par stall hone se rok kar result aane tak naturally aage chalana
+- [x] Web improvement phase mein multiple rotating caption taglines add karna
+- [x] Flutter aur web continuous progress aur late-stage tagline rotation verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [x] Flutter progress ko ek-ek percent chalana aur 90 se 99 percent tak deliberately slow tease pace set karna
+- [x] Flutter mein Finalising captions ko 99 percent ka terminal tagline banana, without cycling back
+- [x] Web progress ko ek-ek percent chalana aur 90 se 99 percent tak deliberately slow tease pace set karna
+- [x] Web mein Finalising captions ko 99 percent ka terminal tagline banana, without cycling back
+- [x] Mobile web project cards par long-press delete interaction add karna
+- [x] Mobile web navigation icons ko Flutter visual ke qareeb align karna
+- [x] Mobile web Captions ready aur Captions need attention badges ko improve karna
+- [x] Flutter aur mobile web processing/mobile-interaction behaviors verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [x] Mobile web project delete action ko long-press se double-tap/double-click par move karna
+- [x] Desktop web right-click delete interaction ko preserve karna
+- [x] Mobile web floating navigation ke peeche wali black partition remove karna
+- [x] Double-tap delete aur transparent navigation visual verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [x] Mobile web Projects screen ke lower black overlay ko remove karna jo project cards ko cover karta hai
+- [x] Floating navigation ke neeche clear project scrolling verify karna
+- [x] Updated Flutter source archive aur corrected web preview share karna
+- [x] Mobile web project status badge ko video cover se hata kar title aur duration ke darmiyan compact line banana
+- [x] Desktop project cover-badge status design preserve rakhna
+- [x] Mobile status line aur desktop status badge verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [x] Mobile web mein Captions ready status aur duration ko same compact row mein align karna
+- [x] Mobile web failed status ko Caption failed label mein short karke duration row mein align karna
+- [x] Desktop cover-badge labels aur placement preserve rakhna
+- [x] Mobile inline status/duration row aur desktop badge behavior verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [x] Mobile web se Captions ready aur Caption failed text status lines remove karna
+- [x] Mobile web failed project cover ke upper-right corner par simple gol warning badge add karna
+- [x] Desktop ready aur attention cover badges preserve rakhna
+- [x] Mobile failure icon aur desktop badge behavior verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [x] Flutter aur mobile web editor preview/playback behavior compare karna
+- [x] Mobile web mein selected local video ka reliable playback restore karna
+- [x] Mobile web centre play overlay ko fixed rakhna, tap par move na hone dena
+- [x] Mobile web preview, timeline aur lower editor controls ko Flutter layout ke qareeb align karna
+- [x] Mobile web editor playback aur layout parity verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [x] Native Flutter aur web player click/play event flow ko compare karna
+- [x] Mobile web centre play button ko fixed rounded-square control mein convert karke reliable playback trigger karna
+- [x] Mobile web se extra side playback controls hata kar compact Flutter-style control row banana
+- [x] Mobile web timeline/reel aur caption track ko thin compact sizing mein refine karna
+- [x] Mobile web rounded-square play aur compact timeline layout verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [x] Flutter EditorScreen, video player, timeline aur tool rail ka web parity specification banana
+- [x] Flutter Customize sheet aur Add/Edit Text screen ka web parity specification banana
+- [x] Mobile web editor header, player, fixed play overlay, controls aur timeline ko native Flutter ke mutabiq rebuild karna
+- [x] Mobile web Customize sheet aur Add/Edit Text flow ko native Flutter ke mutabiq rebuild karna
+- [x] Mobile web Font, Style, Aspect, Effects aur Captions sheets ko native Flutter ke mutabiq align karna
+- [x] Mobile web editor parity, local video path aur all sheet interactions verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [x] Flutter aur web Edit Text playback/audio aur Style action flows compare karna
+- [x] Mobile web Edit Text player ka audible playback aur working seek/play behavior restore karna
+- [x] Mobile web Edit Text Style action se exact Customize captions sheet open karna
+- [x] Flutter Font sheet ke native row sizing aur common bottom-sheet corners/heights ko mobile web mein align karna
+- [x] Bottom-sheet export interaction ko native Flutter jaisa dedicated Export page banana
+- [x] Integrated mobile web Edit Text, Font, sheets aur Export flows verify karna
+- [x] Updated Flutter source archive aur web preview share karna
+- [ ] Flutter mobile aur standalone desktop-web source ka complete clean archive banana
+- [ ] Archive contents aur live preview response verify karna
+- [ ] Complete source archive aur fresh preview link deliver karna
