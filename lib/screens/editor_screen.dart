@@ -46,6 +46,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
     final project = ref.watch(projectsProvider).selected;
     final transcription = ref.watch(transcriptionProvider);
     final design = ref.watch(captionDesignProvider);
@@ -94,7 +95,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 height: 42,
                 child: Row(
                   children: [
-                    if (!kIsWeb)
+                    if (isMobile)
                       _VideoOverlayIconButton(
                         icon: Icons.arrow_back_ios_new_rounded,
                         onTap: () => context.go('/'),
@@ -185,7 +186,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (kIsWeb)
+                  if (!isMobile)
                     Align(
                       alignment: Alignment.centerLeft,
                       child: _EditorFloatingSidebar(onTap: sidebarTapHandler),
@@ -247,7 +248,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 ],
               ),
             ),
-            if (!kIsWeb) ...[
+            if (isMobile) ...[
               const SizedBox(height: 4),
               EditorToolRail(onTap: sidebarTapHandler),
             ],
@@ -297,7 +298,7 @@ class _PreviewSimpleControls extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            if (kIsWeb)
+            if (MediaQuery.of(context).size.width >= 600)
               IconButton(
                 onPressed: () => context.go('/'),
                 icon: const Icon(Icons.arrow_back_ios_new_rounded),
