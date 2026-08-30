@@ -37,7 +37,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 10, 24, 112),
+              padding: const EdgeInsets.fromLTRB(24, 10, 24, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -298,7 +298,7 @@ class ProjectsGrid extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GridView.builder(
-      padding: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.only(top: 16, bottom: 120),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 220,
         childAspectRatio: .68,
@@ -421,24 +421,30 @@ class FloatingNavigation extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          height: 58,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          decoration: BoxDecoration(
-            color: AppColors.elevated,
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: AppColors.line),
-          ),
-          child: Row(
-            children: [
-              const _NavIcon(icon: Icons.home_outlined, active: true),
-              const SizedBox(width: 8),
-              _NavIcon(
-                icon: Icons.person_outline_rounded,
-                active: false,
-                onTap: () => context.go('/settings'),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(30),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              height: 58,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                color: AppColors.elevated.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: AppColors.line),
               ),
-            ],
+              child: Row(
+                children: [
+                  const _NavIcon(icon: Icons.home_outlined, active: true),
+                  const SizedBox(width: 8),
+                  _NavIcon(
+                    icon: Icons.person_outline_rounded,
+                    active: false,
+                    onTap: () => context.go('/settings'),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
         const SizedBox(width: 12),
