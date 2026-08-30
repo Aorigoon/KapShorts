@@ -38,35 +38,64 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 10, 24, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const _ProjectsHeader(),
-                  const SizedBox(height: 9),
-                  Text(
-                    'Create and polish captions from any video.',
-                    style: GoogleFonts.manrope(
-                      color: AppColors.secondary,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      height: 1.35,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Expanded(
-                    child: !controller.loaded
-                        ? const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
+              child: !controller.loaded
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : controller.projects.isEmpty
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const _ProjectsHeader(),
+                            const SizedBox(height: 9),
+                            Text(
+                              'Create and polish captions from any video.',
+                              style: GoogleFonts.manrope(
+                                color: AppColors.secondary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                height: 1.35,
+                              ),
                             ),
-                          )
-                        : controller.projects.isEmpty
-                        ? const EmptyProjectsState()
-                        : ProjectsGrid(projects: controller.projects),
-                  ),
-                ],
-              ),
+                            const SizedBox(height: 14),
+                            const Expanded(child: EmptyProjectsState()),
+                          ],
+                        )
+                      : CustomScrollView(
+                          slivers: [
+                            SliverAppBar(
+                              floating: true,
+                              pinned: false,
+                              snap: true,
+                              backgroundColor: AppColors.canvas,
+                              automaticallyImplyLeading: false,
+                              titleSpacing: 0,
+                              title: const _ProjectsHeader(),
+                            ),
+                            SliverToBoxAdapter(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 9),
+                                  Text(
+                                    'Create and polish captions from any video.',
+                                    style: GoogleFonts.manrope(
+                                      color: AppColors.secondary,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 14),
+                                ],
+                              ),
+                            ),
+                            ProjectsGrid(projects: controller.projects),
+                          ],
+                        ),
             ),
             Align(
               alignment: Alignment.bottomCenter,
@@ -297,67 +326,71 @@ class ProjectsGrid extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return GridView.builder(
+    return SliverPadding(
       padding: const EdgeInsets.only(top: 16, bottom: 120),
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 220,
-        childAspectRatio: .68,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-      ),
-      itemCount: projects.length,
-      itemBuilder: (_, index) {
-        final project = projects[index];
-        return GestureDetector(
-          onSecondaryTap: () => showProjectActionsSheet(context, ref, project),
-          child: InkWell(
-            onTap: () async {
-              await ref.read(projectsProvider).select(project);
-              if (context.mounted) context.go('/editor');
-            },
-            onLongPress: () => showProjectActionsSheet(context, ref, project),
-            onDoubleTap: () => showProjectActionsSheet(context, ref, project),
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.line),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: ProjectVideoCover(videoPath: project.videoPath),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  project.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  project.duration,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.secondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
+      sliver: SliverGrid(
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 220,
+          childAspectRatio: .68,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
         ),
-      );
-    },
-  );
+        delegate: SliverChildBuilderDelegate(
+          (_, index) {
+            final project = projects[index];
+            return GestureDetector(
+              onSecondaryTap: () => showProjectActionsSheet(context, ref, project),
+              child: InkWell(
+                onTap: () async {
+                  await ref.read(projectsProvider).select(project);
+                  if (context.mounted) context.go('/editor');
+                },
+                onLongPress: () => showProjectActionsSheet(context, ref, project),
+                onDoubleTap: () => showProjectActionsSheet(context, ref, project),
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.line),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: ProjectVideoCover(videoPath: project.videoPath),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        project.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        project.duration,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.secondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+          childCount: projects.length,
+        ),
+      ),
+    );
 }
 }
 
