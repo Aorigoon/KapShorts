@@ -102,7 +102,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
                 child: FloatingNavigation(
-                  onCreate: () => showNewProjectSheet(context),
+                  onCreate: () => showFeatureSelectionSheet(context),
                 ),
               ),
             ),
@@ -930,3 +930,122 @@ class _SheetTab extends StatelessWidget {
   );
 }
 
+
+Future<void> showFeatureSelectionSheet(BuildContext context) async {
+  await showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (_) => const FeatureSelectionSheet(),
+  );
+}
+
+class FeatureSelectionSheet extends StatelessWidget {
+  const FeatureSelectionSheet({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 42,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.tertiary,
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Create New',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: _FeatureCard(
+                    icon: Icons.auto_awesome,
+                    title: 'AI Captions',
+                    onTap: () {
+                      Navigator.pop(context);
+                      showNewProjectSheet(context);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _FeatureCard(
+                    icon: Icons.text_snippet,
+                    title: 'Teleprompter',
+                    onTap: () {
+                      Navigator.pop(context);
+                      // TODO: Navigate to Teleprompter
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Teleprompter coming soon!')),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FeatureCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+
+  const _FeatureCard({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        decoration: BoxDecoration(
+          color: AppColors.elevated,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.line),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 32, color: Colors.white),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
