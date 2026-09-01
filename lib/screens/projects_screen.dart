@@ -1000,6 +1000,7 @@ class FeatureSelectionSheet extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: GestureDetector(
@@ -1007,12 +1008,27 @@ class FeatureSelectionSheet extends StatelessWidget {
                       Navigator.pop(context);
                       showNewProjectSheet(context);
                     },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Image.asset(
-                        'assets/images/caption_template.png',
-                        fit: BoxFit.cover,
-                      ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.asset(
+                            'assets/images/caption_template.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'AI Caption',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -1023,12 +1039,27 @@ class FeatureSelectionSheet extends StatelessWidget {
                       Navigator.pop(context);
                       showTeleprompterSheet(context);
                     },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Image.asset(
-                        'assets/images/teleprompter_template.png',
-                        fit: BoxFit.cover,
-                      ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.asset(
+                            'assets/images/teleprompter_template.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'AI Teleprompter',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -1040,3 +1071,4 @@ class FeatureSelectionSheet extends StatelessWidget {
     );
   }
 }
+
