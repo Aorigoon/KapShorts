@@ -80,6 +80,7 @@ flutter:
 
   assets:
     - assets/icons/reply_arrow.svg
+    - assets/images/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

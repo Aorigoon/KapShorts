@@ -939,6 +939,31 @@ Future<void> showFeatureSelectionSheet(BuildContext context) async {
   );
 }
 
+
+Future<void> showTeleprompterSheet(BuildContext context) async {
+  await showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (_) => SafeArea(
+      top: false,
+      child: Container(
+        height: 300,
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        child: const Center(
+          child: Text(
+            'Teleprompter Mode Coming Soon...',
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
 class FeatureSelectionSheet extends StatelessWidget {
   const FeatureSelectionSheet({super.key});
 
@@ -964,39 +989,37 @@ class FeatureSelectionSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Create New',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 24),
             Row(
               children: [
                 Expanded(
-                  child: _FeatureCard(
-                    icon: Icons.auto_awesome,
-                    title: 'AI Captions',
+                  child: GestureDetector(
                     onTap: () {
                       Navigator.pop(context);
                       showNewProjectSheet(context);
                     },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.asset(
+                        'assets/images/caption_template.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _FeatureCard(
-                    icon: Icons.text_snippet,
-                    title: 'Teleprompter',
+                  child: GestureDetector(
                     onTap: () {
                       Navigator.pop(context);
-                      // TODO: Navigate to Teleprompter
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Teleprompter coming soon!')),
-                      );
+                      showTeleprompterSheet(context);
                     },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.asset(
+                        'assets/images/teleprompter_template.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -1008,44 +1031,3 @@ class FeatureSelectionSheet extends StatelessWidget {
   }
 }
 
-class _FeatureCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final VoidCallback onTap;
-
-  const _FeatureCard({
-    required this.icon,
-    required this.title,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-        decoration: BoxDecoration(
-          color: AppColors.elevated,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.line),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 32, color: Colors.white),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
