@@ -34,6 +34,8 @@ jobs:
 
       - name: Install Dependencies
         run: flutter pub get
+      - name: Generate Launcher Icons
+        run: flutter pub run flutter_launcher_icons
 
       - name: Build arm64-v8a APK
         run: flutter build apk --target-platform android-arm64 --release
