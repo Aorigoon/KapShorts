@@ -972,20 +972,20 @@ class FeatureSelectionSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(24, 12, 24, 40),
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
         decoration: const BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(36)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 48,
-              height: 5,
+              width: 42,
+              height: 4,
               decoration: BoxDecoration(
-                color: AppColors.tertiary.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(4),
+                color: AppColors.tertiary,
+                borderRadius: BorderRadius.circular(3),
               ),
             ),
             const SizedBox(height: 32),
@@ -1000,29 +1000,36 @@ class FeatureSelectionSheet extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: _FeatureImageCard(
-                    imagePath: 'assets/images/caption_template.png',
-                    title: 'AI Captions',
-                    subtitle: 'Auto-generate trendy subtitles',
+                  child: GestureDetector(
                     onTap: () {
                       Navigator.pop(context);
                       showNewProjectSheet(context);
                     },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.asset(
+                        'assets/images/caption_template.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _FeatureImageCard(
-                    imagePath: 'assets/images/teleprompter_template.png',
-                    title: 'Teleprompter',
-                    subtitle: 'Smart scrolling with tone guide',
+                  child: GestureDetector(
                     onTap: () {
                       Navigator.pop(context);
                       showTeleprompterSheet(context);
                     },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.asset(
+                        'assets/images/teleprompter_template.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -1033,85 +1040,3 @@ class FeatureSelectionSheet extends StatelessWidget {
     );
   }
 }
-
-class _FeatureImageCard extends StatelessWidget {
-  final String imagePath;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  const _FeatureImageCard({
-    required this.imagePath,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.elevated,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: AppColors.line, width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.4),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(22.5)),
-              child: AspectRatio(
-                aspectRatio: 0.75,
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                      letterSpacing: -0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.secondary,
-                      height: 1.3,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-
