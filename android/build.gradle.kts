@@ -1,4 +1,5 @@
 allprojects {
+    extra.set("ffmpegKitPackage", "min-gpl")
     repositories {
         google()
         mavenCentral()
