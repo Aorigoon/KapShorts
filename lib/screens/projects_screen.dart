@@ -191,7 +191,8 @@ class EmptyProjectsState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Align(
+      alignment: const Alignment(0, -0.3), // Shifts slightly above exact center
       child: FittedBox(
         fit: BoxFit.scaleDown,
         child: Padding(
@@ -200,7 +201,7 @@ class EmptyProjectsState extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               const EmptyProjectArtwork(),
-              const SizedBox(height: 24),
+              // Removed SizedBox to reduce the gap significantly
               Text(
                 'No projects yet',
                 style: GoogleFonts.manrope(
@@ -235,10 +236,13 @@ class EmptyProjectArtwork extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
-      'assets/images/add_project_folder.png',
-      width: 220,
-      height: 220,
+    return Align(
+      heightFactor: 0.7, // Reduces layout height to crop the empty black padding
+      child: Image.asset(
+        'assets/images/add_project_folder.png',
+        width: 280, // Increased icon size
+        height: 280,
+      ),
     );
   }
 }
