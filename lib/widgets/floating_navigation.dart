@@ -92,14 +92,37 @@ class _NavImageIcon extends StatelessWidget {
       child: SizedBox(
         height: 42,
         width: 42,
-        child: Transform.scale(
-          scale: 1.4,
-          child: Image.asset(
-            imagePath,
-            // Active: pure white tint on the icon itself. Inactive: faded grey.
-            color: active ? Colors.white : Colors.white38,
-            colorBlendMode: BlendMode.srcIn,
-          ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Soft white neon glow BEHIND the icon when active
+            if (active)
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      blurRadius: 18,
+                      spreadRadius: 6,
+                    ),
+                  ],
+                ),
+              ),
+            // Original 3D icon — NO color filter at all
+            Transform.scale(
+              scale: 1.4,
+              child: Image.asset(
+                imagePath,
+                // Inactive icons slightly dimmed so active one stands out
+                opacity: active
+                    ? const AlwaysStoppedAnimation(1.0)
+                    : const AlwaysStoppedAnimation(0.5),
+              ),
+            ),
+          ],
         ),
       ),
     );
