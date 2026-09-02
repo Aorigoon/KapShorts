@@ -13,15 +13,39 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: AppColors.canvas,
       body: Stack(
         children: [
-          Center(
-            child: Text(
-              'Home',
-              style: GoogleFonts.manrope(
-                fontSize: 24,
-                color: Colors.white,
-              ),
+          // Main content
+          SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header: Logo icon + "apShorts" text (K is already shown in logo)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        'assets/icon_foreground.png',
+                        width: 38,
+                        height: 38,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'apShorts',
+                        style: GoogleFonts.manrope(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
+
+          // Bottom floating navigation
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(

@@ -81,6 +81,7 @@ flutter:
   assets:
     - assets/icons/reply_arrow.svg
     - assets/images/
+    - assets/icon_foreground.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
