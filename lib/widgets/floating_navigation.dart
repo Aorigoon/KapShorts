@@ -32,8 +32,8 @@ class FloatingNavigation extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  _NavIcon(
-                    icon: Icons.home_outlined,
+                  _NavImageIcon(
+                    imagePath: 'assets/images/nav_home_icon.png',
                     active: currentIndex == 0,
                     onTap: currentIndex == 0 ? null : () => context.go('/'),
                   ),
@@ -119,14 +119,15 @@ class _NavImageIcon extends StatelessWidget {
       child: Container(
         height: 42,
         width: 42,
-        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: active ? Colors.white : Colors.transparent,
           shape: BoxShape.circle,
         ),
-        child: Image.asset(
-          imagePath,
-          color: active ? Colors.black : Colors.white,
+        child: Transform.scale(
+          scale: 1.5, // The images have large transparent padding, scaling them up makes them visible
+          child: Image.asset(
+            imagePath,
+          ),
         ),
       ),
     );
