@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../core/app_colors.dart';
 
-// Active indicator color — a soft orange/amber glow (like the reference app's purple)
-const _kActiveColor = Color(0xFFFF8C00); // deep orange
+
 
 class FloatingNavigation extends StatelessWidget {
   const FloatingNavigation({
@@ -90,29 +89,16 @@ class _NavImageIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: SizedBox(
         height: 42,
         width: 42,
-        decoration: BoxDecoration(
-          // Active: orange rounded square glow. Inactive: transparent.
-          color: active ? _kActiveColor.withValues(alpha: 0.25) : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: active
-              ? [
-                  BoxShadow(
-                    color: _kActiveColor.withValues(alpha: 0.5),
-                    blurRadius: 12,
-                    spreadRadius: 1,
-                  ),
-                ]
-              : null,
-        ),
         child: Transform.scale(
-          scale: 1.4, // compensate for transparent padding in images
+          scale: 1.4,
           child: Image.asset(
             imagePath,
-            // NO color filter — preserve the original 3D icon look
+            // Active: pure white tint on the icon itself. Inactive: faded grey.
+            color: active ? Colors.white : Colors.white38,
+            colorBlendMode: BlendMode.srcIn,
           ),
         ),
       ),
