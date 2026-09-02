@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../core/app_colors.dart';
 
+// Active indicator color — a soft orange/amber glow (like the reference app's purple)
+const _kActiveColor = Color(0xFFFF8C00); // deep orange
+
 class FloatingNavigation extends StatelessWidget {
   const FloatingNavigation({
     required this.onCreate,
@@ -44,8 +47,8 @@ class FloatingNavigation extends StatelessWidget {
                     onTap: currentIndex == 1 ? null : () => context.go('/projects'),
                   ),
                   const SizedBox(width: 8),
-                  _NavIcon(
-                    icon: Icons.person_outline_rounded,
+                  _NavImageIcon(
+                    imagePath: 'assets/images/nav_settings_icon.png',
                     active: currentIndex == 2,
                     onTap: currentIndex == 2 ? null : () => context.go('/settings'),
                   ),
@@ -77,34 +80,6 @@ class FloatingNavigation extends StatelessWidget {
   }
 }
 
-class _NavIcon extends StatelessWidget {
-  const _NavIcon({required this.icon, required this.active, this.onTap});
-  final IconData icon;
-  final bool active;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
-      child: Container(
-        height: 42,
-        width: 42,
-        decoration: BoxDecoration(
-          color: active ? Colors.white : Colors.transparent,
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-          icon,
-          size: 23,
-          color: active ? Colors.black : Colors.white,
-        ),
-      ),
-    );
-  }
-}
-
 class _NavImageIcon extends StatelessWidget {
   const _NavImageIcon({required this.imagePath, required this.active, this.onTap});
   final String imagePath;
@@ -113,21 +88,31 @@ class _NavImageIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         height: 42,
         width: 42,
         decoration: BoxDecoration(
-          color: active ? Colors.white : Colors.transparent,
-          shape: BoxShape.circle,
+          // Active: orange rounded square glow. Inactive: transparent.
+          color: active ? _kActiveColor.withValues(alpha: 0.25) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: active
+              ? [
+                  BoxShadow(
+                    color: _kActiveColor.withValues(alpha: 0.5),
+                    blurRadius: 12,
+                    spreadRadius: 1,
+                  ),
+                ]
+              : null,
         ),
         child: Transform.scale(
-          scale: 1.4, // The images have large transparent padding
+          scale: 1.4, // compensate for transparent padding in images
           child: Image.asset(
             imagePath,
-            // NO color filter! We want the original 3D icon to show fully.
+            // NO color filter — preserve the original 3D icon look
           ),
         ),
       ),
