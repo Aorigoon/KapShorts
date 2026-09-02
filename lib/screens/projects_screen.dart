@@ -15,6 +15,7 @@ import 'package:video_player/video_player.dart';
 import '../core/app_colors.dart';
 import '../core/models/video_project.dart';
 import '../core/providers.dart';
+import '../widgets/floating_navigation.dart';
 class ProjectsScreen extends ConsumerStatefulWidget {
   const ProjectsScreen({super.key});
 
@@ -51,15 +52,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                           children: [
                             const _ProjectsHeader(),
                             const SizedBox(height: 9),
-                            Text(
-                              'Create and polish captions from any video.',
-                              style: GoogleFonts.manrope(
-                                color: AppColors.secondary,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                height: 1.35,
-                              ),
-                            ),
+
                             const SizedBox(height: 14),
                             const Expanded(child: EmptyProjectsState()),
                           ],
@@ -80,15 +73,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const SizedBox(height: 9),
-                                  Text(
-                                    'Create and polish captions from any video.',
-                                    style: GoogleFonts.manrope(
-                                      color: AppColors.secondary,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      height: 1.35,
-                                    ),
-                                  ),
+
                                   const SizedBox(height: 14),
                                 ],
                               ),
@@ -102,6 +87,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
                 child: FloatingNavigation(
+                  currentIndex: 1,
                   onCreate: () => showFeatureSelectionSheet(context),
                 ),
               ),
@@ -372,91 +358,7 @@ class _ProjectVideoCoverState extends State<ProjectVideoCover> {
   );
 }
 
-class FloatingNavigation extends StatelessWidget {
-  const FloatingNavigation({required this.onCreate, super.key});
-  final VoidCallback onCreate;
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(30),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              height: 58,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              decoration: BoxDecoration(
-                color: AppColors.elevated.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: AppColors.line),
-              ),
-              child: Row(
-                children: [
-                  const _NavIcon(icon: Icons.home_outlined, active: true),
-                  const SizedBox(width: 8),
-                  _NavIcon(
-                    icon: Icons.person_outline_rounded,
-                    active: false,
-                    onTap: () => context.go('/settings'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        SizedBox(
-          height: 58,
-          width: 58,
-          child: Material(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(20),
-              onTap: onCreate,
-              child: const Icon(
-                Icons.add_rounded,
-                color: Colors.black,
-                size: 31,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _NavIcon extends StatelessWidget {
-  const _NavIcon({required this.icon, required this.active, this.onTap});
-  final IconData icon;
-  final bool active;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
-      child: Container(
-        height: 42,
-        width: 42,
-        decoration: BoxDecoration(
-          color: active ? Colors.white : Colors.transparent,
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-          icon,
-          size: 23,
-          color: active ? Colors.black : Colors.white,
-        ),
-      ),
-    );
-  }
-}
 
 Future<void> showNewProjectSheet(BuildContext context) async {
   await showModalBottomSheet<void>(

@@ -23,6 +23,7 @@ import 'core/services/worker_transcription_service.dart';
 import 'core/app_colors.dart';
 import 'core/models/caption_design.dart';
 import 'screens/editor_screen.dart';
+import 'screens/home_screen.dart';
 import 'screens/export_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/projects_screen.dart';
@@ -95,7 +96,8 @@ class SubReelApp extends StatelessWidget {
 final _router = GoRouter(
   initialLocation: '/',
   routes: [
-    GoRoute(path: '/', builder: (_, _) => const ProjectsScreen()),
+    GoRoute(path: '/', builder: (_, _) => const HomeScreen()),
+    GoRoute(path: '/projects', builder: (_, _) => const ProjectsScreen()),
     GoRoute(
       path: '/transcribing',
       builder: (_, _) => const TranscribingScreen(),
