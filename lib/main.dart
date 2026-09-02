@@ -96,15 +96,24 @@ class SubReelApp extends StatelessWidget {
 final _router = GoRouter(
   initialLocation: '/',
   routes: [
-    GoRoute(path: '/', builder: (_, _) => const HomeScreen()),
-    GoRoute(path: '/projects', builder: (_, _) => const ProjectsScreen()),
+    GoRoute(
+      path: '/',
+      pageBuilder: (context, state) => const NoTransitionPage(child: HomeScreen()),
+    ),
+    GoRoute(
+      path: '/projects',
+      pageBuilder: (context, state) => const NoTransitionPage(child: ProjectsScreen()),
+    ),
     GoRoute(
       path: '/transcribing',
       builder: (_, _) => const TranscribingScreen(),
     ),
     GoRoute(path: '/editor', builder: (_, _) => const EditorScreen()),
     GoRoute(path: '/export', builder: (_, _) => const ExportScreen()),
-    GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
+    GoRoute(
+      path: '/settings',
+      builder: (_, _) => const SettingsScreen(),
+    ),
   ],
 );
 
