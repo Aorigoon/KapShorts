@@ -91,22 +91,14 @@ class _NavIcon extends StatelessWidget {
       child: Container(
         height: 42,
         width: 42,
-        decoration: const BoxDecoration(
-          color: Colors.transparent,
+        decoration: BoxDecoration(
+          color: active ? Colors.white : Colors.transparent,
           shape: BoxShape.circle,
         ),
         child: Icon(
           icon,
-          size: 26,
-          color: active ? Colors.white : Colors.white54,
-          shadows: active
-              ? [
-                  const Shadow(
-                    color: Colors.white,
-                    blurRadius: 10,
-                  )
-                ]
-              : null,
+          size: 23,
+          color: active ? Colors.black : Colors.white,
         ),
       ),
     );
@@ -127,28 +119,15 @@ class _NavImageIcon extends StatelessWidget {
       child: Container(
         height: 42,
         width: 42,
-        decoration: const BoxDecoration(
-          color: Colors.transparent,
+        decoration: BoxDecoration(
+          color: active ? Colors.white : Colors.transparent,
           shape: BoxShape.circle,
         ),
         child: Transform.scale(
-          scale: 1.4, 
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              if (active)
-                ImageFiltered(
-                  imageFilter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-                  child: Image.asset(
-                    imagePath,
-                    color: Colors.white,
-                  ),
-                ),
-              Image.asset(
-                imagePath,
-                color: active ? Colors.white : Colors.white54,
-              ),
-            ],
+          scale: 1.4, // The images have large transparent padding
+          child: Image.asset(
+            imagePath,
+            // NO color filter! We want the original 3D icon to show fully.
           ),
         ),
       ),
