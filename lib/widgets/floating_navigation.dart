@@ -91,14 +91,22 @@ class _NavIcon extends StatelessWidget {
       child: Container(
         height: 42,
         width: 42,
-        decoration: BoxDecoration(
-          color: active ? Colors.white : Colors.transparent,
+        decoration: const BoxDecoration(
+          color: Colors.transparent,
           shape: BoxShape.circle,
         ),
         child: Icon(
           icon,
-          size: 23,
-          color: active ? Colors.black : Colors.white,
+          size: 26,
+          color: active ? Colors.white : Colors.white54,
+          shadows: active
+              ? [
+                  const Shadow(
+                    color: Colors.white,
+                    blurRadius: 10,
+                  )
+                ]
+              : null,
         ),
       ),
     );
@@ -119,14 +127,28 @@ class _NavImageIcon extends StatelessWidget {
       child: Container(
         height: 42,
         width: 42,
-        decoration: BoxDecoration(
-          color: active ? Colors.white : Colors.transparent,
+        decoration: const BoxDecoration(
+          color: Colors.transparent,
           shape: BoxShape.circle,
         ),
         child: Transform.scale(
-          scale: 1.5, // The images have large transparent padding, scaling them up makes them visible
-          child: Image.asset(
-            imagePath,
+          scale: 1.4, 
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (active)
+                ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+                  child: Image.asset(
+                    imagePath,
+                    color: Colors.white,
+                  ),
+                ),
+              Image.asset(
+                imagePath,
+                color: active ? Colors.white : Colors.white54,
+              ),
+            ],
           ),
         ),
       ),
