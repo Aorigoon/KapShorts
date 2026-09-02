@@ -9,11 +9,13 @@ class FloatingNavigation extends StatelessWidget {
   const FloatingNavigation({
     required this.onCreate,
     this.currentIndex = 0,
+    this.showCreateButton = true,
     super.key,
   });
 
   final VoidCallback onCreate;
   final int currentIndex;
+  final bool showCreateButton;
 
   @override
   Widget build(BuildContext context) {
@@ -56,24 +58,26 @@ class FloatingNavigation extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 12),
-        SizedBox(
-          height: 58,
-          width: 58,
-          child: Material(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            child: InkWell(
+        if (showCreateButton) ...[
+          const SizedBox(width: 12),
+          SizedBox(
+            height: 58,
+            width: 58,
+            child: Material(
+              color: Colors.white,
               borderRadius: BorderRadius.circular(20),
-              onTap: onCreate,
-              child: const Icon(
-                Icons.add_rounded,
-                color: Colors.black,
-                size: 31,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: onCreate,
+                child: const Icon(
+                  Icons.add_rounded,
+                  color: Colors.black,
+                  size: 31,
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -95,18 +99,18 @@ class _NavImageIcon extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Soft white neon glow BEHIND the icon when active
+            // Subtle white glow BEHIND the icon when active (not too strong)
             if (active)
               Container(
-                width: 28,
-                height: 28,
+                width: 20,
+                height: 20,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      blurRadius: 18,
-                      spreadRadius: 6,
+                      color: Colors.white.withValues(alpha: 0.55),
+                      blurRadius: 10,
+                      spreadRadius: 2,
                     ),
                   ],
                 ),

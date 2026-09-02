@@ -3,100 +3,108 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../core/app_colors.dart';
 import '../core/utils.dart';
+import '../widgets/floating_navigation.dart';
+
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => context.go('/'),
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 19),
-        ),
-        backgroundColor: AppColors.canvas,
-        foregroundColor: Colors.white,
-        title: Text(
-          'Profile',
-          style: GoogleFonts.manrope(fontWeight: FontWeight.w500),
-        ),
-        centerTitle: false,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+      backgroundColor: AppColors.canvas,
+      body: Stack(
         children: [
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: AppColors.line),
-            ),
-            child: const Row(
-              children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: AppColors.elevated,
-                  child: Icon(
-                    Icons.person_outline_rounded,
-                    color: Colors.white,
-                  ),
+          ListView(
+            padding: const EdgeInsets.fromLTRB(20, 60, 20, 100),
+            children: [
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: AppColors.line),
                 ),
-                SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Creator workspace',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
+                child: const Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundColor: AppColors.elevated,
+                      child: Icon(
+                        Icons.person_outline_rounded,
+                        color: Colors.white,
                       ),
-                      SizedBox(height: 3),
-                      Text(
-                        'Your caption projects stay on this device.',
-                        style: TextStyle(
-                          color: AppColors.secondary,
-                          fontSize: 12,
-                        ),
+                    ),
+                    SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Creator workspace',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
+                          ),
+                          SizedBox(height: 3),
+                          Text(
+                            'Your caption projects stay on this device.',
+                            style: TextStyle(
+                              color: AppColors.secondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
+              const SizedBox(height: 30),
+              Text(
+                'Preferences',
+                style: GoogleFonts.manrope(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const _SettingsItem(
+                icon: Icons.dark_mode_outlined,
+                title: 'Dark appearance',
+                detail: 'Always on',
+              ),
+              const _SettingsItem(
+                icon: Icons.privacy_tip_outlined,
+                title: 'Your privacy',
+                detail: 'Projects are stored on this device',
+              ),
+              const _SettingsItem(
+                icon: Icons.info_outline_rounded,
+                title: 'About',
+                detail: 'Version 1.0.0',
+              ),
+            ],
+          ),
+          // Bottom navigation — no + button on profile page
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+              child: FloatingNavigation(
+                currentIndex: 2,
+                showCreateButton: false,
+                onCreate: () {},
+              ),
             ),
-          ),
-          const SizedBox(height: 30),
-          Text(
-            'Preferences',
-            style: GoogleFonts.manrope(
-              fontSize: 19,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const _SettingsItem(
-            icon: Icons.dark_mode_outlined,
-            title: 'Dark appearance',
-            detail: 'Always on',
-          ),
-          const _SettingsItem(
-            icon: Icons.privacy_tip_outlined,
-            title: 'Your privacy',
-            detail: 'Projects are stored on this device',
-          ),
-          const _SettingsItem(
-            icon: Icons.info_outline_rounded,
-            title: 'About',
-            detail: 'Version 1.0.0',
           ),
         ],
       ),
     );
   }
 }
+
 
 class ConnectionPill extends StatelessWidget {
   const ConnectionPill({required this.connected, super.key});
