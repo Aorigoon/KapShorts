@@ -17,6 +17,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Cache Android Debug Keystore
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: android-debug-keystore
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -31,6 +37,14 @@ jobs:
         with:
           channel: 'stable'
           cache: true
+
+      - name: Cache Pub packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-cache-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-cache-
 
       - name: Install Dependencies
         run: flutter pub get
@@ -54,8 +68,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: build-${{ github.run_number }}
-          name: Release Build #${{ github.run_number }}
+          tag_name: latest
+          name: Latest Release
           draft: false
           prerelease: false
           files: build/app/outputs/flutter-apk/KapShorts-arm64-v8a.apk
