@@ -132,27 +132,6 @@ class _ProjectsHeader extends StatelessWidget {
             ),
           ),
         ),
-        Material(
-          color: const Color(0xFFFFA000),
-          borderRadius: BorderRadius.circular(18),
-          child: InkWell(
-            onTap: () => context.go('/settings'),
-            borderRadius: BorderRadius.circular(18),
-            child: Container(
-              height: 48,
-              width: 48,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: const Color(0xFFFFB83F)),
-              ),
-              child: const Icon(
-                Icons.person_rounded,
-                size: 23,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -245,12 +224,7 @@ class EmptyProjectsState extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 36),
-              const Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: Colors.white,
-                size: 36,
-              ),
+
             ],
           ),
         ),
@@ -264,58 +238,10 @@ class EmptyProjectArtwork extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 140,
+    return Image.asset(
+      'assets/images/add_project_folder.png',
       width: 140,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Background rotated card 1 (Tilted counter-clockwise)
-          Transform.rotate(
-            angle: -0.12,
-            child: Container(
-              width: 96,
-              height: 96,
-              decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFF2C2C2C), width: 1.5),
-                borderRadius: BorderRadius.circular(22),
-              ),
-            ),
-          ),
-          // Background rotated card 2 (Slightly tilted)
-          Transform.rotate(
-            angle: 0.08,
-            child: Container(
-              width: 98,
-              height: 98,
-              decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFF333333), width: 1.5),
-                borderRadius: BorderRadius.circular(22),
-              ),
-            ),
-          ),
-          // Foreground card (Tilted clockwise)
-          Transform.rotate(
-            angle: 0.15,
-            child: Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E1E1E),
-                border: Border.all(color: const Color(0xFF3E3E3E), width: 1.5),
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.play_arrow_rounded,
-                  size: 48,
-                  color: AppColors.secondary,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      height: 140,
     );
   }
 }
