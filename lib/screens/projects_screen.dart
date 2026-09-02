@@ -191,40 +191,37 @@ class EmptyProjectsState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topCenter,
+    return Center(
       child: FittedBox(
         fit: BoxFit.scaleDown,
         child: Padding(
-          padding: const EdgeInsets.only(top: 58, bottom: 42),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(height: 78),
               const EmptyProjectArtwork(),
               const SizedBox(height: 24),
               Text(
                 'No projects yet',
                 style: GoogleFonts.manrope(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 26,
+                  fontWeight: FontWeight.w600,
                   letterSpacing: -.6,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               const SizedBox(
-                width: 280,
+                width: 300,
                 child: Text(
                   'Upload a video to create your first caption project.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     color: AppColors.secondary,
-                    height: 1.45,
+                    height: 1.5,
                   ),
                 ),
               ),
-
             ],
           ),
         ),
@@ -240,8 +237,8 @@ class EmptyProjectArtwork extends StatelessWidget {
   Widget build(BuildContext context) {
     return Image.asset(
       'assets/images/add_project_folder.png',
-      width: 140,
-      height: 140,
+      width: 220,
+      height: 220,
     );
   }
 }
