@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/app_colors.dart';
 import '../widgets/floating_navigation.dart';
 import 'projects_screen.dart' show showFeatureSelectionSheet;
@@ -14,36 +13,8 @@ class HomeScreen extends StatelessWidget {
       body: Stack(
         children: [
           // Main content
-          SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header: Launch icon (larger size) + "apShorts" app name
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/icon_foreground.png',
-                        width: 66,
-                        height: 66,
-                      ),
-                      const SizedBox(width: 2),
-                      Text(
-                        'apShorts',
-                        style: GoogleFonts.manrope(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          const SafeArea(
+            child: SizedBox.shrink(),
           ),
 
           // Bottom floating navigation
