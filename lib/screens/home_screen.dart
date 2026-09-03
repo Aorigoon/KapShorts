@@ -20,58 +20,99 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Header: Logo (left) + Get Pro Button (right) - Black & White
+                  // 1. Header: Logo (pushed to far left, larger size 84px) + Credits Chip + Get Pro Button
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.only(left: 6, right: 16, top: 8, bottom: 8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // App Logo Icon
+                        // App Logo Icon (larger size 84px, moved further left)
                         Image.asset(
                           'assets/icon_foreground.png',
-                          width: 68,
-                          height: 68,
+                          width: 84,
+                          height: 84,
                         ),
-                        // Get Pro Button (Sleek Black & White)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.white.withOpacity(0.15),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.workspace_premium,
-                                color: Colors.black,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                'Get Pro',
-                                style: GoogleFonts.manrope(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.black,
-                                  letterSpacing: 0.3,
+                        // Right Side: 60 Credits Chip + Get Pro Button
+                        Row(
+                          children: [
+                            // 60 Credits Chip
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.18),
+                                  width: 1,
                                 ),
                               ),
-                            ],
-                          ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.bolt,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '60 Credits',
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                      letterSpacing: 0.2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(width: 8),
+
+                            // Get Pro Button (Sleek Black & White)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.15),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.workspace_premium,
+                                    color: Colors.black,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    'Get Pro',
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.black,
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
                   // 2. Expanded & Beautiful Tagline / Hero Section
                   Padding(
@@ -148,96 +189,6 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: 36),
-
-                  // 3. Style Section Header
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Featured Styles',
-                          style: GoogleFonts.manrope(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            letterSpacing: 0.2,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              'See All',
-                              style: GoogleFonts.manrope(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white54,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            const Icon(
-                              Icons.arrow_forward_ios,
-                              size: 11,
-                              color: Colors.white54,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // 4. Style Preset Cards Grid (Monochrome B&W Dark Theme)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: const [
-                        Expanded(
-                          child: _StylePresetCard(
-                            title: 'Jesus Embrace',
-                            subtitle: 'Spiritual & Warm',
-                            icon: Icons.volunteer_activism_outlined,
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: _StylePresetCard(
-                            title: 'Hug Your Love',
-                            subtitle: 'Cinematic Emotion',
-                            icon: Icons.favorite_border,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: const [
-                        Expanded(
-                          child: _StylePresetCard(
-                            title: 'AI Anime',
-                            subtitle: 'Japanese Art',
-                            icon: Icons.auto_awesome_outlined,
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: _StylePresetCard(
-                            title: 'Cyberpunk',
-                            subtitle: 'Futuristic Neon',
-                            icon: Icons.bolt_outlined,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -252,69 +203,6 @@ class HomeScreen extends StatelessWidget {
                 currentIndex: 0,
                 onCreate: () => showFeatureSelectionSheet(context),
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StylePresetCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-
-  const _StylePresetCard({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 145,
-      decoration: BoxDecoration(
-        color: const Color(0xFF161618),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: 20,
-            right: 20,
-            child: Icon(
-              icon,
-              size: 44,
-              color: Colors.white.withOpacity(0.12),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.manrope(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.manrope(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white54,
-                  ),
-                ),
-              ],
             ),
           ),
         ],
