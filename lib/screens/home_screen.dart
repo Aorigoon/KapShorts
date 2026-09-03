@@ -13,8 +13,21 @@ class HomeScreen extends StatelessWidget {
       body: Stack(
         children: [
           // Main content
-          const SafeArea(
-            child: SizedBox.shrink(),
+          SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header: App logo icon only (larger size)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Image.asset(
+                    'assets/icon_foreground.png',
+                    width: 64,
+                    height: 64,
+                  ),
+                ),
+              ],
+            ),
           ),
 
           // Bottom floating navigation
