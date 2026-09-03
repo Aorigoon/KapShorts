@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'models/caption_design.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,4 +24,41 @@ final captionRecentColorsProvider = StateProvider<List<Color>>(
     Color(0xFF5C9CFF),
     Color(0xFFE870A0),
   ],
+);
+
+class CreditsNotifier extends StateNotifier<int> {
+  CreditsNotifier() : super(60) {
+    _load();
+  }
+
+  static const String _key = 'user_credits';
+
+  Future<void> _load() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      state = prefs.getInt(_key) ?? 60;
+    } catch (_) {}
+  }
+
+  Future<bool> deductCredits(int amount) async {
+    if (state < amount) return false;
+    state = state - amount;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_key, state);
+    } catch (_) {}
+    return true;
+  }
+
+  Future<void> addCredits(int amount) async {
+    state = state + amount;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_key, state);
+    } catch (_) {}
+  }
+}
+
+final creditsProvider = StateNotifierProvider<CreditsNotifier, int>(
+  (_) => CreditsNotifier(),
 );

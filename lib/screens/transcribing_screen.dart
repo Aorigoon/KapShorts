@@ -124,6 +124,7 @@ class _TranscribingScreenState extends ConsumerState<TranscribingScreen>
       );
       ref.read(transcriptionProvider.notifier).state = response;
       await ref.read(projectsProvider).saveTranscript(response);
+      await ref.read(creditsProvider.notifier).deductCredits(10);
       progressTimer?.cancel();
       improvementTaglineTimer?.cancel();
       if (mounted) {

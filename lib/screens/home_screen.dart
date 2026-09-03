@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/app_colors.dart';
+import '../core/providers.dart';
 import '../widgets/floating_navigation.dart';
 import 'projects_screen.dart' show showFeatureSelectionSheet;
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final credits = ref.watch(creditsProvider);
+
     return Scaffold(
       backgroundColor: AppColors.canvas,
       body: Stack(
@@ -20,28 +24,33 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Header: Logo (pushed to far left, larger size 84px) + Credits Chip + Get Pro Button
+                  // 1. Header: Logo (flush to left edge) + Smaller Chips (Credits + Get Pro)
                   Padding(
-                    padding: const EdgeInsets.only(left: 6, right: 16, top: 8, bottom: 8),
+                    padding: const EdgeInsets.only(left: 0, right: 16, top: 4, bottom: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // App Logo Icon (larger size 84px, moved further left)
-                        Image.asset(
-                          'assets/icon_foreground.png',
-                          width: 84,
-                          height: 84,
+                        // App Logo Icon (Shifted flush to left edge, larger size)
+                        Transform.translate(
+                          offset: const Offset(-6, 0),
+                          child: Image.asset(
+                            'assets/icon_foreground.png',
+                            width: 88,
+                            height: 88,
+                          ),
                         ),
-                        // Right Side: 60 Credits Chip + Get Pro Button
+
+                        // Right Side: Smaller Chips (Credits Chip + Get Pro Button)
                         Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            // 60 Credits Chip
+                            // Credits Chip (smaller size, dynamic count)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
                                   color: Colors.white.withOpacity(0.18),
                                   width: 1,
@@ -53,13 +62,13 @@ class HomeScreen extends StatelessWidget {
                                   const Icon(
                                     Icons.bolt,
                                     color: Colors.white,
-                                    size: 16,
+                                    size: 13,
                                   ),
-                                  const SizedBox(width: 4),
+                                  const SizedBox(width: 3),
                                   Text(
-                                    '60 Credits',
+                                    '$credits Credits',
                                     style: GoogleFonts.manrope(
-                                      fontSize: 13,
+                                      fontSize: 11.5,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.white,
                                       letterSpacing: 0.2,
@@ -69,19 +78,19 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
 
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 6),
 
-                            // Get Pro Button (Sleek Black & White)
+                            // Get Pro Button (smaller size)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(14),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.white.withOpacity(0.15),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
                                   ),
                                 ],
                               ),
@@ -91,16 +100,16 @@ class HomeScreen extends StatelessWidget {
                                   const Icon(
                                     Icons.workspace_premium,
                                     color: Colors.black,
-                                    size: 16,
+                                    size: 13,
                                   ),
-                                  const SizedBox(width: 5),
+                                  const SizedBox(width: 4),
                                   Text(
                                     'Get Pro',
                                     style: GoogleFonts.manrope(
-                                      fontSize: 13,
+                                      fontSize: 11.5,
                                       fontWeight: FontWeight.w800,
                                       color: Colors.black,
-                                      letterSpacing: 0.3,
+                                      letterSpacing: 0.2,
                                     ),
                                   ),
                                 ],
@@ -112,7 +121,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
 
                   // 2. Expanded & Beautiful Tagline / Hero Section
                   Padding(
