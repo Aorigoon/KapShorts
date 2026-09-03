@@ -24,33 +24,33 @@ class HomeScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Header: Logo (flush to left edge) + Smaller Chips (Credits + Get Pro)
+                  // 1. Header: Logo (enlarged to 104px, shifted further left) + Original Chips (Credits + Get Pro)
                   Padding(
                     padding: const EdgeInsets.only(left: 0, right: 16, top: 4, bottom: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // App Logo Icon (Shifted flush to left edge, larger size)
+                        // App Logo Icon (Shifted further left, size 104px)
                         Transform.translate(
-                          offset: const Offset(-6, 0),
+                          offset: const Offset(-12, 0),
                           child: Image.asset(
                             'assets/icon_foreground.png',
-                            width: 88,
-                            height: 88,
+                            width: 104,
+                            height: 104,
                           ),
                         ),
 
-                        // Right Side: Smaller Chips (Credits Chip + Get Pro Button)
+                        // Right Side: Original Chips (Credits Chip + Get Pro Button)
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Credits Chip (smaller size, dynamic count)
+                            // Credits Chip (original size, dynamic count)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: Colors.white.withOpacity(0.18),
                                   width: 1,
@@ -62,13 +62,13 @@ class HomeScreen extends ConsumerWidget {
                                   const Icon(
                                     Icons.bolt,
                                     color: Colors.white,
-                                    size: 13,
+                                    size: 16,
                                   ),
-                                  const SizedBox(width: 3),
+                                  const SizedBox(width: 4),
                                   Text(
                                     '$credits Credits',
                                     style: GoogleFonts.manrope(
-                                      fontSize: 11.5,
+                                      fontSize: 13,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.white,
                                       letterSpacing: 0.2,
@@ -78,19 +78,19 @@ class HomeScreen extends ConsumerWidget {
                               ),
                             ),
 
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 8),
 
-                            // Get Pro Button (smaller size)
+                            // Get Pro Button (original size)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.white.withOpacity(0.15),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 3),
                                   ),
                                 ],
                               ),
@@ -100,16 +100,16 @@ class HomeScreen extends ConsumerWidget {
                                   const Icon(
                                     Icons.workspace_premium,
                                     color: Colors.black,
-                                    size: 13,
+                                    size: 16,
                                   ),
-                                  const SizedBox(width: 4),
+                                  const SizedBox(width: 5),
                                   Text(
                                     'Get Pro',
                                     style: GoogleFonts.manrope(
-                                      fontSize: 11.5,
+                                      fontSize: 13,
                                       fontWeight: FontWeight.w800,
                                       color: Colors.black,
-                                      letterSpacing: 0.2,
+                                      letterSpacing: 0.3,
                                     ),
                                   ),
                                 ],
