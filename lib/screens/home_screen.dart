@@ -9,8 +9,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const yellowAccent = Color(0xFFFFC727);
-
     return Scaffold(
       backgroundColor: AppColors.canvas,
       body: Stack(
@@ -22,28 +20,28 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Header: Logo (left) + Get Pro Button (right)
+                  // 1. Header: Logo (left) + Get Pro Button (right) - Black & White
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // App Logo Icon (larger size, moved left)
+                        // App Logo Icon
                         Image.asset(
                           'assets/icon_foreground.png',
                           width: 68,
                           height: 68,
                         ),
-                        // Get Pro Button
+                        // Get Pro Button (Sleek Black & White)
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                           decoration: BoxDecoration(
-                            color: yellowAccent,
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
                               BoxShadow(
-                                color: yellowAccent.withOpacity(0.3),
-                                blurRadius: 10,
+                                color: Colors.white.withOpacity(0.15),
+                                blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
                             ],
@@ -60,9 +58,10 @@ class HomeScreen extends StatelessWidget {
                               Text(
                                 'Get Pro',
                                 style: GoogleFonts.manrope(
-                                  fontSize: 15,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w800,
                                   color: Colors.black,
+                                  letterSpacing: 0.3,
                                 ),
                               ),
                             ],
@@ -72,121 +71,99 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 16),
-
-                  // 2. Hero Title Section
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      'WHAT IS YOUR\nIDEA LIKE?',
-                      style: GoogleFonts.manrope(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        height: 1.15,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // 3. Main CTA Button ("+ Create Video")
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: InkWell(
-                      onTap: () => showFeatureSelectionSheet(context),
-                      borderRadius: BorderRadius.circular(16),
-                      child: Container(
-                        width: double.infinity,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          color: yellowAccent,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: yellowAccent.withOpacity(0.25),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(3),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.black, width: 2),
-                              ),
-                              child: const Icon(
-                                Icons.add,
-                                color: Colors.black,
-                                size: 16,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              'Create Video',
-                              style: GoogleFonts.manrope(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
                   const SizedBox(height: 24),
 
-                  // 4. Horizontal Quick Tools Category Chips
-                  SizedBox(
-                    height: 52,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      children: const [
-                        _QuickToolChip(
-                          icon: Icons.subtitles_outlined,
-                          label: 'Video Translator',
+                  // 2. Expanded & Beautiful Tagline / Hero Section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Badge / Accent line
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.auto_awesome,
+                                color: Colors.white,
+                                size: 13,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'AI Powered Video Studio',
+                                style: GoogleFonts.manrope(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white70,
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        SizedBox(width: 10),
-                        _QuickToolChip(
-                          icon: Icons.face_retouching_natural,
-                          label: 'AI Portrait',
+                        const SizedBox(height: 16),
+                        // Expanded Main Title
+                        RichText(
+                          text: TextSpan(
+                            style: GoogleFonts.manrope(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w900,
+                              height: 1.15,
+                              color: Colors.white,
+                              letterSpacing: -0.5,
+                            ),
+                            children: const [
+                              TextSpan(text: 'Transform Ideas\nInto '),
+                              TextSpan(
+                                text: 'Stunning AI Videos',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: Colors.white38,
+                                  decorationThickness: 2,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        SizedBox(width: 10),
-                        _QuickToolChip(
-                          icon: Icons.video_library_outlined,
-                          label: 'Image to Video',
-                        ),
-                        SizedBox(width: 10),
-                        _QuickToolChip(
-                          icon: Icons.record_voice_over_outlined,
-                          label: 'Text to Speech',
+                        const SizedBox(height: 12),
+                        // Expanded Subtitle Tagline
+                        Text(
+                          'Create professional shorts, auto-captions, and high-converting AI content in seconds.',
+                          style: GoogleFonts.manrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white60,
+                            height: 1.45,
+                            letterSpacing: 0.2,
+                          ),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 36),
 
-                  // 5. Style Section Header
+                  // 3. Style Section Header
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Style',
+                          'Featured Styles',
                           style: GoogleFonts.manrope(
                             fontSize: 20,
                             fontWeight: FontWeight.w800,
                             color: Colors.white,
+                            letterSpacing: 0.2,
                           ),
                         ),
                         Row(
@@ -199,7 +176,7 @@ class HomeScreen extends StatelessWidget {
                                 color: Colors.white54,
                               ),
                             ),
-                            const SizedBox(width: 2),
+                            const SizedBox(width: 4),
                             const Icon(
                               Icons.arrow_forward_ios,
                               size: 11,
@@ -213,7 +190,7 @@ class HomeScreen extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  // 6. Style Preset Cards Grid / Row
+                  // 4. Style Preset Cards Grid (Monochrome B&W Dark Theme)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
@@ -221,7 +198,7 @@ class HomeScreen extends StatelessWidget {
                         Expanded(
                           child: _StylePresetCard(
                             title: 'Jesus Embrace',
-                            gradientColors: [Color(0xFF2C1F4A), Color(0xFF140D24)],
+                            subtitle: 'Spiritual & Warm',
                             icon: Icons.volunteer_activism_outlined,
                           ),
                         ),
@@ -229,7 +206,7 @@ class HomeScreen extends StatelessWidget {
                         Expanded(
                           child: _StylePresetCard(
                             title: 'Hug Your Love',
-                            gradientColors: [Color(0xFF4A1F3D), Color(0xFF240D1D)],
+                            subtitle: 'Cinematic Emotion',
                             icon: Icons.favorite_border,
                           ),
                         ),
@@ -246,7 +223,7 @@ class HomeScreen extends StatelessWidget {
                         Expanded(
                           child: _StylePresetCard(
                             title: 'AI Anime',
-                            gradientColors: [Color(0xFF1F3D4A), Color(0xFF0D1D24)],
+                            subtitle: 'Japanese Art',
                             icon: Icons.auto_awesome_outlined,
                           ),
                         ),
@@ -254,7 +231,7 @@ class HomeScreen extends StatelessWidget {
                         Expanded(
                           child: _StylePresetCard(
                             title: 'Cyberpunk',
-                            gradientColors: [Color(0xFF3D4A1F), Color(0xFF1D240D)],
+                            subtitle: 'Futuristic Neon',
                             icon: Icons.bolt_outlined,
                           ),
                         ),
@@ -283,101 +260,61 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _QuickToolChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _QuickToolChip({
-    required this.icon,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFF18181A),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF2C2C2E), width: 1),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white70, size: 18),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: GoogleFonts.manrope(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _StylePresetCard extends StatelessWidget {
   final String title;
-  final List<Color> gradientColors;
+  final String subtitle;
   final IconData icon;
 
   const _StylePresetCard({
     required this.title,
-    required this.gradientColors,
+    required this.subtitle,
     required this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 140,
+      height: 145,
       decoration: BoxDecoration(
+        color: const Color(0xFF161618),
         borderRadius: BorderRadius.circular(18),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradientColors,
-        ),
         border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
       ),
       child: Stack(
         children: [
-          Center(
+          Positioned(
+            top: 20,
+            right: 20,
             child: Icon(
               icon,
-              size: 40,
-              color: Colors.white.withOpacity(0.2),
+              size: 44,
+              color: Colors.white.withOpacity(0.12),
             ),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(18)),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withOpacity(0.7),
-                  ],
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.manrope(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              child: Text(
-                title,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.manrope(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                const SizedBox(height: 3),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.manrope(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white54,
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ],
