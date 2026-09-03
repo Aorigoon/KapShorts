@@ -26,14 +26,14 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       Image.asset(
                         'assets/icon_foreground.png',
-                        width: 56,
-                        height: 56,
+                        width: 66,
+                        height: 66,
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 2),
                       Text(
                         'apShorts',
                         style: GoogleFonts.manrope(
-                          fontSize: 24,
+                          fontSize: 26,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                           letterSpacing: 0.5,
