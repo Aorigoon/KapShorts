@@ -1,83 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:go_router/go_router.dart';
 import '../core/app_colors.dart';
-import '../core/models/video_project.dart';
 import '../core/providers.dart';
 import '../widgets/floating_navigation.dart';
 import 'projects_screen.dart' show showFeatureSelectionSheet, showNewProjectSheet;
 
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() => ref.read(projectsProvider).load());
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final credits = ref.watch(creditsProvider);
-    final projectsController = ref.watch(projectsProvider);
-    final recentProjects = projectsController.projects;
 
     return Scaffold(
       backgroundColor: AppColors.canvas,
       body: Stack(
         children: [
-          // Scrollable Content
+          // Main Scrollable Content
           SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 110),
+              padding: const EdgeInsets.only(bottom: 100),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Sleek Compact Header Bar (Zero Gap, Icons & Chips aligned)
+                  // 1. Header Bar: No menu icon, KapShorts title on left, compact chips on right
                   Padding(
                     padding: const EdgeInsets.only(left: 20, right: 20, top: 8, bottom: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Left: Menu Icon + Logo
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.06),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.menu_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              'KapShorts',
-                              style: GoogleFonts.manrope(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                letterSpacing: -0.4,
-                              ),
-                            ),
-                          ],
+                        // Left: KapShorts App Title (No hamburger / 3 lines icon)
+                        Text(
+                          'KapShorts',
+                          style: GoogleFonts.manrope(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            letterSpacing: -0.5,
+                          ),
                         ),
 
-                        // Right: Compact Refined Chips
+                        // Right: Compact Refined Chips (Credits & Pro)
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Credits Chip (Compact & Modern)
+                            // Credits Chip
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                               decoration: BoxDecoration(
@@ -111,7 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                             const SizedBox(width: 8),
 
-                            // Get Pro Chip (Compact & Premium Purple Badge)
+                            // Get Pro Chip
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
                               decoration: BoxDecoration(
@@ -156,9 +125,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
 
-                  // 2. Main Headline
+                  // 2. Headline
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: RichText(
@@ -166,7 +135,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         style: GoogleFonts.manrope(
                           fontSize: 28,
                           fontWeight: FontWeight.w800,
-                          height: 1.18,
+                          height: 1.15,
                           color: Colors.white,
                           letterSpacing: -0.5,
                         ),
@@ -183,245 +152,73 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
 
-                  // 3. Primary Action Cards Row (New Project / Gallery Import + AI Assistant)
+                  // 3. Single Main Action Card for Gallery Import ("Ek hi call use karo")
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: [
-                        // Card 1: New Project / Import from Gallery (Vibrant Purple Box)
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => showNewProjectSheet(context),
-                            child: Container(
-                              height: 115,
-                              padding: const EdgeInsets.all(16),
+                    child: GestureDetector(
+                      onTap: () => showNewProjectSheet(context),
+                      child: Container(
+                        width: double.infinity,
+                        height: 125,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF8B5CF6), Color(0xFF6D28D9)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(22),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF8B5CF6).withOpacity(0.35),
+                              blurRadius: 16,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [Color(0xFF8B5CF6), Color(0xFF6D28D9)],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.circular(22),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF8B5CF6).withOpacity(0.35),
-                                    blurRadius: 14,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
+                                color: Colors.white.withOpacity(0.22),
+                                shape: BoxShape.circle,
                               ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.22),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.add_rounded,
-                                      color: Colors.white,
-                                      size: 26,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    'New Project',
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'Import from gallery',
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white.withOpacity(0.8),
-                                    ),
-                                  ),
-                                ],
+                              child: const Icon(
+                                Icons.add_rounded,
+                                color: Colors.white,
+                                size: 28,
                               ),
                             ),
-                          ),
-                        ),
-
-                        const SizedBox(width: 14),
-
-                        // Card 2: AI Assistant (Sleek Dark Box)
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => showFeatureSelectionSheet(context),
-                            child: Container(
-                              height: 115,
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF181820),
-                                borderRadius: BorderRadius.circular(22),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.1),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF8B5CF6).withOpacity(0.15),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.auto_awesome_rounded,
-                                      color: Color(0xFFA78BFA),
-                                      size: 24,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    'AI Assistant',
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'Smart Studio',
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white38,
-                                    ),
-                                  ),
-                                ],
+                            const SizedBox(width: 0, height: 6), // Zero side gap, minimal top gap
+                            Text(
+                              'New Project',
+                              style: GoogleFonts.manrope(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
                               ),
                             ),
-                          ),
+                            Text(
+                              'Import from gallery',
+                              style: GoogleFonts.manrope(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white.withOpacity(0.8),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
 
-                  const SizedBox(height: 26),
+                  const SizedBox(height: 24),
 
-                  // 4. Recent Projects Section
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Recent Projects',
-                          style: GoogleFonts.manrope(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            // Navigate to projects tab / screen
-                            context.go('/projects');
-                          },
-                          child: Text(
-                            'See All',
-                            style: GoogleFonts.manrope(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFFA78BFA),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // Recent Projects Horizontal Scroll
-                  SizedBox(
-                    height: 140,
-                    child: recentProjects.isEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: GestureDetector(
-                              onTap: () => showNewProjectSheet(context),
-                              child: Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF14141A),
-                                  borderRadius: BorderRadius.circular(18),
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.08),
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.05),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.video_library_outlined,
-                                        color: Colors.white54,
-                                        size: 24,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 14),
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'No projects created yet',
-                                          style: GoogleFonts.manrope(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          'Tap New Project to pick a video',
-                                          style: GoogleFonts.manrope(
-                                            fontSize: 12,
-                                            color: Colors.white38,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          )
-                        : ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            itemCount: recentProjects.length,
-                            itemBuilder: (context, index) {
-                              final project = recentProjects[index];
-                              return _RecentProjectCard(project: project);
-                            },
-                          ),
-                  ),
-
-                  const SizedBox(height: 26),
-
-                  // 5. Tools Grid
+                  // 4. Tools Section (Moved up, zero gap between icon and text)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
@@ -435,7 +232,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
 
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -445,7 +242,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       crossAxisCount: 4,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
-                      childAspectRatio: 0.9,
+                      childAspectRatio: 0.95,
                       children: [
                         _ToolButton(
                           icon: Icons.content_cut_rounded,
@@ -512,79 +309,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-class _RecentProjectCard extends StatelessWidget {
-  const _RecentProjectCard({required this.project});
-  final VideoProject project;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        context.push('/editor/${project.id}');
-      },
-      child: Container(
-        width: 110,
-        margin: const EdgeInsets.only(right: 12),
-        decoration: BoxDecoration(
-          color: const Color(0xFF181820),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.08),
-            width: 1,
-          ),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          children: [
-            // Thumbnail / Fallback Gradient
-            Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF2E1065), Color(0xFF0F172A)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.play_circle_fill_rounded,
-                  color: Colors.white70,
-                  size: 32,
-                ),
-              ),
-            ),
-            // Title & Info Overlay
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                color: Colors.black.withOpacity(0.7),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      project.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.manrope(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _ToolButton extends StatelessWidget {
   const _ToolButton({
     required this.icon,
@@ -617,7 +341,7 @@ class _ToolButton extends StatelessWidget {
               color: Colors.white70,
               size: 22,
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 3), // Zero / tight gap between icon and text
             Text(
               label,
               style: GoogleFonts.manrope(
