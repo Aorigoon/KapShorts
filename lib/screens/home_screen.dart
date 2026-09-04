@@ -22,7 +22,7 @@ class HomeScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // TOP HERO CURVED CARD (Black, White & Gray Mixture Header Card)
+                  // HERO CARD (Refined Moderate Corners, Seamless Gradient, No Partition Line)
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -30,61 +30,55 @@ class HomeScreen extends ConsumerWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Color(0xFF2C2D36), // Grayish-charcoal highlight
-                          Color(0xFF1E1F25), // Medium deep gray
-                          Color(0xFF121316), // Dark carbon black
+                          Color(0xFF26272E), // Charcoal top highlight
+                          Color(0xFF191A1E), // Soft dark gray
+                          Color(0xFF101013), // Rich carbon black
                         ],
                         stops: [0.0, 0.55, 1.0],
                       ),
                       borderRadius: const BorderRadius.vertical(
-                        bottom: Radius.circular(38),
+                        bottom: Radius.circular(20), // Moderately rounded corners (not overly rounded)
                       ),
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.white.withOpacity(0.15),
-                          width: 1.2,
-                        ),
-                        left: BorderSide(
-                          color: Colors.white.withOpacity(0.08),
-                          width: 1,
-                        ),
-                        right: BorderSide(
-                          color: Colors.white.withOpacity(0.08),
-                          width: 1,
-                        ),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.7),
-                          blurRadius: 28,
-                          offset: const Offset(0, 14),
-                        ),
-                      ],
+                      // No bottom border / partition line
                     ),
-                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 36),
+                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Main Big Tagline
+                        // Main Big Title
                         RichText(
                           text: TextSpan(
                             style: GoogleFonts.manrope(
-                              fontSize: 36,
+                              fontSize: 34,
                               fontWeight: FontWeight.w900,
-                              height: 1.12,
+                              height: 1.14,
                               color: Colors.white,
-                              letterSpacing: -1.0,
+                              letterSpacing: -0.8,
                             ),
                             children: [
                               const TextSpan(text: 'Create\n'),
                               TextSpan(
                                 text: 'Viral Clips',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.92),
+                                  color: Colors.white.withOpacity(0.95),
                                   fontWeight: FontWeight.w900,
                                 ),
                               ),
                             ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Beautiful Subtitle Line
+                        Text(
+                          'Turn long videos into high-converting shorts in seconds.',
+                          style: GoogleFonts.manrope(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withOpacity(0.55),
+                            height: 1.4,
+                            letterSpacing: 0.1,
                           ),
                         ),
                       ],
