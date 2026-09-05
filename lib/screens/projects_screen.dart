@@ -118,6 +118,9 @@ class _ProjectsHeader extends StatelessWidget {
             ),
           ),
         ),
+        const ProButton(),
+        const SizedBox(width: 8),
+        const CreditBadge(),
       ],
     );
   }
@@ -129,20 +132,21 @@ class CreditBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
+      height: 36,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: AppColors.elevated,
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.line),
       ),
       child: const Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.bolt_rounded, color: Colors.white, size: 21),
-          SizedBox(width: 7),
+          Icon(Icons.bolt_rounded, color: Color(0xFFFFC107), size: 17),
+          SizedBox(width: 4),
           Text(
-            '60',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+            '16',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Colors.white),
           ),
         ],
       ),
@@ -156,17 +160,17 @@ class ProButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      height: 36,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: AppColors.elevated,
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.line),
       ),
       child: const Text(
         'Get PRO',
-        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white),
       ),
     );
   }
