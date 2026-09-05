@@ -819,11 +819,20 @@ Future<void> showTeleprompterSheet(BuildContext context) async {
   );
 }
 
-class FeatureSelectionSheet extends StatelessWidget {
+Future<void> showAIClippingSheet(BuildContext context) async {
+  await showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => const AIClippingSheet(),
+  );
+}
+
+class FeatureSelectionSheet extends ConsumerWidget {
   const FeatureSelectionSheet({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
       top: false,
       child: Container(
@@ -843,84 +852,424 @@ class FeatureSelectionSheet extends StatelessWidget {
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
-            const SizedBox(height: 32),
-            const Text(
+            const SizedBox(height: 28),
+            Text(
               'What would you like to create?',
-              style: TextStyle(
+              style: GoogleFonts.manrope(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
                 color: Colors.white,
                 letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 28),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Option 1: AI Subtitles (Direct Video Upload)
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       Navigator.pop(context);
-                      showNewProjectSheet(context);
+                      await _pickVideoDirectly(context, ref);
                     },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset(
-                            'assets/images/caption_template.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'AI Caption',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                    child: const _FeatureCard(
+                      icon: Icons.closed_caption_rounded,
+                      title: 'AI Subtitles',
+                      subtitle: 'Add viral captions to your video',
+                      accentColor: Color(0xFF6366F1),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 14),
+                // Option 2: AI Clipping (YouTube Link & Local Upload)
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
                       Navigator.pop(context);
-                      showTeleprompterSheet(context);
+                      showAIClippingSheet(context);
                     },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset(
-                            'assets/images/teleprompter_template.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'AI Teleprompter',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                    child: const _FeatureCard(
+                      icon: Icons.content_cut_rounded,
+                      title: 'AI Clipping',
+                      subtitle: 'Turn YouTube or videos into short clips',
+                      accentColor: Color(0xFFFF9800),
                     ),
                   ),
                 ),
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  static Future<void> _pickVideoDirectly(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    try {
+      final file = await FilePicker.pickFile(type: FileType.video);
+      if (file == null) return;
+      ref.read(pendingVideoProvider.notifier).state = file.xFile;
+      await ref
+          .read(projectsProvider)
+          .addVideo(name: file.name, path: file.xFile.path);
+      if (context.mounted) {
+        context.go('/transcribing');
+      }
+    } on PlatformException {
+      if (context.mounted) {
+        showAppMessage(
+          context,
+          'The video picker could not open. Please try again.',
+        );
+      }
+    }
+  }
+}
+
+class _FeatureCard extends StatelessWidget {
+  const _FeatureCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.accentColor,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color accentColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16171C),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.12),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: accentColor.withOpacity(0.15),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: accentColor.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: Icon(
+              icon,
+              color: accentColor,
+              size: 28,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            title,
+            style: GoogleFonts.manrope(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: GoogleFonts.manrope(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              color: Colors.white.withOpacity(0.5),
+              height: 1.3,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AIClippingSheet extends ConsumerStatefulWidget {
+  const AIClippingSheet({super.key});
+
+  @override
+  ConsumerState<AIClippingSheet> createState() => _AIClippingSheetState();
+}
+
+class _AIClippingSheetState extends ConsumerState<AIClippingSheet> {
+  bool busy = false;
+  bool linkMode = true;
+  late final TextEditingController linkController;
+
+  @override
+  void initState() {
+    super.initState();
+    linkController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    linkController.dispose();
+    super.dispose();
+  }
+
+  Future<void> pickVideo() async {
+    setState(() => busy = true);
+    try {
+      final file = await FilePicker.pickFile(type: FileType.video);
+      if (file == null) return;
+      ref.read(pendingVideoProvider.notifier).state = file.xFile;
+      await ref
+          .read(projectsProvider)
+          .addVideo(name: file.name, path: file.xFile.path);
+      if (mounted) {
+        Navigator.pop(context);
+        context.go('/transcribing');
+      }
+    } on PlatformException {
+      if (mounted) {
+        showAppMessage(
+          context,
+          'The video picker could not open. Please try again.',
+        );
+      }
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  Future<void> importVideoLink() async {
+    final rawLink = linkController.text.trim();
+    final uri = Uri.tryParse(rawLink);
+    if (uri == null || !uri.hasScheme || !uri.isScheme('https')) {
+      showAppMessage(context, 'Paste a valid public HTTPS video link.');
+      return;
+    }
+    setState(() => busy = true);
+    HttpClient? client;
+    try {
+      client = HttpClient();
+      final request = await client.getUrl(uri);
+      final response = await request.close();
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw const HttpException('Video link request was not successful.');
+      }
+      if (response.contentLength > 100 * 1024 * 1024) {
+        throw const HttpException('Video is larger than 100 MB.');
+      }
+      final rawName = uri.pathSegments.isEmpty
+          ? 'video.mp4'
+          : uri.pathSegments.last;
+      final fileName = rawName.contains('.') ? rawName : '$rawName.mp4';
+      final directory = await getTemporaryDirectory();
+      final output = File(
+        '${directory.path}/subreel_${DateTime.now().microsecondsSinceEpoch}_$fileName',
+      );
+      await response.pipe(output.openWrite());
+      final savedFile = XFile(output.path, name: fileName);
+      ref.read(pendingVideoProvider.notifier).state = savedFile;
+      await ref
+          .read(projectsProvider)
+          .addVideo(name: savedFile.name, path: output.path);
+      if (mounted) {
+        Navigator.pop(context);
+        context.go('/transcribing');
+      }
+    } on HttpException catch (error) {
+      if (mounted) showAppMessage(context, error.message);
+    } on SocketException {
+      if (mounted) {
+        showAppMessage(context, 'This video link could not be downloaded.');
+      }
+    } on FileSystemException {
+      if (mounted) {
+        showAppMessage(context, 'There was not enough space for this video.');
+      }
+    } finally {
+      client?.close(force: true);
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SafeArea(
+        top: false,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 42,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.tertiary,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'AI Clipping',
+                  style: GoogleFonts.manrope(
+                    fontSize: 23,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: busy ? null : () => setState(() => linkMode = true),
+                      borderRadius: BorderRadius.circular(22),
+                      child: _SheetTab(label: 'YouTube / Link', selected: linkMode),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: InkWell(
+                      onTap: busy ? null : () => setState(() => linkMode = false),
+                      borderRadius: BorderRadius.circular(22),
+                      child: _SheetTab(
+                        label: 'Upload Video',
+                        selected: !linkMode,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              if (linkMode)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.secondary, width: 1.2),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        'Paste a YouTube, TikTok or public video link for AI clipping.',
+                        style: TextStyle(
+                          color: AppColors.secondary,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: linkController,
+                        keyboardType: TextInputType.url,
+                        autocorrect: false,
+                        style: const TextStyle(fontSize: 14),
+                        decoration: InputDecoration(
+                          hintText: 'https://youtube.com/watch?v=...',
+                          hintStyle: const TextStyle(color: AppColors.tertiary),
+                          filled: true,
+                          fillColor: AppColors.elevated,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
+                          ),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        height: 46,
+                        child: FilledButton(
+                          onPressed: busy ? null : importVideoLink,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: Text(
+                            busy ? 'Downloading video...' : 'Generate AI Clips',
+                            style: const TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (!linkMode)
+                InkWell(
+                  onTap: busy ? null : pickVideo,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    height: 174,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.secondary, width: 1.2),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        busy
+                            ? const SizedBox(
+                                height: 28,
+                                width: 28,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(
+                                Icons.video_library_outlined,
+                                size: 34,
+                                color: Colors.white,
+                              ),
+                        const SizedBox(height: 12),
+                        Text(
+                          busy ? 'Opening your files...' : 'Choose a video for AI Clipping',
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 5),
+                        const Text(
+                          'MP4 or MOV · up to 100 MB',
+                          style: TextStyle(
+                            color: AppColors.secondary,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
