@@ -87,7 +87,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
                 child: FloatingNavigation(
-                  currentIndex: 1,
+                  currentIndex: 0,
                   onCreate: () => showFeatureSelectionSheet(context),
                 ),
               ),
@@ -109,12 +109,13 @@ class _ProjectsHeader extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            'Projects',
+            'KapShorts',
             style: GoogleFonts.manrope(
-              fontSize: 34,
-              height: 1,
-              fontWeight: FontWeight.w400,
-              letterSpacing: -1.6,
+              fontSize: 30,
+              height: 1.1,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.8,
+              color: Colors.white,
             ),
           ),
         ),
@@ -139,14 +140,18 @@ class CreditBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.line),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.bolt_rounded, color: Color(0xFFFFC107), size: 17),
-          SizedBox(width: 4),
+          const Icon(Icons.bolt_rounded, color: Color(0xFFFFC107), size: 17),
+          const SizedBox(width: 4),
           Text(
-            '16',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Colors.white),
+            '60 Credits',
+            style: GoogleFonts.manrope(
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+              color: Colors.white,
+            ),
           ),
         ],
       ),

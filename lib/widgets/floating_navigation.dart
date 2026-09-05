@@ -43,15 +43,9 @@ class FloatingNavigation extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   _NavImageIcon(
-                    imagePath: 'assets/images/nav_project_icon.png',
-                    active: currentIndex == 1,
-                    onTap: currentIndex == 1 ? null : () => context.go('/projects'),
-                  ),
-                  const SizedBox(width: 8),
-                  _NavImageIcon(
                     imagePath: 'assets/images/nav_settings_icon.png',
-                    active: currentIndex == 2,
-                    onTap: currentIndex == 2 ? null : () => context.go('/settings'),
+                    active: currentIndex == 1,
+                    onTap: currentIndex == 1 ? null : () => context.go('/settings'),
                   ),
                 ],
               ),

@@ -98,10 +98,6 @@ final _router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      pageBuilder: (context, state) => const NoTransitionPage(child: HomeScreen()),
-    ),
-    GoRoute(
-      path: '/projects',
       pageBuilder: (context, state) => const NoTransitionPage(child: ProjectsScreen()),
     ),
     GoRoute(

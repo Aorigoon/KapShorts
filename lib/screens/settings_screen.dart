@@ -93,7 +93,7 @@ class SettingsScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
               child: FloatingNavigation(
-                currentIndex: 2,
+                currentIndex: 1,
                 showCreateButton: false,
                 onCreate: () {},
               ),
