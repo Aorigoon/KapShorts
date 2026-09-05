@@ -119,9 +119,9 @@ class _ProjectsHeader extends StatelessWidget {
             ),
           ),
         ),
-        const ProButton(),
-        const SizedBox(width: 8),
         const CreditBadge(),
+        const SizedBox(width: 8),
+        const ProButton(),
       ],
     );
   }
@@ -135,23 +135,31 @@ class CreditBadge extends ConsumerWidget {
     final credits = ref.watch(creditsProvider);
     return Container(
       height: 38,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 13),
       decoration: BoxDecoration(
-        color: AppColors.elevated,
+        color: const Color(0xFF1E1F26),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.line),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.14),
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.bolt_rounded, color: Color(0xFFFFC107), size: 18),
-          const SizedBox(width: 4),
+          const Icon(
+            Icons.electric_bolt_rounded,
+            color: Color(0xFFFFC107),
+            size: 19,
+          ),
+          const SizedBox(width: 5),
           Text(
             '$credits',
             style: GoogleFonts.manrope(
-              fontWeight: FontWeight.w700,
-              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              fontSize: 15,
               color: Colors.white,
+              letterSpacing: 0.2,
             ),
           ),
         ],
@@ -167,12 +175,15 @@ class ProButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 38,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: AppColors.elevated,
+        color: const Color(0xFF1E1F26),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.line),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.14),
+          width: 1,
+        ),
       ),
       child: Text(
         'Get PRO',
@@ -180,6 +191,7 @@ class ProButton extends StatelessWidget {
           fontSize: 14,
           fontWeight: FontWeight.w700,
           color: Colors.white,
+          letterSpacing: 0.2,
         ),
       ),
     );
