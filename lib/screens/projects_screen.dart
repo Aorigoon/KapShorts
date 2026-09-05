@@ -38,7 +38,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 10, 24, 0),
+              padding: const EdgeInsets.fromLTRB(24, 4, 24, 0),
               child: !controller.loaded
                   ? const Center(
                       child: CircularProgressIndicator(
@@ -109,12 +109,12 @@ class _ProjectsHeader extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            'KapShorts',
+            'Projects',
             style: GoogleFonts.manrope(
-              fontSize: 30,
-              height: 1.1,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.8,
+              fontSize: 34,
+              height: 1,
+              fontWeight: FontWeight.w400,
+              letterSpacing: -1.6,
               color: Colors.white,
             ),
           ),
@@ -127,13 +127,14 @@ class _ProjectsHeader extends StatelessWidget {
   }
 }
 
-class CreditBadge extends StatelessWidget {
+class CreditBadge extends ConsumerWidget {
   const CreditBadge({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final credits = ref.watch(creditsProvider);
     return Container(
-      height: 36,
+      height: 38,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: AppColors.elevated,
@@ -143,13 +144,13 @@ class CreditBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.bolt_rounded, color: Color(0xFFFFC107), size: 17),
+          const Icon(Icons.bolt_rounded, color: Color(0xFFFFC107), size: 18),
           const SizedBox(width: 4),
           Text(
-            '60 Credits',
+            '$credits',
             style: GoogleFonts.manrope(
               fontWeight: FontWeight.w700,
-              fontSize: 13,
+              fontSize: 14,
               color: Colors.white,
             ),
           ),
@@ -165,7 +166,7 @@ class ProButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 36,
+      height: 38,
       padding: const EdgeInsets.symmetric(horizontal: 14),
       alignment: Alignment.center,
       decoration: BoxDecoration(
@@ -173,9 +174,13 @@ class ProButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.line),
       ),
-      child: const Text(
+      child: Text(
         'Get PRO',
-        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white),
+        style: GoogleFonts.manrope(
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
+        ),
       ),
     );
   }
