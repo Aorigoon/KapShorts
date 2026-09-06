@@ -1277,6 +1277,8 @@ enum EditorTool {
   captions,
   aspectRatio,
   highlight,
+  highlightWords,
+  activeWords,
 }
 
 class EditorToolRail extends StatelessWidget {
@@ -1290,6 +1292,8 @@ class EditorToolRail extends StatelessWidget {
       (EditorTool.addText, Icons.edit_note_rounded, 'Edit Text'),
       (EditorTool.fonts, Icons.text_fields_rounded, 'Font'),
       (EditorTool.highlight, Icons.highlight_rounded, 'Highlight'),
+      (EditorTool.highlightWords, Icons.format_color_text_rounded, 'H. Words'),
+      (EditorTool.activeWords, Icons.electric_bolt_rounded, 'Active'),
       (EditorTool.templates, Icons.auto_fix_high_rounded, 'Style'),
       (EditorTool.aspectRatio, Icons.crop_free_rounded, 'Aspect'),
       (EditorTool.effects, Icons.blur_on_rounded, 'Effects'),
@@ -1348,6 +1352,8 @@ class _EditorFloatingSidebar extends StatelessWidget {
       (EditorTool.addText, Icons.edit_note_rounded, 'Edit Text'),
       (EditorTool.fonts, Icons.text_fields_rounded, 'Font'),
       (EditorTool.highlight, Icons.highlight_rounded, 'Highlight'),
+      (EditorTool.highlightWords, Icons.format_color_text_rounded, 'H. Words'),
+      (EditorTool.activeWords, Icons.electric_bolt_rounded, 'Active'),
       (EditorTool.templates, Icons.auto_fix_high_rounded, 'Style'),
       (EditorTool.effects, Icons.blur_on_rounded, 'Effects'),
       (EditorTool.captions, Icons.subtitles_rounded, 'Captions'),
@@ -1431,6 +1437,8 @@ Future<void> showEditorToolSheet(
     EditorTool.addText: 'Edit Text',
     EditorTool.fonts: 'Font',
     EditorTool.highlight: 'Highlight',
+    EditorTool.highlightWords: 'Highlight Words',
+    EditorTool.activeWords: 'Active Words',
     EditorTool.templates: 'Style',
     EditorTool.effects: 'Effects',
     EditorTool.overlay: 'Overlay',
@@ -1739,6 +1747,178 @@ Future<void> showEditorToolSheet(
                 ],
               );
             },
+          );
+        } else if (tool == EditorTool.highlightWords) {
+          content = HighlightWordOverview(
+            transcription: editorTranscription,
+            onWordToggled: (globalIndex) async {
+              final current = editorTranscription ?? ref.read(projectsProvider).selected?.transcription;
+              if (current == null) return;
+              final modified = Map<String, dynamic>.from(current);
+              final emphasized = modified['emphasizedIndices'] is List
+                  ? List<int>.from(modified['emphasizedIndices'] as List)
+                  : <int>[];
+              if (emphasized.contains(globalIndex)) {
+                emphasized.remove(globalIndex);
+              } else {
+                emphasized.add(globalIndex);
+              }
+              modified['emphasizedIndices'] = emphasized;
+              ref.read(transcriptionProvider.notifier).state = modified;
+              final proj = ref.read(projectsProvider).selected;
+              if (proj != null) {
+                await ref.read(projectsProvider).saveTranscript(modified);
+              }
+              setSheetState(() {});
+            },
+          );
+        } else if (tool == EditorTool.activeWords) {
+          content = Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Active Word Color', style: TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 12,
+                runSpacing: 10,
+                children: [
+                  ...ref.read(captionRecentColorsProvider).map(
+                    (color) => InkWell(
+                      onTap: () => updateDesign(design.copyWith(activeColor: color)),
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: design.activeColor == color ? Colors.white : Colors.transparent,
+                            width: 3,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () async {
+                      final picked = await showDialog<Color>(
+                        context: context,
+                        builder: (_) => _ColorPickerDialog(initial: design.activeColor),
+                      );
+                      if (picked != null) updateDesign(design.copyWith(activeColor: picked));
+                    },
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.line, width: 2),
+                        gradient: const SweepGradient(
+                          colors: [Colors.red, Colors.orange, Colors.yellow, Colors.green, Colors.blue, Colors.purple, Colors.red],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              const Text('Active Word Background', style: TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: [
+                  // None
+                  GestureDetector(
+                    onTap: () => updateDesign(design.copyWith(activeBackground: const Color(0x00000000))),
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: (design.activeBackground == null || design.activeBackground!.alpha == 0) ? Colors.white : AppColors.line,
+                          width: 3,
+                        ),
+                        color: AppColors.elevated,
+                      ),
+                      child: const Icon(Icons.block, size: 16, color: AppColors.secondary),
+                    ),
+                  ),
+                  ...[ Colors.black, Colors.white, Colors.yellow, const Color(0xFF44C7FF), const Color(0xFFFF5C5C)].map(
+                    (color) => GestureDetector(
+                      onTap: () => updateDesign(design.copyWith(activeBackground: color)),
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: color,
+                          border: Border.all(
+                            color: design.activeBackground == color ? Colors.white : Colors.transparent,
+                            width: 3,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  const Text('Active Size', style: TextStyle(fontWeight: FontWeight.w700)),
+                  const Spacer(),
+                  Text('${(design.activeSize ?? design.size).round()} px', style: const TextStyle(color: AppColors.secondary)),
+                ],
+              ),
+              Slider(
+                value: design.activeSize ?? design.size,
+                min: 18,
+                max: 60,
+                divisions: 21,
+                activeColor: Colors.white,
+                inactiveColor: AppColors.line,
+                onChanged: (value) => updateDesign(design.copyWith(activeSize: value)),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Text('Blink Effect', style: TextStyle(fontWeight: FontWeight.w700)),
+                  const Spacer(),
+                  Switch(
+                    value: design.activeBlink,
+                    onChanged: (v) => updateDesign(design.copyWith(activeBlink: v)),
+                    activeColor: Colors.white,
+                    activeTrackColor: AppColors.line,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              const Text('Active Weight', style: TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 9),
+              Wrap(
+                spacing: 8,
+                children: [FontWeight.w500, FontWeight.w700, FontWeight.w900].map(
+                  (weight) => ChoiceChip(
+                    label: Text(weight == FontWeight.w500 ? 'Regular' : weight == FontWeight.w700 ? 'Bold' : 'Extra Bold'),
+                    selected: (design.activeWeight ?? design.weight) == weight,
+                    onSelected: (_) => updateDesign(design.copyWith(activeWeight: weight)),
+                    selectedColor: Colors.white,
+                    backgroundColor: AppColors.elevated,
+                    labelStyle: TextStyle(
+                      color: (design.activeWeight ?? design.weight) == weight ? Colors.black : Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    side: BorderSide(
+                      color: (design.activeWeight ?? design.weight) == weight ? Colors.white : AppColors.line,
+                    ),
+                  ),
+                ).toList(),
+              ),
+            ],
           );
         } else if (tool == EditorTool.templates) {
           const templates = ['Triple Pop', 'Ali Abdaal Tri', 'Podcast Minimal', 'Emphasis Outline', 'Clean Box', 'Bubble', 'Hormozi Bold', 'MrBeast Impact', 'Karaoke Bar', 'Gold Shadow', 'Neon Highlight', 'Double Pop', 'Left Ladder', 'Stacked Punch', 'Soft Talk', 'Coral Punch', 'Electric Wave', 'Mono Signal', 'Halo Words', 'Marker Pop', 'Nightline', 'Retro Offset', 'Quiet Outline', 'Cloud Float', 'Fire Starter', 'Solar Build', 'Hard Echo', 'Midnight Chip', 'Focus Pixel', 'Velvet Three', 'Ember Karaoke', 'Prism Stack', 'Noir Plate', 'Signal Tag', 'Mint Outline', 'Horizon Slide', 'Paper Stamp', 'Cinema Serif', 'Script Bloom', 'Poster Ink', 'Block Parade', 'Prism Grotesk', 'Arcade Pulse', 'Luxe Title', 'Velvet Script', 'Classic Cut', 'Reel Candy', 'Blackout Bold', 'Pixel Snap', 'Sunbeam Serif', 'Doodle Yellow', 'Bubble Chrome', 'Clean Digital', 'Film Noir', 'Sunset Script', 'Viva Poster', 'Soda Pop', 'Urban Mono', 'Chrome Marker', 'Neon Serif', 'Storybook Script', 'Punchline Sans', 'Warm Stage', 'Blink Pop', 'Karaoke Fill', 'Bold Box', 'Minimal Clean', 'Neon Glow', 'Typewriter', 'Bounce', 'Podcast Clean', 'MrBeast Action', 'Ali Abdaal Minimal', 'Ali Abdaal Highlight'];
@@ -3053,6 +3233,13 @@ class _CaptionOverlay extends StatelessWidget {
         doubleLayer: design.doubleLayer,
         hardShadow: design.hardShadow,
       );
+      final chipBg = isEmphasized
+          ? (design.highlightColor ?? design.activeColor)
+          : isSpoken
+          ? (design.activeBackground != null && design.activeBackground!.alpha > 0
+              ? design.activeBackground!
+              : design.activeColor)
+          : design.chipColor;
       final widget = design.wordChip
           ? Container(
               padding: EdgeInsets.symmetric(
@@ -3060,15 +3247,27 @@ class _CaptionOverlay extends StatelessWidget {
                 vertical: design.size * .11,
               ),
               decoration: BoxDecoration(
-                color: isEmphasized ? (design.highlightColor ?? design.activeColor) : isSpoken ? design.activeColor : design.chipColor,
+                color: chipBg,
                 borderRadius: BorderRadius.circular(design.size * .18),
               ),
               child: word,
             )
+          : (isSpoken && design.activeBackground != null && design.activeBackground!.alpha > 0)
+          ? Container(
+              padding: EdgeInsets.symmetric(horizontal: design.size * .18, vertical: design.size * .06),
+              decoration: BoxDecoration(
+                color: design.activeBackground,
+                borderRadius: BorderRadius.circular(design.size * .14),
+              ),
+              child: word,
+            )
           : word;
+      final wrapped = (isSpoken && design.activeBlink)
+          ? _BlinkingWidget(child: widget)
+          : widget;
       return GestureDetector(
         onTap: () => onWordToggled?.call(group[index].globalIndex),
-        child: widget,
+        child: wrapped,
       );
     }
 
@@ -3809,6 +4008,34 @@ class _TemplateStyleCardState extends State<TemplateStyleCard>
       },
     );
   }
+}
+
+class _BlinkingWidget extends StatefulWidget {
+  const _BlinkingWidget({required this.child});
+  final Widget child;
+  @override
+  State<_BlinkingWidget> createState() => _BlinkingWidgetState();
+}
+
+class _BlinkingWidgetState extends State<_BlinkingWidget> with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 550),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => FadeTransition(
+        opacity: Tween<double>(begin: 0.25, end: 1.0).animate(
+          CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
+        ),
+        child: widget.child,
+      );
 }
 
 class HighlightWordOverview extends StatelessWidget {

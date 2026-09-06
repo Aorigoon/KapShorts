@@ -165,6 +165,8 @@ class CaptionDesign {
     this.wordChip = false,
     this.chipColor = const Color(0xE6111115),
     this.hardShadow = false,
+    this.activeBackground,
+    this.activeBlink = false,
   });
   final double size;
   final CaptionPosition position;
@@ -181,6 +183,8 @@ class CaptionDesign {
   final double? highlightSize;
   final FontWeight? highlightWeight;
   final Color? highlightColor;
+  final Color? activeBackground;
+  final bool activeBlink;
   final Color? backgroundColor;
   final Color? borderColor;
   final double boxHorizontalPadding;
@@ -228,6 +232,8 @@ class CaptionDesign {
     bool? wordChip,
     Color? chipColor,
     bool? hardShadow,
+    Color? activeBackground,
+    bool? activeBlink,
   }) => CaptionDesign(
     size: size ?? this.size,
     position: position ?? this.position,
@@ -244,6 +250,8 @@ class CaptionDesign {
     highlightSize: highlightSize ?? this.highlightSize,
     highlightWeight: highlightWeight ?? this.highlightWeight,
     highlightColor: highlightColor ?? this.highlightColor,
+    activeBackground: activeBackground ?? this.activeBackground,
+    activeBlink: activeBlink ?? this.activeBlink,
     backgroundColor: backgroundColor ?? this.backgroundColor,
     borderColor: borderColor ?? this.borderColor,
     boxHorizontalPadding: boxHorizontalPadding ?? this.boxHorizontalPadding,
