@@ -50,7 +50,7 @@ class AnimatedSlidingToggle extends StatelessWidget {
                 widthFactor: 0.5,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF383842),
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: const [
                       BoxShadow(
@@ -73,8 +73,8 @@ class AnimatedSlidingToggle extends StatelessWidget {
                       child: AnimatedDefaultTextStyle(
                         duration: const Duration(milliseconds: 200),
                         style: TextStyle(
-                          color: !value ? Colors.white : const Color(0xFF8E8E93),
-                          fontWeight: !value ? FontWeight.w700 : FontWeight.w600,
+                          color: !value ? Colors.black : const Color(0xFF8E8E93),
+                          fontWeight: !value ? FontWeight.w800 : FontWeight.w600,
                           fontSize: 15,
                         ),
                         child: Text(leftLabel),
@@ -90,8 +90,8 @@ class AnimatedSlidingToggle extends StatelessWidget {
                       child: AnimatedDefaultTextStyle(
                         duration: const Duration(milliseconds: 200),
                         style: TextStyle(
-                          color: value ? Colors.white : const Color(0xFF8E8E93),
-                          fontWeight: value ? FontWeight.w700 : FontWeight.w600,
+                          color: value ? Colors.black : const Color(0xFF8E8E93),
+                          fontWeight: value ? FontWeight.w800 : FontWeight.w600,
                           fontSize: 15,
                         ),
                         child: Text(rightLabel),
@@ -1276,6 +1276,7 @@ enum EditorTool {
   overlay,
   captions,
   aspectRatio,
+  highlight,
 }
 
 class EditorToolRail extends StatelessWidget {
@@ -1288,6 +1289,7 @@ class EditorToolRail extends StatelessWidget {
       (EditorTool.style, Icons.tune_rounded, 'Customize'),
       (EditorTool.addText, Icons.edit_note_rounded, 'Edit Text'),
       (EditorTool.fonts, Icons.text_fields_rounded, 'Font'),
+      (EditorTool.highlight, Icons.highlight_rounded, 'Highlight'),
       (EditorTool.templates, Icons.auto_fix_high_rounded, 'Style'),
       (EditorTool.aspectRatio, Icons.crop_free_rounded, 'Aspect'),
       (EditorTool.effects, Icons.blur_on_rounded, 'Effects'),
@@ -1345,6 +1347,7 @@ class _EditorFloatingSidebar extends StatelessWidget {
       (EditorTool.style, Icons.tune_rounded, 'Customize'),
       (EditorTool.addText, Icons.edit_note_rounded, 'Edit Text'),
       (EditorTool.fonts, Icons.text_fields_rounded, 'Font'),
+      (EditorTool.highlight, Icons.highlight_rounded, 'Highlight'),
       (EditorTool.templates, Icons.auto_fix_high_rounded, 'Style'),
       (EditorTool.effects, Icons.blur_on_rounded, 'Effects'),
       (EditorTool.captions, Icons.subtitles_rounded, 'Captions'),
@@ -1427,6 +1430,7 @@ Future<void> showEditorToolSheet(
     EditorTool.style: 'Customize',
     EditorTool.addText: 'Edit Text',
     EditorTool.fonts: 'Font',
+    EditorTool.highlight: 'Highlight',
     EditorTool.templates: 'Style',
     EditorTool.effects: 'Effects',
     EditorTool.overlay: 'Overlay',
@@ -1606,6 +1610,91 @@ Future<void> showEditorToolSheet(
                     );
                   },
                 ),
+              ),
+            ],
+          );
+        } else if (tool == EditorTool.highlight) {
+          final recentColors = ref.read(captionRecentColorsProvider);
+          void applyCaptionColor(Color color, {bool addToRecent = false}) {
+            updateDesign(design.copyWith(activeColor: color));
+            if (!addToRecent) return;
+            final updatedRecent = [
+              color,
+              ...recentColors.where((item) => item.toARGB32() != color.toARGB32()),
+            ].take(4).toList();
+            ref.read(captionRecentColorsProvider.notifier).state = updatedRecent;
+          }
+          
+          content = Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Highlight Color', style: TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 12,
+                runSpacing: 10,
+                children: [
+                  ...recentColors.map(
+                    (color) => InkWell(
+                      onTap: () => applyCaptionColor(color),
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: design.activeColor == color ? Colors.white : Colors.transparent,
+                            width: 3,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  const Text('Highlight Size', style: TextStyle(fontWeight: FontWeight.w700)),
+                  const Spacer(),
+                  Text('${(design.activeSize ?? design.size).round()} px', style: const TextStyle(color: AppColors.secondary)),
+                ],
+              ),
+              Slider(
+                value: design.activeSize ?? design.size,
+                min: 18,
+                max: 50,
+                divisions: 16,
+                activeColor: Colors.white,
+                inactiveColor: AppColors.line,
+                onChanged: (value) => updateDesign(design.copyWith(activeSize: value)),
+              ),
+              const SizedBox(height: 12),
+              const Text('Highlight Weight', style: TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 9),
+              Wrap(
+                spacing: 8,
+                children: [FontWeight.w500, FontWeight.w700, FontWeight.w900].map(
+                  (weight) => ChoiceChip(
+                    label: Text(
+                      weight == FontWeight.w500 ? 'Regular' : weight == FontWeight.w700 ? 'Bold' : 'Extra bold',
+                    ),
+                    selected: (design.activeWeight ?? design.weight) == weight,
+                    onSelected: (_) => updateDesign(design.copyWith(activeWeight: weight)),
+                    selectedColor: Colors.white,
+                    backgroundColor: AppColors.elevated,
+                    labelStyle: TextStyle(
+                      color: (design.activeWeight ?? design.weight) == weight ? Colors.black : Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    side: BorderSide(
+                      color: (design.activeWeight ?? design.weight) == weight ? Colors.white : AppColors.line,
+                    ),
+                  ),
+                ).toList(),
               ),
             ],
           );
@@ -2585,6 +2674,7 @@ class VideoPreviewPlayer extends StatefulWidget {
     required this.playbackSpeed,
     required this.previewAspect,
     required this.onReplaceVideo,
+    this.onWordToggled,
     super.key,
   });
   final String videoPath;
@@ -2596,6 +2686,7 @@ class VideoPreviewPlayer extends StatefulWidget {
   final ValueNotifier<double> playbackSpeed;
   final ValueNotifier<PreviewAspect> previewAspect;
   final VoidCallback onReplaceVideo;
+  final void Function(int globalIndex)? onWordToggled;
 
   @override
   State<VideoPreviewPlayer> createState() => _VideoPreviewPlayerState();
@@ -2816,6 +2907,7 @@ class _VideoPreviewPlayerState extends State<VideoPreviewPlayer> {
           transcription: widget.transcription,
           position: position,
           design: widget.design,
+          onWordToggled: widget.onWordToggled,
         ),
         playOverlay,
       ],
@@ -2848,10 +2940,12 @@ class _CaptionOverlay extends StatelessWidget {
     required this.transcription,
     required this.position,
     required this.design,
+    this.onWordToggled,
   });
   final Map<String, dynamic>? transcription;
   final Duration position;
   final CaptionDesign design;
+  final void Function(int globalIndex)? onWordToggled;
 
   @override
   Widget build(BuildContext context) {
@@ -2882,7 +2976,9 @@ class _CaptionOverlay extends StatelessWidget {
         ? (chunkProgress * 5).clamp(0.0, 1.0)
         : 1.0;
     Widget wordAt(int index, {double sizeMultiplier = 1}) {
-      final isActive = index == selectedWordIndex;
+      final isSpoken = index == selectedWordIndex;
+      final isEmphasized = group[index].isEmphasized;
+      final isActive = isSpoken || isEmphasized;
       final word = CaptionWord(
         text: design.uppercase
             ? group[index].text.toUpperCase()
@@ -2897,10 +2993,11 @@ class _CaptionOverlay extends StatelessWidget {
               : isActive
               ? design.activeColor
               : design.color,
-          fontSize: design.size * sizeMultiplier,
+          fontSize: (isActive ? (design.activeSize ?? design.size) : design.size) * sizeMultiplier,
           font: isActive ? (design.activeFont ?? design.font) : null,
+          fontWeight: isActive ? (design.activeWeight ?? design.weight) : null,
         ),
-        isActive: isActive,
+        isActive: isSpoken,
         effect: design.effect,
         wordProgress:
             ((now - group[index].start) /
@@ -2913,7 +3010,7 @@ class _CaptionOverlay extends StatelessWidget {
         doubleLayer: design.doubleLayer,
         hardShadow: design.hardShadow,
       );
-      return design.wordChip
+      final widget = design.wordChip
           ? Container(
               padding: EdgeInsets.symmetric(
                 horizontal: design.size * .24,
@@ -2926,6 +3023,10 @@ class _CaptionOverlay extends StatelessWidget {
               child: word,
             )
           : word;
+      return GestureDetector(
+        onTap: () => onWordToggled?.call(group[index].globalIndex),
+        child: widget,
+      );
     }
 
     final wordsLayout = switch (design.layout) {
@@ -3568,18 +3669,9 @@ class _TemplateStyleCardState extends State<TemplateStyleCard>
                                             : wordIsActive
                                             ? design.activeColor
                                             : design.color,
-                                        fontSize:
-                                            design.font == CaptionFont.pixel ||
-                                                design.font ==
-                                                    CaptionFont.rubikMono
-                                            ? 11
-                                            : design.font ==
-                                                      CaptionFont.caveat ||
-                                                  design.font ==
-                                                      CaptionFont.lobster
-                                            ? 21
-                                            : 17,
+                                        fontSize: (wordIsActive ? (design.activeSize ?? design.size) : design.size) * 0.7, // scale down for card
                                         font: wordIsActive ? (design.activeFont ?? design.font) : null,
+                                        fontWeight: wordIsActive ? (design.activeWeight ?? design.weight) : null,
                                       ),
                                     );
                                     final framedPreview = design.wordChip
@@ -3994,79 +4086,6 @@ Future<void> showCustomizeSheet(BuildContext context, WidgetRef ref) async {
                         onTap: () {
                           colorBeforeCustomPage = design.color;
                           customColorIsHighlight = false;
-                          setSheetState(() => customColorPage = true);
-                        },
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          width: 34,
-                          height: 34,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: const SweepGradient(
-                              colors: [
-                                Color(0xFFFF4D4D),
-                                Color(0xFFFFD34E),
-                                Color(0xFF72E06A),
-                                Color(0xFF44C7FF),
-                                Color(0xFF7858FF),
-                                Color(0xFFFF5EBE),
-                                Color(0xFFFF4D4D),
-                              ],
-                            ),
-                            border: Border.all(color: Colors.white54),
-                          ),
-                          alignment: Alignment.center,
-                          child: Container(
-                            width: 21,
-                            height: 21,
-                            decoration: const BoxDecoration(
-                              color: AppColors.surface,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.add_rounded,
-                              size: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  const Text(
-                    'Highlight color',
-                    style: TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 10,
-                    children: [
-                      ...recentColors.map(
-                        (color) => InkWell(
-                          onTap: () => applyCaptionColor(color, isHighlight: true),
-                          borderRadius: BorderRadius.circular(20),
-                          child: Container(
-                            width: 34,
-                            height: 34,
-                            decoration: BoxDecoration(
-                              color: color,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: design.activeColor == color
-                                    ? Colors.white
-                                    : Colors.transparent,
-                                width: 3,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          colorBeforeCustomPage = design.activeColor;
-                          customColorIsHighlight = true;
                           setSheetState(() => customColorPage = true);
                         },
                         borderRadius: BorderRadius.circular(20),

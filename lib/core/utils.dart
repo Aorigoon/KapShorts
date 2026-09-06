@@ -55,6 +55,7 @@ TextStyle captionTextStyle(
   Color? color,
   double? fontSize,
   CaptionFont? font,
+  FontWeight? fontWeight,
 }) {
   final usedFont = font ?? design.font;
   final base = switch (usedFont) {
@@ -148,10 +149,14 @@ class TimedCaptionWord {
     required this.text,
     required this.start,
     required this.end,
+    required this.globalIndex,
+    this.isEmphasized = false,
   });
   final String text;
   final double start;
   final double end;
+  final int globalIndex;
+  final bool isEmphasized;
 }
 
 List<TimedCaptionWord> resolveCaptionWords(
@@ -163,6 +168,11 @@ List<TimedCaptionWord> resolveCaptionWords(
       : <Map>[];
   final rawWords = transcription?['words'];
   final timedWords = <TimedCaptionWord>[];
+  
+  final rawEmphasized = transcription?['emphasizedIndices'];
+  final emphasizedSet = rawEmphasized is List ? rawEmphasized.map((e) => e as int).toSet() : <int>{};
+  
+  var globalIndex = 0;
   if (rawWords is List) {
     for (final item in rawWords.whereType<Map>()) {
       final text = item['text'] as String? ?? '';
@@ -173,16 +183,31 @@ List<TimedCaptionWord> resolveCaptionWords(
           end != null &&
           end >= start) {
         timedWords.add(
-          TimedCaptionWord(text: text.trim(), start: start, end: end),
+          TimedCaptionWord(
+            text: text.trim(), 
+            start: start, 
+            end: end,
+            globalIndex: globalIndex,
+            isEmphasized: emphasizedSet.contains(globalIndex),
+          ),
         );
+        globalIndex++;
       }
     }
   }
   if (timedWords.isNotEmpty && _wordTimesMatchSegments(timedWords, segments)) {
     timedWords.sort((a, b) => a.start.compareTo(b.start));
+    // fix indices after sort just in case
+    for(var i=0; i<timedWords.length; i++) {
+        final w = timedWords[i];
+        timedWords[i] = TimedCaptionWord(
+            text: w.text, start: w.start, end: w.end, 
+            globalIndex: i, isEmphasized: emphasizedSet.contains(i),
+        );
+    }
     return timedWords;
   }
-  return _wordsFromSegments(segments);
+  return _wordsFromSegments(segments, emphasizedSet);
 }
 
 List<List<TimedCaptionWord>> captionGroups(
@@ -233,8 +258,9 @@ bool _wordTimesMatchSegments(
   return wordIndex == words.length;
 }
 
-List<TimedCaptionWord> _wordsFromSegments(List<Map> segments) {
+List<TimedCaptionWord> _wordsFromSegments(List<Map> segments, Set<int> emphasizedSet) {
   final timedWords = <TimedCaptionWord>[];
+  var globalIndex = 0;
   for (final item in segments) {
     final text = item['text'] as String? ?? '';
     final start = (item['start'] as num?)?.toDouble() ?? 0;
@@ -254,8 +280,11 @@ List<TimedCaptionWord> _wordsFromSegments(List<Map> segments) {
           text: tokens[index],
           start: wordStart,
           end: index == tokens.length - 1 ? end : wordStart + duration,
+          globalIndex: globalIndex,
+          isEmphasized: emphasizedSet.contains(globalIndex),
         ),
       );
+      globalIndex++;
     }
   }
   return timedWords;

@@ -144,6 +144,8 @@ class CaptionDesign {
     this.effect = CaptionEffect.none,
     this.font = CaptionFont.manrope,
     this.activeFont,
+    this.activeSize,
+    this.activeWeight,
     this.backgroundColor,
     this.borderColor,
     this.boxHorizontalPadding = 0,
@@ -169,6 +171,8 @@ class CaptionDesign {
   final CaptionEffect effect;
   final CaptionFont font;
   final CaptionFont? activeFont;
+  final double? activeSize;
+  final FontWeight? activeWeight;
   final Color? backgroundColor;
   final Color? borderColor;
   final double boxHorizontalPadding;
@@ -195,6 +199,8 @@ class CaptionDesign {
     CaptionEffect? effect,
     CaptionFont? font,
     CaptionFont? activeFont,
+    double? activeSize,
+    FontWeight? activeWeight,
     Color? backgroundColor,
     Color? borderColor,
     double? boxHorizontalPadding,
@@ -220,6 +226,10 @@ class CaptionDesign {
     effect: effect ?? this.effect,
     font: font ?? this.font,
     activeFont: activeFont ?? this.activeFont,
+    activeSize: activeSize ?? this.activeSize,
+    activeWeight: activeWeight ?? this.activeWeight,
+    this.activeSize,
+    this.activeWeight,
     backgroundColor: backgroundColor ?? this.backgroundColor,
     borderColor: borderColor ?? this.borderColor,
     boxHorizontalPadding: boxHorizontalPadding ?? this.boxHorizontalPadding,
