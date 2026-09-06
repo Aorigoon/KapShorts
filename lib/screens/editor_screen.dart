@@ -1444,7 +1444,9 @@ Future<void> showEditorToolSheet(
     EditorTool.overlay: 'Overlay',
     EditorTool.captions: 'Captions',
   };
-  bool editingHighlightFont = false;
+  bool customColorPage = false;
+  String customColorTarget = 'activeColor';
+  bool choosingHighlightFont = false;
   await showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
@@ -1452,6 +1454,7 @@ Future<void> showEditorToolSheet(
     builder: (_) => StatefulBuilder(
       builder: (sheetContext, setSheetState) {
         final design = ref.read(captionDesignProvider);
+        final baseRecent = ref.read(captionRecentColorsProvider);
         final editorTranscription =
             ref.read(transcriptionProvider) ??
             ref.read(projectsProvider).selected?.transcription ??
@@ -1459,6 +1462,49 @@ Future<void> showEditorToolSheet(
         void updateDesign(CaptionDesign value) {
           ref.read(captionDesignProvider.notifier).state = value;
           setSheetState(() {});
+        }
+
+        if (customColorPage) {
+          final currentColor = switch (customColorTarget) {
+            'activeColor' => design.activeColor,
+            'activeBackground' => design.activeBackground ?? Colors.yellow,
+            'highlightColor' => design.highlightColor ?? design.activeColor,
+            'highlightBackground' => design.highlightBackground ?? Colors.yellow,
+            _ => design.activeColor,
+          };
+          void updateColor(Color c) {
+            final updated = switch (customColorTarget) {
+              'activeColor' => design.copyWith(activeColor: c),
+              'activeBackground' => design.copyWith(activeBackground: c),
+              'highlightColor' => design.copyWith(highlightColor: c),
+              'highlightBackground' => design.copyWith(highlightBackground: c),
+              _ => design,
+            };
+            updateDesign(updated);
+          }
+          return Theme(
+            data: Theme.of(sheetContext).copyWith(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+            ),
+            child: SafeArea(
+              top: false,
+              child: _InSheetCustomColorPage(
+                initialColor: currentColor,
+                onLiveChange: (color) => updateColor(color),
+                onBack: () => setSheetState(() => customColorPage = false),
+                onApply: (color) {
+                  updateColor(color);
+                  final updatedRecent = [
+                    color,
+                    ...baseRecent.where((item) => item.toARGB32() != color.toARGB32()),
+                  ].take(4).toList();
+                  ref.read(captionRecentColorsProvider.notifier).state = updatedRecent;
+                  setSheetState(() => customColorPage = false);
+                },
+              ),
+            ),
+          );
         }
 
         Widget content;
@@ -1474,313 +1520,377 @@ Future<void> showEditorToolSheet(
             FontPreviewChoice(CaptionFont.josefinSans, 'Josefin Sans', 'Josefin Sans'),
             FontPreviewChoice(CaptionFont.teko, 'Teko', 'Teko'),
             FontPreviewChoice(CaptionFont.firaSans, 'Fira Sans', 'Fira Sans'),
-
             FontPreviewChoice(CaptionFont.bungee, 'Bungee', 'BUNGEE'),
             FontPreviewChoice(CaptionFont.chivo, 'Chivo', 'Chivo'),
             FontPreviewChoice(CaptionFont.comfortaa, 'Comfortaa', 'Comfortaa'),
             FontPreviewChoice(CaptionFont.cormorant, 'Cormorant', 'Cormorant'),
-            FontPreviewChoice(
-              CaptionFont.fredoka,
-              'Fredoka One',
-              'Fredoka one',
-            ),
-            FontPreviewChoice(
-              CaptionFont.leagueGothic,
-              'League Gothic',
-              'League Gothic',
-            ),
-            FontPreviewChoice(
-              CaptionFont.lilitaOne,
-              'Lilita One',
-              'Lilita One',
-            ),
+            FontPreviewChoice(CaptionFont.fredoka, 'Fredoka One', 'Fredoka one'),
+            FontPreviewChoice(CaptionFont.leagueGothic, 'League Gothic', 'League Gothic'),
+            FontPreviewChoice(CaptionFont.lilitaOne, 'Lilita One', 'Lilita One'),
             FontPreviewChoice(CaptionFont.lobster, 'Lobster', 'Lobster'),
             FontPreviewChoice(CaptionFont.pacifico, 'Pacifico', 'Pacifico'),
-            FontPreviewChoice(
-              CaptionFont.ptSansNarrow,
-              'PT Sans Narrow',
-              'PT Sans Narrow',
-            ),
-            FontPreviewChoice(
-              CaptionFont.rubikWetPaint,
-              'Rubik Wet Paint',
-              'Rubik Wetpaint',
-            ),
+            FontPreviewChoice(CaptionFont.ptSansNarrow, 'PT Sans Narrow', 'PT Sans Narrow'),
+            FontPreviewChoice(CaptionFont.rubikWetPaint, 'Rubik Wet Paint', 'Rubik Wetpaint'),
             FontPreviewChoice(CaptionFont.rye, 'Rye', 'Rye'),
-            FontPreviewChoice(
-              CaptionFont.secularOne,
-              'Secular One',
-              'Secular one',
-            ),
-            FontPreviewChoice(
-              CaptionFont.staatliches,
-              'Staatliches',
-              'STAATLICHES',
-            ),
-            FontPreviewChoice(
-              CaptionFont.truculenta,
-              'Truculenta',
-              'Truculenta',
-            ),
+            FontPreviewChoice(CaptionFont.secularOne, 'Secular One', 'Secular one'),
+            FontPreviewChoice(CaptionFont.staatliches, 'Staatliches', 'STAATLICHES'),
+            FontPreviewChoice(CaptionFont.truculenta, 'Truculenta', 'Truculenta'),
             FontPreviewChoice(CaptionFont.tiltWarp, 'Tilt Warp', 'Tilt Warp'),
-            FontPreviewChoice(
-              CaptionFont.montserrat,
-              'Montserrat',
-              'Montserrat',
-            ),
+            FontPreviewChoice(CaptionFont.montserrat, 'Montserrat', 'Montserrat'),
             FontPreviewChoice(CaptionFont.sriracha, 'Sriracha', 'Sriracha'),
             FontPreviewChoice(CaptionFont.anton, 'Anton', 'Anton'),
-            FontPreviewChoice(
-              CaptionFont.archivoBlack,
-              'Archivo Black',
-              'Archivo Black',
-            ),
+            FontPreviewChoice(CaptionFont.archivoBlack, 'Archivo Black', 'Archivo Black'),
             FontPreviewChoice(CaptionFont.baloo2, 'Baloo 2', 'Baloo 2'),
             FontPreviewChoice(CaptionFont.caveat, 'Caveat', 'Caveat'),
             FontPreviewChoice(CaptionFont.dmSans, 'DM Sans', 'DM Sans'),
             FontPreviewChoice(CaptionFont.inter, 'Inter', 'Inter'),
-            FontPreviewChoice(
-              CaptionFont.jetBrainsMono,
-              'JetBrains Mono',
-              'JetBrains Mono',
-            ),
+            FontPreviewChoice(CaptionFont.jetBrainsMono, 'JetBrains Mono', 'JetBrains Mono'),
             FontPreviewChoice(CaptionFont.manrope, 'Manrope', 'Manrope'),
             FontPreviewChoice(CaptionFont.oswald, 'Oswald', 'Oswald'),
-            FontPreviewChoice(
-              CaptionFont.permanentMarker,
-              'Permanent Marker',
-              'Permanent Marker',
-            ),
-            FontPreviewChoice(
-              CaptionFont.playfair,
-              'Playfair Display',
-              'Playfair Display',
-            ),
+            FontPreviewChoice(CaptionFont.permanentMarker, 'Permanent Marker', 'Permanent Marker'),
+            FontPreviewChoice(CaptionFont.playfair, 'Playfair Display', 'Playfair Display'),
             FontPreviewChoice(CaptionFont.poppins, 'Poppins', 'Poppins'),
             FontPreviewChoice(CaptionFont.righteous, 'Righteous', 'Righteous'),
-            FontPreviewChoice(
-              CaptionFont.spaceGrotesk,
-              'Space Grotesk',
-              'Space Grotesk',
-            ),
+            FontPreviewChoice(CaptionFont.spaceGrotesk, 'Space Grotesk', 'Space Grotesk'),
             FontPreviewChoice(CaptionFont.syne, 'Syne', 'Syne'),
-            FontPreviewChoice(
-              CaptionFont.abril,
-              'Abril Fatface',
-              'Abril Fatface',
-            ),
-            FontPreviewChoice(
-              CaptionFont.rubikMono,
-              'Rubik Mono One',
-              'Rubik Mono One',
-            ),
-            FontPreviewChoice(
-              CaptionFont.pixel,
-              'Press Start 2P',
-              'Press Start 2P',
-            ),
+            FontPreviewChoice(CaptionFont.abril, 'Abril Fatface', 'Abril Fatface'),
+            FontPreviewChoice(CaptionFont.rubikMono, 'Rubik Mono One', 'Rubik Mono One'),
+            FontPreviewChoice(CaptionFont.pixel, 'Press Start 2P', 'Press Start 2P'),
           ];
-          content = Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedSlidingToggle(
-                value: editingHighlightFont,
-                onChanged: (val) => setSheetState(() => editingHighlightFont = val),
-                leftLabel: 'Base Font',
-                rightLabel: 'Highlight Font',
+          content = SizedBox(
+            height: 310,
+            child: GridView.builder(
+              padding: const EdgeInsets.only(bottom: 28),
+              itemCount: fonts.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                childAspectRatio: 2.25,
               ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 282,
-                child: GridView.builder(
-                  padding: const EdgeInsets.only(bottom: 28),
-                  itemCount: fonts.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
-                    childAspectRatio: 2.25,
-                  ),
-                  itemBuilder: (_, index) {
-                    final isSelected = editingHighlightFont
-                        ? design.activeFont == fonts[index].font
-                        : design.font == fonts[index].font;
-                    return FontPreviewCard(
-                      choice: fonts[index],
-                      selected: isSelected,
-                      onTap: () {
-                        if (editingHighlightFont) {
-                          updateDesign(design.copyWith(activeFont: fonts[index].font));
-                        } else {
-                          updateDesign(design.copyWith(font: fonts[index].font));
-                        }
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
+              itemBuilder: (_, index) {
+                final isSelected = design.font == fonts[index].font;
+                return FontPreviewCard(
+                  choice: fonts[index],
+                  selected: isSelected,
+                  onTap: () => updateDesign(design.copyWith(font: fonts[index].font)),
+                );
+              },
+            ),
           );
         } else if (tool == EditorTool.highlight) {
-          final recentColors = ref.read(captionRecentColorsProvider);
-          void applyHighlightColor(Color color, {bool addToRecent = false}) {
-            updateDesign(design.copyWith(highlightColor: color));
-            if (!addToRecent) return;
-            final updatedRecent = [
-              color,
-              ...recentColors.where((item) => item.toARGB32() != color.toARGB32()),
-            ].take(4).toList();
-            ref.read(captionRecentColorsProvider.notifier).state = updatedRecent;
-          }
+          const allFonts = [
+            FontPreviewChoice(CaptionFont.roboto, 'Roboto', 'Roboto'),
+            FontPreviewChoice(CaptionFont.openSans, 'Open Sans', 'Open Sans'),
+            FontPreviewChoice(CaptionFont.lato, 'Lato', 'Lato'),
+            FontPreviewChoice(CaptionFont.ubuntu, 'Ubuntu', 'Ubuntu'),
+            FontPreviewChoice(CaptionFont.bebasNeue, 'Bebas Neue', 'Bebas Neue'),
+            FontPreviewChoice(CaptionFont.dancingScript, 'Dancing Script', 'Dancing Script'),
+            FontPreviewChoice(CaptionFont.cinzel, 'Cinzel', 'Cinzel'),
+            FontPreviewChoice(CaptionFont.josefinSans, 'Josefin Sans', 'Josefin Sans'),
+            FontPreviewChoice(CaptionFont.teko, 'Teko', 'Teko'),
+            FontPreviewChoice(CaptionFont.firaSans, 'Fira Sans', 'Fira Sans'),
+            FontPreviewChoice(CaptionFont.bungee, 'Bungee', 'BUNGEE'),
+            FontPreviewChoice(CaptionFont.chivo, 'Chivo', 'Chivo'),
+            FontPreviewChoice(CaptionFont.comfortaa, 'Comfortaa', 'Comfortaa'),
+            FontPreviewChoice(CaptionFont.cormorant, 'Cormorant', 'Cormorant'),
+            FontPreviewChoice(CaptionFont.fredoka, 'Fredoka One', 'Fredoka one'),
+            FontPreviewChoice(CaptionFont.leagueGothic, 'League Gothic', 'League Gothic'),
+            FontPreviewChoice(CaptionFont.lilitaOne, 'Lilita One', 'Lilita One'),
+            FontPreviewChoice(CaptionFont.lobster, 'Lobster', 'Lobster'),
+            FontPreviewChoice(CaptionFont.pacifico, 'Pacifico', 'Pacifico'),
+            FontPreviewChoice(CaptionFont.ptSansNarrow, 'PT Sans Narrow', 'PT Sans Narrow'),
+            FontPreviewChoice(CaptionFont.rubikWetPaint, 'Rubik Wet Paint', 'Rubik Wetpaint'),
+            FontPreviewChoice(CaptionFont.rye, 'Rye', 'Rye'),
+            FontPreviewChoice(CaptionFont.secularOne, 'Secular One', 'Secular one'),
+            FontPreviewChoice(CaptionFont.staatliches, 'Staatliches', 'STAATLICHES'),
+            FontPreviewChoice(CaptionFont.truculenta, 'Truculenta', 'Truculenta'),
+            FontPreviewChoice(CaptionFont.tiltWarp, 'Tilt Warp', 'Tilt Warp'),
+            FontPreviewChoice(CaptionFont.montserrat, 'Montserrat', 'Montserrat'),
+            FontPreviewChoice(CaptionFont.sriracha, 'Sriracha', 'Sriracha'),
+            FontPreviewChoice(CaptionFont.anton, 'Anton', 'Anton'),
+            FontPreviewChoice(CaptionFont.archivoBlack, 'Archivo Black', 'Archivo Black'),
+            FontPreviewChoice(CaptionFont.baloo2, 'Baloo 2', 'Baloo 2'),
+            FontPreviewChoice(CaptionFont.caveat, 'Caveat', 'Caveat'),
+            FontPreviewChoice(CaptionFont.dmSans, 'DM Sans', 'DM Sans'),
+            FontPreviewChoice(CaptionFont.inter, 'Inter', 'Inter'),
+            FontPreviewChoice(CaptionFont.jetBrainsMono, 'JetBrains Mono', 'JetBrains Mono'),
+            FontPreviewChoice(CaptionFont.manrope, 'Manrope', 'Manrope'),
+            FontPreviewChoice(CaptionFont.oswald, 'Oswald', 'Oswald'),
+            FontPreviewChoice(CaptionFont.permanentMarker, 'Permanent Marker', 'Permanent Marker'),
+            FontPreviewChoice(CaptionFont.playfair, 'Playfair Display', 'Playfair Display'),
+            FontPreviewChoice(CaptionFont.poppins, 'Poppins', 'Poppins'),
+            FontPreviewChoice(CaptionFont.righteous, 'Righteous', 'Righteous'),
+            FontPreviewChoice(CaptionFont.spaceGrotesk, 'Space Grotesk', 'Space Grotesk'),
+            FontPreviewChoice(CaptionFont.syne, 'Syne', 'Syne'),
+            FontPreviewChoice(CaptionFont.abril, 'Abril Fatface', 'Abril Fatface'),
+            FontPreviewChoice(CaptionFont.rubikMono, 'Rubik Mono One', 'Rubik Mono One'),
+            FontPreviewChoice(CaptionFont.pixel, 'Press Start 2P', 'Press Start 2P'),
+          ];
 
-          content = SingleChildScrollView(
-            child: Column(
+          if (choosingHighlightFont) {
+            content = Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Highlight Font', style: TextStyle(fontWeight: FontWeight.w700)),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                      onPressed: () => setSheetState(() => choosingHighlightFont = false),
+                    ),
+                    const Text('Choose Highlight Font', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                  ],
+                ),
                 const SizedBox(height: 10),
                 SizedBox(
-                  height: 40,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: CaptionFont.values.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  height: 270,
+                  child: GridView.builder(
+                    padding: const EdgeInsets.only(bottom: 28),
+                    itemCount: allFonts.length,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      childAspectRatio: 2.25,
+                    ),
                     itemBuilder: (_, index) {
-                      final f = CaptionFont.values[index];
-                      final isSel = (design.highlightFont ?? design.font) == f;
-                      return ChoiceChip(
-                        label: Text(
-                          f.name.toUpperCase(),
-                          style: captionTextStyle(
-                            design,
-                            font: f,
-                            fontSize: 11,
-                            color: isSel ? Colors.black : Colors.white,
-                          ),
-                        ),
-                        selected: isSel,
-                        onSelected: (_) => updateDesign(design.copyWith(highlightFont: f)),
-                        selectedColor: Colors.white,
-                        backgroundColor: AppColors.elevated,
-                        side: BorderSide(color: isSel ? Colors.white : AppColors.line),
+                      final isSelected = (design.highlightFont ?? design.font) == allFonts[index].font;
+                      return FontPreviewCard(
+                        choice: allFonts[index],
+                        selected: isSelected,
+                        onTap: () {
+                          updateDesign(design.copyWith(highlightFont: allFonts[index].font));
+                          setSheetState(() => choosingHighlightFont = false);
+                        },
                       );
                     },
                   ),
                 ),
-                const SizedBox(height: 18),
-                const Text('Highlight Text Color', style: TextStyle(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 10,
-                  children: [
-                    ...recentColors.map(
-                      (color) => InkWell(
-                        onTap: () => applyHighlightColor(color),
+              ],
+            );
+          } else {
+            const topFonts = [CaptionFont.anton, CaptionFont.archivoBlack, CaptionFont.poppins];
+            content = SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Text('Highlight Font', style: TextStyle(fontWeight: FontWeight.w700)),
+                      const Spacer(),
+                      InkWell(
+                        onTap: () => setSheetState(() => choosingHighlightFont = true),
+                        borderRadius: BorderRadius.circular(12),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          child: Row(
+                            children: [
+                              Text('More', style: TextStyle(color: AppColors.secondary, fontWeight: FontWeight.w600, fontSize: 12)),
+                              SizedBox(width: 4),
+                              Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.secondary),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      ...topFonts.map((f) {
+                        final isSel = (design.highlightFont ?? design.font) == f;
+                        return ChoiceChip(
+                          label: Text(
+                            f.name.toUpperCase(),
+                            style: captionTextStyle(
+                              design,
+                              font: f,
+                              fontSize: 11,
+                              color: isSel ? Colors.black : Colors.white,
+                            ),
+                          ),
+                          selected: isSel,
+                          onSelected: (_) => updateDesign(design.copyWith(highlightFont: f)),
+                          selectedColor: Colors.white,
+                          backgroundColor: AppColors.elevated,
+                          side: BorderSide(color: isSel ? Colors.white : AppColors.line),
+                        );
+                      }),
+                      ChoiceChip(
+                        label: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.more_horiz_rounded, size: 14, color: Colors.white),
+                            SizedBox(width: 4),
+                            Text('More...', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                          ],
+                        ),
+                        selected: false,
+                        onSelected: (_) => setSheetState(() => choosingHighlightFont = true),
+                        backgroundColor: AppColors.elevated,
+                        side: const BorderSide(color: AppColors.line),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  const Text('Highlight Text Color', style: TextStyle(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 10,
+                    children: [
+                      ...baseRecent.map(
+                        (color) => InkWell(
+                          onTap: () => updateDesign(design.copyWith(highlightColor: color)),
+                          borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            width: 34,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: (design.highlightColor ?? design.activeColor) == color ? Colors.white : Colors.transparent,
+                                width: 3,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Custom Rainbow Picker Button
+                      InkWell(
+                        onTap: () {
+                          setSheetState(() {
+                            customColorTarget = 'highlightColor';
+                            customColorPage = true;
+                          });
+                        },
                         borderRadius: BorderRadius.circular(20),
                         child: Container(
                           width: 34,
                           height: 34,
                           decoration: BoxDecoration(
-                            color: color,
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color: (design.highlightColor ?? design.activeColor) == color ? Colors.white : Colors.transparent,
-                              width: 3,
+                            border: Border.all(color: AppColors.line, width: 2),
+                            gradient: const SweepGradient(
+                              colors: [Colors.red, Colors.orange, Colors.yellow, Colors.green, Colors.blue, Colors.purple, Colors.red],
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-                const Text('Highlight Background Cover', style: TextStyle(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    // None (Transparent)
-                    GestureDetector(
-                      onTap: () => updateDesign(design.copyWith(highlightBackground: const Color(0x00000000))),
-                      child: Container(
-                        width: 34,
-                        height: 34,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: (design.highlightBackground == null || design.highlightBackground!.alpha == 0) ? Colors.white : AppColors.line,
-                            width: 3,
-                          ),
-                          color: AppColors.elevated,
-                        ),
-                        child: const Icon(Icons.block, size: 16, color: AppColors.secondary),
-                      ),
-                    ),
-                    ...[Colors.black, Colors.white, Colors.yellow, const Color(0xFF44C7FF), const Color(0xFFFF5C5C), const Color(0xFF00FF88)].map(
-                      (color) => GestureDetector(
-                        onTap: () => updateDesign(design.copyWith(highlightBackground: color)),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  const Text('Highlight Background Cover', style: TextStyle(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      // None (Transparent)
+                      GestureDetector(
+                        onTap: () => updateDesign(design.copyWith(highlightBackground: const Color(0x00000000))),
                         child: Container(
                           width: 34,
                           height: 34,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: color,
                             border: Border.all(
-                              color: design.highlightBackground == color ? Colors.white : Colors.transparent,
+                              color: (design.highlightBackground == null || design.highlightBackground!.alpha == 0) ? Colors.white : AppColors.line,
                               width: 3,
+                            ),
+                            color: AppColors.elevated,
+                          ),
+                          child: const Icon(Icons.block, size: 16, color: AppColors.secondary),
+                        ),
+                      ),
+                      ...[Colors.black, Colors.white, Colors.yellow, const Color(0xFF44C7FF), const Color(0xFFFF5C5C), const Color(0xFF00FF88)].map(
+                        (color) => GestureDetector(
+                          onTap: () => updateDesign(design.copyWith(highlightBackground: color)),
+                          child: Container(
+                            width: 34,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: color,
+                              border: Border.all(
+                                color: design.highlightBackground == color ? Colors.white : Colors.transparent,
+                                width: 3,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-                Row(
-                  children: [
-                    const Text('Highlight Size', style: TextStyle(fontWeight: FontWeight.w700)),
-                    const Spacer(),
-                    Text('${(design.highlightSize ?? design.activeSize ?? design.size).round()} px', style: const TextStyle(color: AppColors.secondary)),
-                  ],
-                ),
-                Slider(
-                  value: design.highlightSize ?? design.activeSize ?? design.size,
-                  min: 18,
-                  max: 60,
-                  divisions: 21,
-                  activeColor: Colors.white,
-                  inactiveColor: AppColors.line,
-                  onChanged: (value) => updateDesign(design.copyWith(highlightSize: value)),
-                ),
-                const SizedBox(height: 12),
-                const Text('Highlight Weight', style: TextStyle(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 9),
-                Wrap(
-                  spacing: 8,
-                  children: [FontWeight.w500, FontWeight.w700, FontWeight.w900].map(
-                    (weight) => ChoiceChip(
-                      label: Text(
-                        weight == FontWeight.w500 ? 'Regular' : weight == FontWeight.w700 ? 'Bold' : 'Extra bold',
+                      // Custom Rainbow Picker Button
+                      InkWell(
+                        onTap: () {
+                          setSheetState(() {
+                            customColorTarget = 'highlightBackground';
+                            customColorPage = true;
+                          });
+                        },
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.line, width: 2),
+                            gradient: const SweepGradient(
+                              colors: [Colors.red, Colors.orange, Colors.yellow, Colors.green, Colors.blue, Colors.purple, Colors.red],
+                            ),
+                          ),
+                        ),
                       ),
-                      selected: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight,
-                      onSelected: (_) => updateDesign(design.copyWith(highlightWeight: weight)),
-                      selectedColor: Colors.white,
-                      backgroundColor: AppColors.elevated,
-                      labelStyle: TextStyle(
-                        color: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight ? Colors.black : Colors.white,
-                        fontWeight: FontWeight.w700,
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      const Text('Highlight Size', style: TextStyle(fontWeight: FontWeight.w700)),
+                      const Spacer(),
+                      Text('${(design.highlightSize ?? design.activeSize ?? design.size).round()} px', style: const TextStyle(color: AppColors.secondary)),
+                    ],
+                  ),
+                  Slider(
+                    value: design.highlightSize ?? design.activeSize ?? design.size,
+                    min: 18,
+                    max: 60,
+                    divisions: 21,
+                    activeColor: Colors.white,
+                    inactiveColor: AppColors.line,
+                    onChanged: (value) => updateDesign(design.copyWith(highlightSize: value)),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text('Highlight Weight', style: TextStyle(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 9),
+                  Wrap(
+                    spacing: 8,
+                    children: [FontWeight.w500, FontWeight.w700, FontWeight.w900].map(
+                      (weight) => ChoiceChip(
+                        label: Text(
+                          weight == FontWeight.w500 ? 'Regular' : weight == FontWeight.w700 ? 'Bold' : 'Extra bold',
+                        ),
+                        selected: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight,
+                        onSelected: (_) => updateDesign(design.copyWith(highlightWeight: weight)),
+                        selectedColor: Colors.white,
+                        backgroundColor: AppColors.elevated,
+                        labelStyle: TextStyle(
+                          color: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight ? Colors.black : Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        side: BorderSide(
+                          color: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight ? Colors.white : AppColors.line,
+                        ),
                       ),
-                      side: BorderSide(
-                        color: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight ? Colors.white : AppColors.line,
-                      ),
-                    ),
-                  ).toList(),
-                ),
-              ],
-            ),
-          );
+                    ).toList(),
+                  ),
+                ],
+              ),
+            );
+          }
         } else if (tool == EditorTool.highlightWords) {
           content = HighlightWordOverview(
             transcription: editorTranscription,
@@ -1806,125 +1916,6 @@ Future<void> showEditorToolSheet(
             },
           );
         } else if (tool == EditorTool.activeWords) {
-          content = Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Active Word Color', style: TextStyle(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 12,
-                runSpacing: 10,
-                children: [
-                  ...ref.read(captionRecentColorsProvider).map(
-                    (color) => InkWell(
-                      onTap: () => updateDesign(design.copyWith(activeColor: color)),
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        width: 34,
-                        height: 34,
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: design.activeColor == color ? Colors.white : Colors.transparent,
-                            width: 3,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-              const Text('Active Word Background', style: TextStyle(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: [
-                  // None
-                  GestureDetector(
-                    onTap: () => updateDesign(design.copyWith(activeBackground: const Color(0x00000000))),
-                    child: Container(
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: (design.activeBackground == null || design.activeBackground!.alpha == 0) ? Colors.white : AppColors.line,
-                          width: 3,
-                        ),
-                        color: AppColors.elevated,
-                      ),
-                      child: const Icon(Icons.block, size: 16, color: AppColors.secondary),
-                    ),
-                  ),
-                  ...[ Colors.black, Colors.white, Colors.yellow, const Color(0xFF44C7FF), const Color(0xFFFF5C5C)].map(
-                    (color) => GestureDetector(
-                      onTap: () => updateDesign(design.copyWith(activeBackground: color)),
-                      child: Container(
-                        width: 34,
-                        height: 34,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: color,
-                          border: Border.all(
-                            color: design.activeBackground == color ? Colors.white : Colors.transparent,
-                            width: 3,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  const Text('Active Size', style: TextStyle(fontWeight: FontWeight.w700)),
-                  const Spacer(),
-                  Text('${(design.activeSize ?? design.size).round()} px', style: const TextStyle(color: AppColors.secondary)),
-                ],
-              ),
-              Slider(
-                value: design.activeSize ?? design.size,
-                min: 18,
-                max: 60,
-                divisions: 21,
-                activeColor: Colors.white,
-                inactiveColor: AppColors.line,
-                onChanged: (value) => updateDesign(design.copyWith(activeSize: value)),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  const Text('Blink Effect', style: TextStyle(fontWeight: FontWeight.w700)),
-                  const Spacer(),
-                  Switch(
-                    value: design.activeBlink,
-                    onChanged: (v) => updateDesign(design.copyWith(activeBlink: v)),
-                    activeColor: Colors.white,
-                    activeTrackColor: AppColors.line,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              const Text('Active Weight', style: TextStyle(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 9),
-              Wrap(
-                spacing: 8,
-                children: [FontWeight.w500, FontWeight.w700, FontWeight.w900].map(
-                  (weight) => ChoiceChip(
-                    label: Text(weight == FontWeight.w500 ? 'Regular' : weight == FontWeight.w700 ? 'Bold' : 'Extra Bold'),
-                    selected: (design.activeWeight ?? design.weight) == weight,
-                    onSelected: (_) => updateDesign(design.copyWith(activeWeight: weight)),
-                    selectedColor: Colors.white,
-                    backgroundColor: AppColors.elevated,
-                    labelStyle: TextStyle(
-                      color: (design.activeWeight ?? design.weight) == weight ? Colors.black : Colors.white,
-                      fontWeight: FontWeight.w700,
-                    ),
                     side: BorderSide(
                       color: (design.activeWeight ?? design.weight) == weight ? Colors.white : AppColors.line,
                     ),
