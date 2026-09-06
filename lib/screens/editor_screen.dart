@@ -1291,8 +1291,8 @@ class EditorToolRail extends StatelessWidget {
       (EditorTool.style, Icons.tune_rounded, 'Customize'),
       (EditorTool.addText, Icons.edit_note_rounded, 'Edit Text'),
       (EditorTool.fonts, Icons.text_fields_rounded, 'Font'),
-      (EditorTool.highlight, Icons.highlight_rounded, 'Highlight'),
       (EditorTool.highlightWords, Icons.format_color_text_rounded, 'H. Words'),
+      (EditorTool.highlight, Icons.highlight_rounded, 'Highlight'),
       (EditorTool.activeWords, Icons.electric_bolt_rounded, 'Active'),
       (EditorTool.templates, Icons.auto_fix_high_rounded, 'Style'),
       (EditorTool.aspectRatio, Icons.crop_free_rounded, 'Aspect'),
@@ -1351,8 +1351,8 @@ class _EditorFloatingSidebar extends StatelessWidget {
       (EditorTool.style, Icons.tune_rounded, 'Customize'),
       (EditorTool.addText, Icons.edit_note_rounded, 'Edit Text'),
       (EditorTool.fonts, Icons.text_fields_rounded, 'Font'),
-      (EditorTool.highlight, Icons.highlight_rounded, 'Highlight'),
       (EditorTool.highlightWords, Icons.format_color_text_rounded, 'H. Words'),
+      (EditorTool.highlight, Icons.highlight_rounded, 'Highlight'),
       (EditorTool.activeWords, Icons.electric_bolt_rounded, 'Active'),
       (EditorTool.templates, Icons.auto_fix_high_rounded, 'Style'),
       (EditorTool.effects, Icons.blur_on_rounded, 'Effects'),
@@ -1632,79 +1632,154 @@ Future<void> showEditorToolSheet(
             ].take(4).toList();
             ref.read(captionRecentColorsProvider.notifier).state = updatedRecent;
           }
-          
-          content = Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Highlight Color', style: TextStyle(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 12,
-                runSpacing: 10,
-                children: [
-                  ...recentColors.map(
-                    (color) => InkWell(
-                      onTap: () => applyHighlightColor(color),
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        width: 34,
-                        height: 34,
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: (design.highlightColor ?? design.activeColor) == color ? Colors.white : Colors.transparent,
-                            width: 3,
+
+          content = SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Highlight Font', style: TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 40,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: CaptionFont.values.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (_, index) {
+                      final f = CaptionFont.values[index];
+                      final isSel = (design.highlightFont ?? design.font) == f;
+                      return ChoiceChip(
+                        label: Text(
+                          f.name.toUpperCase(),
+                          style: TextStyle(
+                            fontFamily: f.fontFamily,
+                            fontWeight: FontWeight.w700,
+                            color: isSel ? Colors.black : Colors.white,
+                            fontSize: 11,
+                          ),
+                        ),
+                        selected: isSel,
+                        onSelected: (_) => updateDesign(design.copyWith(highlightFont: f)),
+                        selectedColor: Colors.white,
+                        backgroundColor: AppColors.elevated,
+                        side: BorderSide(color: isSel ? Colors.white : AppColors.line),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 18),
+                const Text('Highlight Text Color', style: TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 10,
+                  children: [
+                    ...recentColors.map(
+                      (color) => InkWell(
+                        onTap: () => applyHighlightColor(color),
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: (design.highlightColor ?? design.activeColor) == color ? Colors.white : Colors.transparent,
+                              width: 3,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  const Text('Highlight Size', style: TextStyle(fontWeight: FontWeight.w700)),
-                  const Spacer(),
-                  Text('${(design.highlightSize ?? design.activeSize ?? design.size).round()} px', style: const TextStyle(color: AppColors.secondary)),
-                ],
-              ),
-              Slider(
-                value: design.highlightSize ?? design.activeSize ?? design.size,
-                min: 18,
-                max: 50,
-                divisions: 16,
-                activeColor: Colors.white,
-                inactiveColor: AppColors.line,
-                onChanged: (value) => updateDesign(design.copyWith(highlightSize: value)),
-              ),
-              const SizedBox(height: 12),
-              const Text('Highlight Weight', style: TextStyle(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 9),
-              Wrap(
-                spacing: 8,
-                children: [FontWeight.w500, FontWeight.w700, FontWeight.w900].map(
-                  (weight) => ChoiceChip(
-                    label: Text(
-                      weight == FontWeight.w500 ? 'Regular' : weight == FontWeight.w700 ? 'Bold' : 'Extra bold',
+                  ],
+                ),
+                const SizedBox(height: 18),
+                const Text('Highlight Background Cover', style: TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    // None (Transparent)
+                    GestureDetector(
+                      onTap: () => updateDesign(design.copyWith(highlightBackground: const Color(0x00000000))),
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: (design.highlightBackground == null || design.highlightBackground!.alpha == 0) ? Colors.white : AppColors.line,
+                            width: 3,
+                          ),
+                          color: AppColors.elevated,
+                        ),
+                        child: const Icon(Icons.block, size: 16, color: AppColors.secondary),
+                      ),
                     ),
-                    selected: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight,
-                    onSelected: (_) => updateDesign(design.copyWith(highlightWeight: weight)),
-                    selectedColor: Colors.white,
-                    backgroundColor: AppColors.elevated,
-                    labelStyle: TextStyle(
-                      color: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight ? Colors.black : Colors.white,
-                      fontWeight: FontWeight.w700,
+                    ...[Colors.black, Colors.white, Colors.yellow, const Color(0xFF44C7FF), const Color(0xFFFF5C5C), const Color(0xFF00FF88)].map(
+                      (color) => GestureDetector(
+                        onTap: () => updateDesign(design.copyWith(highlightBackground: color)),
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: color,
+                            border: Border.all(
+                              color: design.highlightBackground == color ? Colors.white : Colors.transparent,
+                              width: 3,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                    side: BorderSide(
-                      color: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight ? Colors.white : AppColors.line,
+                  ],
+                ),
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    const Text('Highlight Size', style: TextStyle(fontWeight: FontWeight.w700)),
+                    const Spacer(),
+                    Text('${(design.highlightSize ?? design.activeSize ?? design.size).round()} px', style: const TextStyle(color: AppColors.secondary)),
+                  ],
+                ),
+                Slider(
+                  value: design.highlightSize ?? design.activeSize ?? design.size,
+                  min: 18,
+                  max: 60,
+                  divisions: 21,
+                  activeColor: Colors.white,
+                  inactiveColor: AppColors.line,
+                  onChanged: (value) => updateDesign(design.copyWith(highlightSize: value)),
+                ),
+                const SizedBox(height: 12),
+                const Text('Highlight Weight', style: TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 9),
+                Wrap(
+                  spacing: 8,
+                  children: [FontWeight.w500, FontWeight.w700, FontWeight.w900].map(
+                    (weight) => ChoiceChip(
+                      label: Text(
+                        weight == FontWeight.w500 ? 'Regular' : weight == FontWeight.w700 ? 'Bold' : 'Extra bold',
+                      ),
+                      selected: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight,
+                      onSelected: (_) => updateDesign(design.copyWith(highlightWeight: weight)),
+                      selectedColor: Colors.white,
+                      backgroundColor: AppColors.elevated,
+                      labelStyle: TextStyle(
+                        color: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight ? Colors.black : Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      side: BorderSide(
+                        color: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight ? Colors.white : AppColors.line,
+                      ),
                     ),
-                  ),
-                ).toList(),
-              ),
-            ],
+                  ).toList(),
+                ),
+              ],
+            ),
           );
         } else if (tool == EditorTool.highlightWords) {
           content = HighlightWordOverview(
@@ -3179,7 +3254,9 @@ class _CaptionOverlay extends StatelessWidget {
         hardShadow: design.hardShadow,
       );
       final chipBg = isEmphasized
-          ? (design.highlightColor ?? design.activeColor)
+          ? (design.highlightBackground != null && design.highlightBackground!.alpha > 0
+              ? design.highlightBackground!
+              : (design.highlightColor ?? design.activeColor))
           : isSpoken
           ? (design.activeBackground != null && design.activeBackground!.alpha > 0
               ? design.activeBackground!
@@ -3194,6 +3271,15 @@ class _CaptionOverlay extends StatelessWidget {
               decoration: BoxDecoration(
                 color: chipBg,
                 borderRadius: BorderRadius.circular(design.size * .18),
+              ),
+              child: word,
+            )
+          : (isEmphasized && design.highlightBackground != null && design.highlightBackground!.alpha > 0)
+          ? Container(
+              padding: EdgeInsets.symmetric(horizontal: design.size * .18, vertical: design.size * .06),
+              decoration: BoxDecoration(
+                color: design.highlightBackground,
+                borderRadius: BorderRadius.circular(design.size * .14),
               ),
               child: word,
             )

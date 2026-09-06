@@ -150,6 +150,7 @@ class CaptionDesign {
     this.highlightSize,
     this.highlightWeight,
     this.highlightColor,
+    this.highlightBackground,
     this.backgroundColor,
     this.borderColor,
     this.boxHorizontalPadding = 0,
@@ -183,6 +184,7 @@ class CaptionDesign {
   final double? highlightSize;
   final FontWeight? highlightWeight;
   final Color? highlightColor;
+  final Color? highlightBackground;
   final Color? activeBackground;
   final bool activeBlink;
   final Color? backgroundColor;
@@ -217,6 +219,7 @@ class CaptionDesign {
     double? highlightSize,
     FontWeight? highlightWeight,
     Color? highlightColor,
+    Color? highlightBackground,
     Color? backgroundColor,
     Color? borderColor,
     double? boxHorizontalPadding,
@@ -250,6 +253,7 @@ class CaptionDesign {
     highlightSize: highlightSize ?? this.highlightSize,
     highlightWeight: highlightWeight ?? this.highlightWeight,
     highlightColor: highlightColor ?? this.highlightColor,
+    highlightBackground: highlightBackground ?? this.highlightBackground,
     activeBackground: activeBackground ?? this.activeBackground,
     activeBlink: activeBlink ?? this.activeBlink,
     backgroundColor: backgroundColor ?? this.backgroundColor,
