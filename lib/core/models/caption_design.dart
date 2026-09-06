@@ -143,6 +143,7 @@ class CaptionDesign {
     this.visible = true,
     this.effect = CaptionEffect.none,
     this.font = CaptionFont.manrope,
+    this.activeFont,
     this.backgroundColor,
     this.borderColor,
     this.boxHorizontalPadding = 0,
@@ -167,6 +168,7 @@ class CaptionDesign {
   final bool visible;
   final CaptionEffect effect;
   final CaptionFont font;
+  final CaptionFont? activeFont;
   final Color? backgroundColor;
   final Color? borderColor;
   final double boxHorizontalPadding;
@@ -192,6 +194,7 @@ class CaptionDesign {
     bool? visible,
     CaptionEffect? effect,
     CaptionFont? font,
+    CaptionFont? activeFont,
     Color? backgroundColor,
     Color? borderColor,
     double? boxHorizontalPadding,
@@ -216,6 +219,7 @@ class CaptionDesign {
     visible: visible ?? this.visible,
     effect: effect ?? this.effect,
     font: font ?? this.font,
+    activeFont: activeFont ?? this.activeFont,
     backgroundColor: backgroundColor ?? this.backgroundColor,
     borderColor: borderColor ?? this.borderColor,
     boxHorizontalPadding: boxHorizontalPadding ?? this.boxHorizontalPadding,
@@ -1005,7 +1009,7 @@ class CaptionDesign {
     ),
     'Warm Stage' => const CaptionDesign(
       size: 30,
-      position: CaptionPosition.center,
+      position: CaptionPosition.bottom,
       color: Colors.white,
       activeColor: Color(0xFFFFC857),
       weight: FontWeight.w900,
@@ -1068,7 +1072,7 @@ class CaptionDesign {
       weight: FontWeight.w700,
       effect: CaptionEffect.pop,
       font: CaptionFont.poppins,
-      position: CaptionPosition.center,
+      position: CaptionPosition.bottom,
       outlineWidth: 0,
       maxWordsPerLine: 3,
       glow: true,

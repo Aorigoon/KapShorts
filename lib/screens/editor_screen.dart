@@ -361,6 +361,7 @@ Future<void> showPlaybackSpeedSheet(
   ValueNotifier<double> playbackSpeed,
 ) async {
   const rates = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+  bool editingHighlightFont = false;
   await showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
@@ -481,6 +482,7 @@ Future<void> showAspectRatioSheet(
   BuildContext context,
   ValueNotifier<PreviewAspect> previewAspect,
 ) async {
+  bool editingHighlightFont = false;
   await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -1337,6 +1339,7 @@ Future<void> showEditorToolSheet(
     EditorTool.overlay: 'Overlay',
     EditorTool.captions: 'Captions',
   };
+  bool editingHighlightFont = false;
   await showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
@@ -1472,21 +1475,53 @@ Future<void> showEditorToolSheet(
               'Press Start 2P',
             ),
           ];
-          content = SizedBox(
-            height: 310, // Adjust height to show ~5.5 items (e.g. 5.5 * 52 = 286, plus padding)
-            child: ListView.separated(
-              padding: const EdgeInsets.only(bottom: 28),
-              itemCount: fonts.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
-              itemBuilder: (_, index) => SizedBox(
-                height: 48,
-                child: FontPreviewCard(
-                  choice: fonts[index],
-                  selected: design.font == fonts[index].font,
-                  onTap: () => updateDesign(design.copyWith(font: fonts[index].font)),
+          content = Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SegmentedButton<bool>(
+                segments: const [
+                  ButtonSegment(value: false, label: Text('Base Font')),
+                  ButtonSegment(value: true, label: Text('Highlight Font')),
+                ],
+                selected: {editingHighlightFont},
+                onSelectionChanged: (set) => setSheetState(() => editingHighlightFont = set.first),
+                style: SegmentedButton.styleFrom(
+                  backgroundColor: AppColors.canvas,
+                  selectedBackgroundColor: Colors.white,
+                  selectedForegroundColor: Colors.black,
                 ),
               ),
-            ),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 282,
+                child: GridView.builder(
+                  padding: const EdgeInsets.only(bottom: 28),
+                  itemCount: fonts.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                    childAspectRatio: 2.25,
+                  ),
+                  itemBuilder: (_, index) {
+                    final isSelected = editingHighlightFont
+                        ? design.activeFont == fonts[index].font
+                        : design.font == fonts[index].font;
+                    return FontPreviewCard(
+                      choice: fonts[index],
+                      selected: isSelected,
+                      onTap: () {
+                        if (editingHighlightFont) {
+                          updateDesign(design.copyWith(activeFont: fonts[index].font));
+                        } else {
+                          updateDesign(design.copyWith(font: fonts[index].font));
+                        }
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
           );
         } else if (tool == EditorTool.templates) {
           const templates = ['Podcast Minimal', 'Emphasis Outline', 'Clean Box', 'Bubble', 'Hormozi Bold', 'MrBeast Impact', 'Karaoke Bar', 'Gold Shadow', 'Neon Highlight', 'Double Pop', 'Left Ladder', 'Stacked Punch', 'Soft Talk', 'Coral Punch', 'Electric Wave', 'Mono Signal', 'Halo Words', 'Marker Pop', 'Nightline', 'Retro Offset', 'Quiet Outline', 'Cloud Float', 'Fire Starter', 'Solar Build', 'Hard Echo', 'Midnight Chip', 'Focus Pixel', 'Velvet Three', 'Ember Karaoke', 'Prism Stack', 'Noir Plate', 'Signal Tag', 'Mint Outline', 'Horizon Slide', 'Paper Stamp', 'Cinema Serif', 'Script Bloom', 'Poster Ink', 'Block Parade', 'Prism Grotesk', 'Arcade Pulse', 'Luxe Title', 'Velvet Script', 'Classic Cut', 'Reel Candy', 'Blackout Bold', 'Pixel Snap', 'Sunbeam Serif', 'Doodle Yellow', 'Bubble Chrome', 'Clean Digital', 'Film Noir', 'Sunset Script', 'Viva Poster', 'Soda Pop', 'Urban Mono', 'Chrome Marker', 'Neon Serif', 'Storybook Script', 'Punchline Sans', 'Warm Stage', 'Blink Pop', 'Karaoke Fill', 'Bold Box', 'Minimal Clean', 'Neon Glow', 'Typewriter', 'Bounce', 'Podcast Clean', 'MrBeast Action', 'Ali Abdaal Minimal', 'Ali Abdaal Highlight'];
@@ -1509,7 +1544,7 @@ Future<void> showEditorToolSheet(
                   name: name,
                   selected: selected,
                   onTap: () async {
-                    updateDesign(CaptionDesign.fromTemplate(name));
+                    updateDesign(CaptionDesign.fromTemplate(name).copyWith(position: design.position));
                     await ref.read(projectsProvider).updateTemplate(name);
                   },
                 );
@@ -2777,6 +2812,7 @@ class _CaptionOverlay extends StatelessWidget {
               ? design.activeColor
               : design.color,
           fontSize: design.size * sizeMultiplier,
+          font: isActive ? (design.activeFont ?? design.font) : null,
         ),
         isActive: isActive,
         effect: design.effect,
@@ -3457,6 +3493,7 @@ class _TemplateStyleCardState extends State<TemplateStyleCard>
                                                       CaptionFont.lobster
                                             ? 21
                                             : 17,
+                                        font: wordIsActive ? (design.activeFont ?? design.font) : null,
                                       ),
                                     );
                                     final framedPreview = design.wordChip
@@ -3677,6 +3714,7 @@ Future<void> showCustomizeSheet(BuildContext context, WidgetRef ref) async {
   var customColorPage = false;
   var customColorIsHighlight = false;
   Color? colorBeforeCustomPage;
+  bool editingHighlightFont = false;
   await showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
@@ -3684,7 +3722,12 @@ Future<void> showCustomizeSheet(BuildContext context, WidgetRef ref) async {
     builder: (_) => StatefulBuilder(
       builder: (sheetContext, setSheetState) {
         final design = ref.read(captionDesignProvider);
-        final recentColors = ref.read(captionRecentColorsProvider);
+        final baseRecent = ref.read(captionRecentColorsProvider);
+        final recentColors = [
+          design.activeColor,
+          if (design.color.toARGB32() != design.activeColor.toARGB32()) design.color,
+          ...baseRecent.where((c) => c.toARGB32() != design.activeColor.toARGB32() && c.toARGB32() != design.color.toARGB32())
+        ].take(5).toList();
         void update(CaptionDesign value) {
           ref.read(captionDesignProvider.notifier).state = value;
           setSheetState(() {});
@@ -3699,7 +3742,7 @@ Future<void> showCustomizeSheet(BuildContext context, WidgetRef ref) async {
           if (!addToRecent) return;
           final updatedRecent = [
             color,
-            ...recentColors.where(
+            ...baseRecent.where(
               (item) => item.toARGB32() != color.toARGB32(),
             ),
           ].take(4).toList();

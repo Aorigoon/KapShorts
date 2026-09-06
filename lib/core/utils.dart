@@ -54,8 +54,10 @@ TextStyle captionTextStyle(
   CaptionDesign design, {
   Color? color,
   double? fontSize,
+  CaptionFont? font,
 }) {
-  final base = switch (design.font) {
+  final usedFont = font ?? design.font;
+  final base = switch (usedFont) {
     CaptionFont.poppins => GoogleFonts.poppins(),
     CaptionFont.inter => GoogleFonts.inter(),
     CaptionFont.anton => GoogleFonts.anton(),
