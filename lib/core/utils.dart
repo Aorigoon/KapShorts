@@ -92,6 +92,16 @@ TextStyle captionTextStyle(
     CaptionFont.truculenta => GoogleFonts.truculenta(),
     CaptionFont.tiltWarp => GoogleFonts.tiltWarp(),
     CaptionFont.sriracha => GoogleFonts.sriracha(),
+    CaptionFont.roboto => GoogleFonts.roboto(),
+    CaptionFont.openSans => GoogleFonts.openSans(),
+    CaptionFont.lato => GoogleFonts.lato(),
+    CaptionFont.ubuntu => GoogleFonts.ubuntu(),
+    CaptionFont.bebasNeue => GoogleFonts.bebasNeue(),
+    CaptionFont.dancingScript => GoogleFonts.dancingScript(),
+    CaptionFont.cinzel => GoogleFonts.cinzel(),
+    CaptionFont.josefinSans => GoogleFonts.josefinSans(),
+    CaptionFont.teko => GoogleFonts.teko(),
+    CaptionFont.firaSans => GoogleFonts.firaSans(),
   };
   final outline = design.outlineWidth <= 0
       ? <Shadow>[]

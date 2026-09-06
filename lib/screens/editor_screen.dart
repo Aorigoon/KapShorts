@@ -1356,6 +1356,17 @@ Future<void> showEditorToolSheet(
         Widget content;
         if (tool == EditorTool.fonts) {
           const fonts = [
+            FontPreviewChoice(CaptionFont.roboto, 'Roboto', 'Roboto'),
+            FontPreviewChoice(CaptionFont.openSans, 'Open Sans', 'Open Sans'),
+            FontPreviewChoice(CaptionFont.lato, 'Lato', 'Lato'),
+            FontPreviewChoice(CaptionFont.ubuntu, 'Ubuntu', 'Ubuntu'),
+            FontPreviewChoice(CaptionFont.bebasNeue, 'Bebas Neue', 'Bebas Neue'),
+            FontPreviewChoice(CaptionFont.dancingScript, 'Dancing Script', 'Dancing Script'),
+            FontPreviewChoice(CaptionFont.cinzel, 'Cinzel', 'Cinzel'),
+            FontPreviewChoice(CaptionFont.josefinSans, 'Josefin Sans', 'Josefin Sans'),
+            FontPreviewChoice(CaptionFont.teko, 'Teko', 'Teko'),
+            FontPreviewChoice(CaptionFont.firaSans, 'Fira Sans', 'Fira Sans'),
+
             FontPreviewChoice(CaptionFont.bungee, 'Bungee', 'BUNGEE'),
             FontPreviewChoice(CaptionFont.chivo, 'Chivo', 'Chivo'),
             FontPreviewChoice(CaptionFont.comfortaa, 'Comfortaa', 'Comfortaa'),
@@ -1462,21 +1473,18 @@ Future<void> showEditorToolSheet(
             ),
           ];
           content = SizedBox(
-            height: 282,
-            child: GridView.builder(
+            height: 310, // Adjust height to show ~5.5 items (e.g. 5.5 * 52 = 286, plus padding)
+            child: ListView.separated(
               padding: const EdgeInsets.only(bottom: 28),
               itemCount: fonts.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: 2.25,
-              ),
-              itemBuilder: (_, index) => FontPreviewCard(
-                choice: fonts[index],
-                selected: design.font == fonts[index].font,
-                onTap: () =>
-                    updateDesign(design.copyWith(font: fonts[index].font)),
+              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              itemBuilder: (_, index) => SizedBox(
+                height: 48,
+                child: FontPreviewCard(
+                  choice: fonts[index],
+                  selected: design.font == fonts[index].font,
+                  onTap: () => updateDesign(design.copyWith(font: fonts[index].font)),
+                ),
               ),
             ),
           );
@@ -3667,6 +3675,7 @@ Future<void> saveTranscriptSegmentText(
 
 Future<void> showCustomizeSheet(BuildContext context, WidgetRef ref) async {
   var customColorPage = false;
+  var customColorIsHighlight = false;
   Color? colorBeforeCustomPage;
   await showModalBottomSheet<void>(
     context: context,
@@ -3681,8 +3690,12 @@ Future<void> showCustomizeSheet(BuildContext context, WidgetRef ref) async {
           setSheetState(() {});
         }
 
-        void applyCaptionColor(Color color, {bool addToRecent = false}) {
-          update(design.copyWith(color: color, activeColor: color));
+        void applyCaptionColor(Color color, {bool addToRecent = false, bool isHighlight = false}) {
+          if (isHighlight) {
+            update(design.copyWith(activeColor: color));
+          } else {
+            update(design.copyWith(color: color));
+          }
           if (!addToRecent) return;
           final updatedRecent = [
             color,
@@ -3702,17 +3715,17 @@ Future<void> showCustomizeSheet(BuildContext context, WidgetRef ref) async {
             child: SafeArea(
               top: false,
               child: _InSheetCustomColorPage(
-                initialColor: design.color,
+                initialColor: customColorIsHighlight ? design.activeColor : design.color,
                 onLiveChange: (color) =>
-                    update(design.copyWith(color: color, activeColor: color)),
+                    update(customColorIsHighlight ? design.copyWith(activeColor: color) : design.copyWith(color: color)),
                 onBack: () {
-                  final restore = colorBeforeCustomPage ?? design.color;
-                  update(design.copyWith(color: restore, activeColor: restore));
+                  final restore = colorBeforeCustomPage ?? (customColorIsHighlight ? design.activeColor : design.color);
+                  update(customColorIsHighlight ? design.copyWith(activeColor: restore) : design.copyWith(color: restore));
                   colorBeforeCustomPage = null;
                   setSheetState(() => customColorPage = false);
                 },
                 onApply: (color) {
-                  applyCaptionColor(color, addToRecent: true);
+                  applyCaptionColor(color, addToRecent: true, isHighlight: customColorIsHighlight);
                   colorBeforeCustomPage = null;
                   setSheetState(() => customColorPage = false);
                 },
@@ -3851,6 +3864,80 @@ Future<void> showCustomizeSheet(BuildContext context, WidgetRef ref) async {
                       InkWell(
                         onTap: () {
                           colorBeforeCustomPage = design.color;
+                          customColorIsHighlight = false;
+                          setSheetState(() => customColorPage = true);
+                        },
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: const SweepGradient(
+                              colors: [
+                                Color(0xFFFF4D4D),
+                                Color(0xFFFFD34E),
+                                Color(0xFF72E06A),
+                                Color(0xFF44C7FF),
+                                Color(0xFF7858FF),
+                                Color(0xFFFF5EBE),
+                                Color(0xFFFF4D4D),
+                              ],
+                            ),
+                            border: Border.all(color: Colors.white54),
+                          ),
+                          alignment: Alignment.center,
+                          child: Container(
+                            width: 21,
+                            height: 21,
+                            decoration: const BoxDecoration(
+                              color: AppColors.surface,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.add_rounded,
+                              size: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  const Text(
+                    'Highlight color',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 10,
+                    children: [
+                      ...recentColors.map(
+                        (color) => InkWell(
+                          onTap: () => applyCaptionColor(color, isHighlight: true),
+                          borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            width: 34,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: design.activeColor == color
+                                    ? Colors.white
+                                    : Colors.transparent,
+                                width: 3,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          colorBeforeCustomPage = design.activeColor;
+                          customColorIsHighlight = true;
                           setSheetState(() => customColorPage = true);
                         },
                         borderRadius: BorderRadius.circular(20),
