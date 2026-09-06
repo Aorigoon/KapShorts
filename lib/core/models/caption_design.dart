@@ -228,8 +228,6 @@ class CaptionDesign {
     activeFont: activeFont ?? this.activeFont,
     activeSize: activeSize ?? this.activeSize,
     activeWeight: activeWeight ?? this.activeWeight,
-    this.activeSize,
-    this.activeWeight,
     backgroundColor: backgroundColor ?? this.backgroundColor,
     borderColor: borderColor ?? this.borderColor,
     boxHorizontalPadding: boxHorizontalPadding ?? this.boxHorizontalPadding,

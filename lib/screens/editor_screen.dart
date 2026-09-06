@@ -3868,6 +3868,7 @@ Future<void> saveTranscriptSegmentText(
           end: entry.$1 == replacementTokens.length - 1
               ? end
               : start + span * (entry.$1 + 1),
+          globalIndex: 0,
         ),
       )
       .toList();
