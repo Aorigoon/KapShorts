@@ -1916,13 +1916,176 @@ Future<void> showEditorToolSheet(
             },
           );
         } else if (tool == EditorTool.activeWords) {
-                    side: BorderSide(
-                      color: (design.activeWeight ?? design.weight) == weight ? Colors.white : AppColors.line,
+          content = SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Active Word Color', style: TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 10,
+                  children: [
+                    ...baseRecent.map(
+                      (color) => InkWell(
+                        onTap: () => updateDesign(design.copyWith(activeColor: color)),
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: design.activeColor == color ? Colors.white : Colors.transparent,
+                              width: 3,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ).toList(),
-              ),
-            ],
+                    // Custom Rainbow Picker Button
+                    InkWell(
+                      onTap: () {
+                        setSheetState(() {
+                          customColorTarget = 'activeColor';
+                          customColorPage = true;
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.line, width: 2),
+                          gradient: const SweepGradient(
+                            colors: [Colors.red, Colors.orange, Colors.yellow, Colors.green, Colors.blue, Colors.purple, Colors.red],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+                const Text('Active Word Background', style: TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    // None
+                    GestureDetector(
+                      onTap: () => updateDesign(design.copyWith(activeBackground: const Color(0x00000000))),
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: (design.activeBackground == null || design.activeBackground!.alpha == 0) ? Colors.white : AppColors.line,
+                            width: 3,
+                          ),
+                          color: AppColors.elevated,
+                        ),
+                        child: const Icon(Icons.block, size: 16, color: AppColors.secondary),
+                      ),
+                    ),
+                    ...[ Colors.black, Colors.white, Colors.yellow, const Color(0xFF44C7FF), const Color(0xFFFF5C5C)].map(
+                      (color) => GestureDetector(
+                        onTap: () => updateDesign(design.copyWith(activeBackground: color)),
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: color,
+                            border: Border.all(
+                              color: design.activeBackground == color ? Colors.white : Colors.transparent,
+                              width: 3,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Custom Rainbow Picker Button
+                    InkWell(
+                      onTap: () {
+                        setSheetState(() {
+                          customColorTarget = 'activeBackground';
+                          customColorPage = true;
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.line, width: 2),
+                          gradient: const SweepGradient(
+                            colors: [Colors.red, Colors.orange, Colors.yellow, Colors.green, Colors.blue, Colors.purple, Colors.red],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    const Text('Active Size', style: TextStyle(fontWeight: FontWeight.w700)),
+                    const Spacer(),
+                    Text('${(design.activeSize ?? design.size).round()} px', style: const TextStyle(color: AppColors.secondary)),
+                  ],
+                ),
+                Slider(
+                  value: design.activeSize ?? design.size,
+                  min: 18,
+                  max: 60,
+                  divisions: 21,
+                  activeColor: Colors.white,
+                  inactiveColor: AppColors.line,
+                  onChanged: (value) => updateDesign(design.copyWith(activeSize: value)),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    const Text('Blink Effect', style: TextStyle(fontWeight: FontWeight.w700)),
+                    const Spacer(),
+                    Switch(
+                      value: design.activeBlink,
+                      onChanged: (v) => updateDesign(design.copyWith(activeBlink: v)),
+                      activeColor: Colors.white,
+                      activeTrackColor: AppColors.line,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                const Text('Active Weight', style: TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 9),
+                Wrap(
+                  spacing: 8,
+                  children: [FontWeight.w500, FontWeight.w700, FontWeight.w900].map(
+                    (weight) => ChoiceChip(
+                      label: Text(weight == FontWeight.w500 ? 'Regular' : weight == FontWeight.w700 ? 'Bold' : 'Extra Bold'),
+                      selected: (design.activeWeight ?? design.weight) == weight,
+                      onSelected: (_) => updateDesign(design.copyWith(activeWeight: weight)),
+                      selectedColor: Colors.white,
+                      backgroundColor: AppColors.elevated,
+                      labelStyle: TextStyle(
+                        color: (design.activeWeight ?? design.weight) == weight ? Colors.black : Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      side: BorderSide(
+                        color: (design.activeWeight ?? design.weight) == weight ? Colors.white : AppColors.line,
+                      ),
+                    ),
+                  ).toList(),
+                ),
+              ],
+            ),
           );
         } else if (tool == EditorTool.templates) {
           const templates = ['Triple Pop', 'Ali Abdaal Tri', 'Podcast Minimal', 'Emphasis Outline', 'Clean Box', 'Bubble', 'Hormozi Bold', 'MrBeast Impact', 'Karaoke Bar', 'Gold Shadow', 'Neon Highlight', 'Double Pop', 'Left Ladder', 'Stacked Punch', 'Soft Talk', 'Coral Punch', 'Electric Wave', 'Mono Signal', 'Halo Words', 'Marker Pop', 'Nightline', 'Retro Offset', 'Quiet Outline', 'Cloud Float', 'Fire Starter', 'Solar Build', 'Hard Echo', 'Midnight Chip', 'Focus Pixel', 'Velvet Three', 'Ember Karaoke', 'Prism Stack', 'Noir Plate', 'Signal Tag', 'Mint Outline', 'Horizon Slide', 'Paper Stamp', 'Cinema Serif', 'Script Bloom', 'Poster Ink', 'Block Parade', 'Prism Grotesk', 'Arcade Pulse', 'Luxe Title', 'Velvet Script', 'Classic Cut', 'Reel Candy', 'Blackout Bold', 'Pixel Snap', 'Sunbeam Serif', 'Doodle Yellow', 'Bubble Chrome', 'Clean Digital', 'Film Noir', 'Sunset Script', 'Viva Poster', 'Soda Pop', 'Urban Mono', 'Chrome Marker', 'Neon Serif', 'Storybook Script', 'Punchline Sans', 'Warm Stage', 'Blink Pop', 'Karaoke Fill', 'Bold Box', 'Minimal Clean', 'Neon Glow', 'Typewriter', 'Bounce', 'Podcast Clean', 'MrBeast Action', 'Ali Abdaal Minimal', 'Ali Abdaal Highlight'];
