@@ -15,6 +15,99 @@ import '../core/models/video_project.dart';
 import '../core/models/caption_design.dart';
 import '../core/providers.dart';
 import '../core/utils.dart';
+class AnimatedSlidingToggle extends StatelessWidget {
+  const AnimatedSlidingToggle({
+    required this.value,
+    required this.onChanged,
+    required this.leftLabel,
+    required this.rightLabel,
+    super.key,
+  });
+
+  final bool value; // false = left, true = right
+  final ValueChanged<bool> onChanged;
+  final String leftLabel;
+  final String rightLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => onChanged(!value),
+      child: Container(
+        height: 48,
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E1E24),
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Stack(
+          children: [
+            AnimatedAlign(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic,
+              alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+              child: FractionallySizedBox(
+                widthFactor: 0.5,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF383842),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => onChanged(false),
+                    child: Center(
+                      child: AnimatedDefaultTextStyle(
+                        duration: const Duration(milliseconds: 200),
+                        style: TextStyle(
+                          color: !value ? Colors.white : const Color(0xFF8E8E93),
+                          fontWeight: !value ? FontWeight.w700 : FontWeight.w600,
+                          fontSize: 15,
+                        ),
+                        child: Text(leftLabel),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => onChanged(true),
+                    child: Center(
+                      child: AnimatedDefaultTextStyle(
+                        duration: const Duration(milliseconds: 200),
+                        style: TextStyle(
+                          color: value ? Colors.white : const Color(0xFF8E8E93),
+                          fontWeight: value ? FontWeight.w700 : FontWeight.w600,
+                          fontSize: 15,
+                        ),
+                        child: Text(rightLabel),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class EditorScreen extends ConsumerStatefulWidget {
   const EditorScreen({super.key});
 
@@ -1478,18 +1571,11 @@ Future<void> showEditorToolSheet(
           content = Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SegmentedButton<bool>(
-                segments: const [
-                  ButtonSegment(value: false, label: Text('Base Font')),
-                  ButtonSegment(value: true, label: Text('Highlight Font')),
-                ],
-                selected: {editingHighlightFont},
-                onSelectionChanged: (set) => setSheetState(() => editingHighlightFont = set.first),
-                style: SegmentedButton.styleFrom(
-                  backgroundColor: AppColors.canvas,
-                  selectedBackgroundColor: Colors.white,
-                  selectedForegroundColor: Colors.black,
-                ),
+              AnimatedSlidingToggle(
+                value: editingHighlightFont,
+                onChanged: (val) => setSheetState(() => editingHighlightFont = val),
+                leftLabel: 'Base Font',
+                rightLabel: 'Highlight Font',
               ),
               const SizedBox(height: 16),
               SizedBox(
