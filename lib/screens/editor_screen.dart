@@ -1801,29 +1801,9 @@ Future<void> showEditorToolSheet(
                       ),
                     ),
                   ),
-                  InkWell(
-                    onTap: () async {
-                      final picked = await showDialog<Color>(
-                        context: context,
-                        builder: (_) => _ColorPickerDialog(initial: design.activeColor),
-                      );
-                      if (picked != null) updateDesign(design.copyWith(activeColor: picked));
-                    },
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.line, width: 2),
-                        gradient: const SweepGradient(
-                          colors: [Colors.red, Colors.orange, Colors.yellow, Colors.green, Colors.blue, Colors.purple, Colors.red],
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
+
               const SizedBox(height: 20),
               const Text('Active Word Background', style: TextStyle(fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
