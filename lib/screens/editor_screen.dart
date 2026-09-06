@@ -1652,11 +1652,11 @@ Future<void> showEditorToolSheet(
                       return ChoiceChip(
                         label: Text(
                           f.name.toUpperCase(),
-                          style: TextStyle(
-                            fontFamily: f.fontFamily,
-                            fontWeight: FontWeight.w700,
-                            color: isSel ? Colors.black : Colors.white,
+                          style: captionTextStyle(
+                            design,
+                            font: f,
                             fontSize: 11,
+                            color: isSel ? Colors.black : Colors.white,
                           ),
                         ),
                         selected: isSel,
