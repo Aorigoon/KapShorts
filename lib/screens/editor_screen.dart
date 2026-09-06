@@ -1615,8 +1615,8 @@ Future<void> showEditorToolSheet(
           );
         } else if (tool == EditorTool.highlight) {
           final recentColors = ref.read(captionRecentColorsProvider);
-          void applyCaptionColor(Color color, {bool addToRecent = false}) {
-            updateDesign(design.copyWith(activeColor: color));
+          void applyHighlightColor(Color color, {bool addToRecent = false}) {
+            updateDesign(design.copyWith(highlightColor: color));
             if (!addToRecent) return;
             final updatedRecent = [
               color,
@@ -1625,81 +1625,123 @@ Future<void> showEditorToolSheet(
             ref.read(captionRecentColorsProvider.notifier).state = updatedRecent;
           }
           
-          content = Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Highlight Color', style: TextStyle(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 12,
-                runSpacing: 10,
+          bool showWords = true;
+          content = StatefulBuilder(
+            builder: (context, setInnerState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ...recentColors.map(
-                    (color) => InkWell(
-                      onTap: () => applyCaptionColor(color),
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        width: 34,
-                        height: 34,
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: design.activeColor == color ? Colors.white : Colors.transparent,
-                            width: 3,
-                          ),
+                  AnimatedSlidingToggle(
+                    value: !showWords,
+                    leftLabel: 'Words',
+                    rightLabel: 'Style',
+                    onChanged: (val) => setInnerState(() => showWords = !val),
+                  ),
+                  const SizedBox(height: 20),
+                  if (showWords)
+                    HighlightWordOverview(
+                      transcription: transcription,
+                      onWordToggled: (globalIndex) async {
+                        final current = transcription ?? ref.read(projectsProvider).selected?.transcription;
+                        if (current == null) return;
+                        final modified = Map<String, dynamic>.from(current);
+                        final emphasized = modified['emphasizedIndices'] is List
+                            ? List<int>.from(modified['emphasizedIndices'] as List)
+                            : <int>[];
+                        if (emphasized.contains(globalIndex)) {
+                          emphasized.remove(globalIndex);
+                        } else {
+                          emphasized.add(globalIndex);
+                        }
+                        modified['emphasizedIndices'] = emphasized;
+                        ref.read(captionTranscriptionProvider.notifier).state = modified;
+                        final proj = ref.read(projectsProvider).selected;
+                        if (proj != null) {
+                          await ref.read(projectsProvider).saveTranscript(modified);
+                        }
+                      },
+                    )
+                  else
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Highlight Color', style: TextStyle(fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 10,
+                          children: [
+                            ...recentColors.map(
+                              (color) => InkWell(
+                                onTap: () => applyHighlightColor(color),
+                                borderRadius: BorderRadius.circular(20),
+                                child: Container(
+                                  width: 34,
+                                  height: 34,
+                                  decoration: BoxDecoration(
+                                    color: color,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: (design.highlightColor ?? design.activeColor) == color ? Colors.white : Colors.transparent,
+                                      width: 3,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
+                        const SizedBox(height: 24),
+                        Row(
+                          children: [
+                            const Text('Highlight Size', style: TextStyle(fontWeight: FontWeight.w700)),
+                            const Spacer(),
+                            Text('${(design.highlightSize ?? design.activeSize ?? design.size).round()} px', style: const TextStyle(color: AppColors.secondary)),
+                          ],
+                        ),
+                        Slider(
+                          value: design.highlightSize ?? design.activeSize ?? design.size,
+                          min: 18,
+                          max: 50,
+                          divisions: 16,
+                          activeColor: Colors.white,
+                          inactiveColor: AppColors.line,
+                          onChanged: (value) => updateDesign(design.copyWith(highlightSize: value)),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text('Highlight Weight', style: TextStyle(fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 9),
+                        Wrap(
+                          spacing: 8,
+                          children: [FontWeight.w500, FontWeight.w700, FontWeight.w900].map(
+                            (weight) => ChoiceChip(
+                              label: Text(
+                                weight == FontWeight.w500 ? 'Regular' : weight == FontWeight.w700 ? 'Bold' : 'Extra bold',
+                              ),
+                              selected: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight,
+                              onSelected: (_) => updateDesign(design.copyWith(highlightWeight: weight)),
+                              selectedColor: Colors.white,
+                              backgroundColor: AppColors.elevated,
+                              labelStyle: TextStyle(
+                                color: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight ? Colors.black : Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              side: BorderSide(
+                                color: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight ? Colors.white : AppColors.line,
+                              ),
+                            ),
+                          ).toList(),
+                        ),
+                      ],
                     ),
-                  ),
                 ],
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  const Text('Highlight Size', style: TextStyle(fontWeight: FontWeight.w700)),
-                  const Spacer(),
-                  Text('${(design.activeSize ?? design.size).round()} px', style: const TextStyle(color: AppColors.secondary)),
-                ],
-              ),
-              Slider(
-                value: design.activeSize ?? design.size,
-                min: 18,
-                max: 50,
-                divisions: 16,
-                activeColor: Colors.white,
-                inactiveColor: AppColors.line,
-                onChanged: (value) => updateDesign(design.copyWith(activeSize: value)),
-              ),
-              const SizedBox(height: 12),
-              const Text('Highlight Weight', style: TextStyle(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 9),
-              Wrap(
-                spacing: 8,
-                children: [FontWeight.w500, FontWeight.w700, FontWeight.w900].map(
-                  (weight) => ChoiceChip(
-                    label: Text(
-                      weight == FontWeight.w500 ? 'Regular' : weight == FontWeight.w700 ? 'Bold' : 'Extra bold',
-                    ),
-                    selected: (design.activeWeight ?? design.weight) == weight,
-                    onSelected: (_) => updateDesign(design.copyWith(activeWeight: weight)),
-                    selectedColor: Colors.white,
-                    backgroundColor: AppColors.elevated,
-                    labelStyle: TextStyle(
-                      color: (design.activeWeight ?? design.weight) == weight ? Colors.black : Colors.white,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    side: BorderSide(
-                      color: (design.activeWeight ?? design.weight) == weight ? Colors.white : AppColors.line,
-                    ),
-                  ),
-                ).toList(),
-              ),
-            ],
+              );
+            },
           );
         } else if (tool == EditorTool.templates) {
-          const templates = ['Podcast Minimal', 'Emphasis Outline', 'Clean Box', 'Bubble', 'Hormozi Bold', 'MrBeast Impact', 'Karaoke Bar', 'Gold Shadow', 'Neon Highlight', 'Double Pop', 'Left Ladder', 'Stacked Punch', 'Soft Talk', 'Coral Punch', 'Electric Wave', 'Mono Signal', 'Halo Words', 'Marker Pop', 'Nightline', 'Retro Offset', 'Quiet Outline', 'Cloud Float', 'Fire Starter', 'Solar Build', 'Hard Echo', 'Midnight Chip', 'Focus Pixel', 'Velvet Three', 'Ember Karaoke', 'Prism Stack', 'Noir Plate', 'Signal Tag', 'Mint Outline', 'Horizon Slide', 'Paper Stamp', 'Cinema Serif', 'Script Bloom', 'Poster Ink', 'Block Parade', 'Prism Grotesk', 'Arcade Pulse', 'Luxe Title', 'Velvet Script', 'Classic Cut', 'Reel Candy', 'Blackout Bold', 'Pixel Snap', 'Sunbeam Serif', 'Doodle Yellow', 'Bubble Chrome', 'Clean Digital', 'Film Noir', 'Sunset Script', 'Viva Poster', 'Soda Pop', 'Urban Mono', 'Chrome Marker', 'Neon Serif', 'Storybook Script', 'Punchline Sans', 'Warm Stage', 'Blink Pop', 'Karaoke Fill', 'Bold Box', 'Minimal Clean', 'Neon Glow', 'Typewriter', 'Bounce', 'Podcast Clean', 'MrBeast Action', 'Ali Abdaal Minimal', 'Ali Abdaal Highlight'];
+          const templates = ['Triple Pop', 'Ali Abdaal Tri', 'Podcast Minimal', 'Emphasis Outline', 'Clean Box', 'Bubble', 'Hormozi Bold', 'MrBeast Impact', 'Karaoke Bar', 'Gold Shadow', 'Neon Highlight', 'Double Pop', 'Left Ladder', 'Stacked Punch', 'Soft Talk', 'Coral Punch', 'Electric Wave', 'Mono Signal', 'Halo Words', 'Marker Pop', 'Nightline', 'Retro Offset', 'Quiet Outline', 'Cloud Float', 'Fire Starter', 'Solar Build', 'Hard Echo', 'Midnight Chip', 'Focus Pixel', 'Velvet Three', 'Ember Karaoke', 'Prism Stack', 'Noir Plate', 'Signal Tag', 'Mint Outline', 'Horizon Slide', 'Paper Stamp', 'Cinema Serif', 'Script Bloom', 'Poster Ink', 'Block Parade', 'Prism Grotesk', 'Arcade Pulse', 'Luxe Title', 'Velvet Script', 'Classic Cut', 'Reel Candy', 'Blackout Bold', 'Pixel Snap', 'Sunbeam Serif', 'Doodle Yellow', 'Bubble Chrome', 'Clean Digital', 'Film Noir', 'Sunset Script', 'Viva Poster', 'Soda Pop', 'Urban Mono', 'Chrome Marker', 'Neon Serif', 'Storybook Script', 'Punchline Sans', 'Warm Stage', 'Blink Pop', 'Karaoke Fill', 'Bold Box', 'Minimal Clean', 'Neon Glow', 'Typewriter', 'Bounce', 'Podcast Clean', 'MrBeast Action', 'Ali Abdaal Minimal', 'Ali Abdaal Highlight'];
           content = SizedBox(
             height: 356,
             child: GridView.builder(
@@ -2987,15 +3029,16 @@ class _CaptionOverlay extends StatelessWidget {
           design,
           color: design.wordChip
               ? (isActive ? Colors.black : Colors.white)
-              : design.effect == CaptionEffect.karaoke &&
-                    index <= selectedWordIndex
+              : isEmphasized
+              ? (design.highlightColor ?? design.activeColor)
+              : design.effect == CaptionEffect.karaoke && index <= selectedWordIndex
               ? design.activeColor
-              : isActive
+              : isSpoken
               ? design.activeColor
               : design.color,
-          fontSize: (isActive ? (design.activeSize ?? design.size) : design.size) * sizeMultiplier,
-          font: isActive ? (design.activeFont ?? design.font) : null,
-          fontWeight: isActive ? (design.activeWeight ?? design.weight) : null,
+          fontSize: (isEmphasized ? (design.highlightSize ?? design.activeSize ?? design.size) : isSpoken ? (design.activeSize ?? design.size) : design.size) * sizeMultiplier,
+          font: isEmphasized ? (design.highlightFont ?? design.activeFont ?? design.font) : isSpoken ? (design.activeFont ?? design.font) : null,
+          fontWeight: isEmphasized ? (design.highlightWeight ?? design.activeWeight ?? design.weight) : isSpoken ? (design.activeWeight ?? design.weight) : null,
         ),
         isActive: isSpoken,
         effect: design.effect,
@@ -3017,7 +3060,7 @@ class _CaptionOverlay extends StatelessWidget {
                 vertical: design.size * .11,
               ),
               decoration: BoxDecoration(
-                color: isActive ? design.activeColor : design.chipColor,
+                color: isEmphasized ? (design.highlightColor ?? design.activeColor) : isSpoken ? design.activeColor : design.chipColor,
                 borderRadius: BorderRadius.circular(design.size * .18),
               ),
               child: word,
@@ -3764,6 +3807,51 @@ class _TemplateStyleCardState extends State<TemplateStyleCard>
           ),
         );
       },
+    );
+  }
+}
+
+class HighlightWordOverview extends StatelessWidget {
+  const HighlightWordOverview({
+    required this.transcription,
+    required this.onWordToggled,
+    super.key,
+  });
+  final Map<String, dynamic>? transcription;
+  final void Function(int globalIndex) onWordToggled;
+
+  @override
+  Widget build(BuildContext context) {
+    final words = resolveCaptionWords(transcription);
+    if (words.isEmpty) return const SizedBox.shrink();
+    return Container(
+      constraints: const BoxConstraints(maxHeight: 280),
+      child: SingleChildScrollView(
+        child: Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: words.map(
+            (word) => GestureDetector(
+              onTap: () => onWordToggled(word.globalIndex),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: word.isEmphasized ? const Color(0xFFFFD34E) : AppColors.elevated,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  word.text,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: word.isEmphasized ? Colors.black : Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ).toList(),
+        ),
+      ),
     );
   }
 }

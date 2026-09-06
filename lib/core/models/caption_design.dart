@@ -146,6 +146,10 @@ class CaptionDesign {
     this.activeFont,
     this.activeSize,
     this.activeWeight,
+    this.highlightFont,
+    this.highlightSize,
+    this.highlightWeight,
+    this.highlightColor,
     this.backgroundColor,
     this.borderColor,
     this.boxHorizontalPadding = 0,
@@ -173,6 +177,10 @@ class CaptionDesign {
   final CaptionFont? activeFont;
   final double? activeSize;
   final FontWeight? activeWeight;
+  final CaptionFont? highlightFont;
+  final double? highlightSize;
+  final FontWeight? highlightWeight;
+  final Color? highlightColor;
   final Color? backgroundColor;
   final Color? borderColor;
   final double boxHorizontalPadding;
@@ -201,6 +209,10 @@ class CaptionDesign {
     CaptionFont? activeFont,
     double? activeSize,
     FontWeight? activeWeight,
+    CaptionFont? highlightFont,
+    double? highlightSize,
+    FontWeight? highlightWeight,
+    Color? highlightColor,
     Color? backgroundColor,
     Color? borderColor,
     double? boxHorizontalPadding,
@@ -228,6 +240,10 @@ class CaptionDesign {
     activeFont: activeFont ?? this.activeFont,
     activeSize: activeSize ?? this.activeSize,
     activeWeight: activeWeight ?? this.activeWeight,
+    highlightFont: highlightFont ?? this.highlightFont,
+    highlightSize: highlightSize ?? this.highlightSize,
+    highlightWeight: highlightWeight ?? this.highlightWeight,
+    highlightColor: highlightColor ?? this.highlightColor,
     backgroundColor: backgroundColor ?? this.backgroundColor,
     borderColor: borderColor ?? this.borderColor,
     boxHorizontalPadding: boxHorizontalPadding ?? this.boxHorizontalPadding,
@@ -1151,6 +1167,31 @@ class CaptionDesign {
       font: CaptionFont.poppins,
       wordChip: true,
       chipColor: Color(0xFFFFD166),
+      outlineWidth: 0,
+      maxWordsPerLine: 4,
+    ),
+    'Triple Pop' => const CaptionDesign(
+      size: 32,
+      position: CaptionPosition.center,
+      color: Colors.white,
+      activeColor: Color(0xFF44C7FF),
+      highlightColor: Color(0xFFFFD166),
+      weight: FontWeight.w900,
+      effect: CaptionEffect.pop,
+      font: CaptionFont.montserrat,
+      outlineWidth: 2.0,
+      maxWordsPerLine: 4,
+    ),
+    'Ali Abdaal Tri' => const CaptionDesign(
+      size: 28,
+      color: Colors.white,
+      activeColor: Color(0xFF44C7FF),
+      highlightColor: Color(0xFFFFD166),
+      weight: FontWeight.w700,
+      effect: CaptionEffect.pop,
+      font: CaptionFont.poppins,
+      wordChip: true,
+      chipColor: Colors.transparent,
       outlineWidth: 0,
       maxWordsPerLine: 4,
     ),
