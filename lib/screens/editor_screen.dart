@@ -1719,20 +1719,6 @@ Future<void> showEditorToolSheet(
                           side: BorderSide(color: isSel ? Colors.white : AppColors.line),
                         );
                       }),
-                      ChoiceChip(
-                        label: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.more_horiz_rounded, size: 14, color: Colors.white),
-                            SizedBox(width: 4),
-                            Text('More...', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-                          ],
-                        ),
-                        selected: false,
-                        onSelected: (_) => setSheetState(() => choosingHighlightFont = true),
-                        backgroundColor: AppColors.elevated,
-                        side: const BorderSide(color: AppColors.line),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 18),
@@ -1742,7 +1728,7 @@ Future<void> showEditorToolSheet(
                     spacing: 12,
                     runSpacing: 10,
                     children: [
-                      ...baseRecent.map(
+                      ...baseRecent.take(5).map(
                         (color) => InkWell(
                           onTap: () => updateDesign(design.copyWith(highlightColor: color)),
                           borderRadius: BorderRadius.circular(20),
@@ -1806,7 +1792,7 @@ Future<void> showEditorToolSheet(
                           child: const Icon(Icons.block, size: 16, color: AppColors.secondary),
                         ),
                       ),
-                      ...[Colors.black, Colors.white, Colors.yellow, const Color(0xFF44C7FF), const Color(0xFFFF5C5C), const Color(0xFF00FF88)].map(
+                      ...baseRecent.take(4).map(
                         (color) => GestureDetector(
                           onTap: () => updateDesign(design.copyWith(highlightBackground: color)),
                           child: Container(
@@ -1927,7 +1913,7 @@ Future<void> showEditorToolSheet(
                   spacing: 12,
                   runSpacing: 10,
                   children: [
-                    ...baseRecent.map(
+                    ...baseRecent.take(5).map(
                       (color) => InkWell(
                         onTap: () => updateDesign(design.copyWith(activeColor: color)),
                         borderRadius: BorderRadius.circular(20),
@@ -1992,7 +1978,7 @@ Future<void> showEditorToolSheet(
                         child: const Icon(Icons.block, size: 16, color: AppColors.secondary),
                       ),
                     ),
-                    ...[ Colors.black, Colors.white, Colors.yellow, const Color(0xFF44C7FF), const Color(0xFFFF5C5C)].map(
+                    ...baseRecent.take(4).map(
                       (color) => GestureDetector(
                         onTap: () => updateDesign(design.copyWith(activeBackground: color)),
                         child: Container(
