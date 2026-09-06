@@ -1655,7 +1655,7 @@ Future<void> showEditorToolSheet(
                           emphasized.add(globalIndex);
                         }
                         modified['emphasizedIndices'] = emphasized;
-                        ref.read(captionTranscriptionProvider.notifier).state = modified;
+                        ref.read(transcriptionProvider.notifier).state = modified;
                         final proj = ref.read(projectsProvider).selected;
                         if (proj != null) {
                           await ref.read(projectsProvider).saveTranscript(modified);
