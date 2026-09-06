@@ -1633,120 +1633,78 @@ Future<void> showEditorToolSheet(
             ref.read(captionRecentColorsProvider.notifier).state = updatedRecent;
           }
           
-          bool showWords = true;
-          content = StatefulBuilder(
-            builder: (context, setInnerState) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+          content = Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Highlight Color', style: TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 12,
+                runSpacing: 10,
                 children: [
-                  AnimatedSlidingToggle(
-                    value: !showWords,
-                    leftLabel: 'Words',
-                    rightLabel: 'Style',
-                    onChanged: (val) => setInnerState(() => showWords = !val),
-                  ),
-                  const SizedBox(height: 20),
-                  if (showWords)
-                    HighlightWordOverview(
-                      transcription: transcription,
-                      onWordToggled: (globalIndex) async {
-                        final current = transcription ?? ref.read(projectsProvider).selected?.transcription;
-                        if (current == null) return;
-                        final modified = Map<String, dynamic>.from(current);
-                        final emphasized = modified['emphasizedIndices'] is List
-                            ? List<int>.from(modified['emphasizedIndices'] as List)
-                            : <int>[];
-                        if (emphasized.contains(globalIndex)) {
-                          emphasized.remove(globalIndex);
-                        } else {
-                          emphasized.add(globalIndex);
-                        }
-                        modified['emphasizedIndices'] = emphasized;
-                        ref.read(transcriptionProvider.notifier).state = modified;
-                        final proj = ref.read(projectsProvider).selected;
-                        if (proj != null) {
-                          await ref.read(projectsProvider).saveTranscript(modified);
-                        }
-                      },
-                    )
-                  else
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Highlight Color', style: TextStyle(fontWeight: FontWeight.w700)),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 12,
-                          runSpacing: 10,
-                          children: [
-                            ...recentColors.map(
-                              (color) => InkWell(
-                                onTap: () => applyHighlightColor(color),
-                                borderRadius: BorderRadius.circular(20),
-                                child: Container(
-                                  width: 34,
-                                  height: 34,
-                                  decoration: BoxDecoration(
-                                    color: color,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: (design.highlightColor ?? design.activeColor) == color ? Colors.white : Colors.transparent,
-                                      width: 3,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                  ...recentColors.map(
+                    (color) => InkWell(
+                      onTap: () => applyHighlightColor(color),
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: (design.highlightColor ?? design.activeColor) == color ? Colors.white : Colors.transparent,
+                            width: 3,
+                          ),
                         ),
-                        const SizedBox(height: 24),
-                        Row(
-                          children: [
-                            const Text('Highlight Size', style: TextStyle(fontWeight: FontWeight.w700)),
-                            const Spacer(),
-                            Text('${(design.highlightSize ?? design.activeSize ?? design.size).round()} px', style: const TextStyle(color: AppColors.secondary)),
-                          ],
-                        ),
-                        Slider(
-                          value: design.highlightSize ?? design.activeSize ?? design.size,
-                          min: 18,
-                          max: 50,
-                          divisions: 16,
-                          activeColor: Colors.white,
-                          inactiveColor: AppColors.line,
-                          onChanged: (value) => updateDesign(design.copyWith(highlightSize: value)),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text('Highlight Weight', style: TextStyle(fontWeight: FontWeight.w700)),
-                        const SizedBox(height: 9),
-                        Wrap(
-                          spacing: 8,
-                          children: [FontWeight.w500, FontWeight.w700, FontWeight.w900].map(
-                            (weight) => ChoiceChip(
-                              label: Text(
-                                weight == FontWeight.w500 ? 'Regular' : weight == FontWeight.w700 ? 'Bold' : 'Extra bold',
-                              ),
-                              selected: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight,
-                              onSelected: (_) => updateDesign(design.copyWith(highlightWeight: weight)),
-                              selectedColor: Colors.white,
-                              backgroundColor: AppColors.elevated,
-                              labelStyle: TextStyle(
-                                color: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight ? Colors.black : Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                              side: BorderSide(
-                                color: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight ? Colors.white : AppColors.line,
-                              ),
-                            ),
-                          ).toList(),
-                        ),
-                      ],
+                      ),
                     ),
+                  ),
                 ],
-              );
-            },
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  const Text('Highlight Size', style: TextStyle(fontWeight: FontWeight.w700)),
+                  const Spacer(),
+                  Text('${(design.highlightSize ?? design.activeSize ?? design.size).round()} px', style: const TextStyle(color: AppColors.secondary)),
+                ],
+              ),
+              Slider(
+                value: design.highlightSize ?? design.activeSize ?? design.size,
+                min: 18,
+                max: 50,
+                divisions: 16,
+                activeColor: Colors.white,
+                inactiveColor: AppColors.line,
+                onChanged: (value) => updateDesign(design.copyWith(highlightSize: value)),
+              ),
+              const SizedBox(height: 12),
+              const Text('Highlight Weight', style: TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 9),
+              Wrap(
+                spacing: 8,
+                children: [FontWeight.w500, FontWeight.w700, FontWeight.w900].map(
+                  (weight) => ChoiceChip(
+                    label: Text(
+                      weight == FontWeight.w500 ? 'Regular' : weight == FontWeight.w700 ? 'Bold' : 'Extra bold',
+                    ),
+                    selected: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight,
+                    onSelected: (_) => updateDesign(design.copyWith(highlightWeight: weight)),
+                    selectedColor: Colors.white,
+                    backgroundColor: AppColors.elevated,
+                    labelStyle: TextStyle(
+                      color: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight ? Colors.black : Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    side: BorderSide(
+                      color: (design.highlightWeight ?? design.activeWeight ?? design.weight) == weight ? Colors.white : AppColors.line,
+                    ),
+                  ),
+                ).toList(),
+              ),
+            ],
           );
         } else if (tool == EditorTool.highlightWords) {
           content = HighlightWordOverview(
@@ -2994,7 +2952,14 @@ class _VideoPreviewPlayerState extends State<VideoPreviewPlayer> {
         controller == null ||
         !controller.value.isInitialized)
       return;
-    command ? controller.play() : controller.pause();
+    if (command) {
+      if (controller.value.position >= controller.value.duration - const Duration(milliseconds: 200)) {
+        controller.seekTo(Duration.zero);
+      }
+      controller.play();
+    } else {
+      controller.pause();
+    }
     widget.playbackCommand.value = null;
   }
 
