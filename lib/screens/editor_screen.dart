@@ -1678,9 +1678,6 @@ const allFonts = [
             const featuredFonts = [
               CaptionFont.anton,
               CaptionFont.archivoBlack,
-              CaptionFont.poppins,
-              CaptionFont.montserrat,
-              CaptionFont.roboto,
             ];
             final currentHFont = design.highlightFont ?? design.font;
             final visibleFonts = [
@@ -1695,62 +1692,49 @@ const allFonts = [
                 children: [
                   const Text('Highlight Font', style: TextStyle(fontWeight: FontWeight.w700)),
                   const SizedBox(height: 10),
-                  SizedBox(
-                    height: 38,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: visibleFonts.length + 1,
-                      itemBuilder: (_, index) {
-                        if (index == visibleFonts.length) {
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 8),
-                            child: ActionChip(
-                              label: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'More',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  SizedBox(width: 2),
-                                  Icon(Icons.chevron_right_rounded, size: 16, color: Colors.white),
-                                ],
-                              ),
-                              onPressed: () => setSheetState(() => choosingHighlightFont = true),
-                              backgroundColor: AppColors.elevated,
-                              side: const BorderSide(color: AppColors.line),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 10,
+                    children: [
+                      ...visibleFonts.map((f) {
+                        final isSel = currentHFont == f;
+                        return ChoiceChip(
+                          label: Text(
+                            f.name.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: isSel ? Colors.black : Colors.white,
                             ),
-                          );
-                        }
-                        final f = visibleFonts[index];
-                        final isSel = (design.highlightFont ?? design.font) == f;
-                        return Padding(
-                          padding: EdgeInsets.only(left: index == 0 ? 0 : 8),
-                          child: ChoiceChip(
-                            label: Text(
-                              f.name.toUpperCase(),
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: isSel ? Colors.black : Colors.white,
-                              ),
-                            ),
-                            selected: isSel,
-                            onSelected: (_) => updateDesign(design.copyWith(highlightFont: f)),
-                            selectedColor: Colors.white,
-                            backgroundColor: AppColors.elevated,
-                            side: BorderSide(color: isSel ? Colors.white : AppColors.line),
                           ),
+                          selected: isSel,
+                          onSelected: (_) => updateDesign(design.copyWith(highlightFont: f)),
+                          selectedColor: Colors.white,
+                          backgroundColor: AppColors.elevated,
                         );
-                      },
-                    ),
+                      }),
+                      ActionChip(
+                        label: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'More',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
+                              ),
+                            ),
+                            SizedBox(width: 2),
+                            Icon(Icons.chevron_right_rounded, size: 16, color: Colors.white),
+                          ],
+                        ),
+                        onPressed: () => setSheetState(() => choosingHighlightFont = true),
+                        backgroundColor: AppColors.elevated,
+                        side: const BorderSide(color: AppColors.line),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 18),
-                  const Text('Highlight Text Color', style: TextStyle(fontWeight: FontWeight.w700)),
                   const SizedBox(height: 10),
                   Wrap(
                     spacing: 12,
@@ -1964,9 +1948,6 @@ const allFonts = [
             const featuredFonts = [
               CaptionFont.anton,
               CaptionFont.archivoBlack,
-              CaptionFont.poppins,
-              CaptionFont.montserrat,
-              CaptionFont.roboto,
             ];
             final visibleFonts = [
               if (!featuredFonts.contains(currentAFont)) currentAFont,
@@ -1980,59 +1961,49 @@ const allFonts = [
                 children: [
                   const Text('Active Font', style: TextStyle(fontWeight: FontWeight.w700)),
                   const SizedBox(height: 10),
-                  SizedBox(
-                    height: 38,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: visibleFonts.length + 1,
-                      itemBuilder: (_, index) {
-                        if (index == visibleFonts.length) {
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 8),
-                            child: ActionChip(
-                              label: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'More',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  SizedBox(width: 2),
-                                  Icon(Icons.chevron_right_rounded, size: 16, color: Colors.white),
-                                ],
-                              ),
-                              onPressed: () => setSheetState(() => choosingActiveFont = true),
-                              backgroundColor: AppColors.elevated,
-                              side: const BorderSide(color: AppColors.line),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 10,
+                    children: [
+                      ...visibleFonts.map((f) {
+                        final isSel = currentAFont == f;
+                        return ChoiceChip(
+                          label: Text(
+                            f.name.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: isSel ? Colors.black : Colors.white,
                             ),
-                          );
-                        }
-                        final f = visibleFonts[index];
-                        final isSel = (design.activeFont ?? design.font) == f;
-                        return Padding(
-                          padding: EdgeInsets.only(left: index == 0 ? 0 : 8),
-                          child: ChoiceChip(
-                            label: Text(
-                              f.name.toUpperCase(),
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: isSel ? Colors.black : Colors.white,
-                              ),
-                            ),
-                            selected: isSel,
-                            onSelected: (_) => updateDesign(design.copyWith(activeFont: f)),
-                            selectedColor: Colors.white,
-                            backgroundColor: AppColors.elevated,
-                            side: BorderSide(color: isSel ? Colors.white : AppColors.line),
                           ),
+                          selected: isSel,
+                          onSelected: (_) => updateDesign(design.copyWith(activeFont: f)),
+                          selectedColor: Colors.white,
+                          backgroundColor: AppColors.elevated,
+                          side: BorderSide(color: isSel ? Colors.white : AppColors.line),
                         );
-                      },
-                    ),
+                      }),
+                      ActionChip(
+                        label: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'More',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
+                              ),
+                            ),
+                            SizedBox(width: 2),
+                            Icon(Icons.chevron_right_rounded, size: 16, color: Colors.white),
+                          ],
+                        ),
+                        onPressed: () => setSheetState(() => choosingActiveFont = true),
+                        backgroundColor: AppColors.elevated,
+                        side: const BorderSide(color: AppColors.line),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 18),
                   const Text('Active Word Color', style: TextStyle(fontWeight: FontWeight.w700)),
