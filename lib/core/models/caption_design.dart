@@ -168,6 +168,10 @@ class CaptionDesign {
     this.hardShadow = false,
     this.activeBackground,
     this.activeBlink = false,
+    this.activeHasOutline = true,
+    this.highlightHasOutline = true,
+    this.customX,
+    this.customY,
   });
   final double size;
   final CaptionPosition position;
@@ -187,6 +191,10 @@ class CaptionDesign {
   final Color? highlightBackground;
   final Color? activeBackground;
   final bool activeBlink;
+  final bool activeHasOutline;
+  final bool highlightHasOutline;
+  final double? customX;
+  final double? customY;
   final Color? backgroundColor;
   final Color? borderColor;
   final double boxHorizontalPadding;
@@ -237,6 +245,10 @@ class CaptionDesign {
     bool? hardShadow,
     Color? activeBackground,
     bool? activeBlink,
+    bool? activeHasOutline,
+    bool? highlightHasOutline,
+    double? customX,
+    double? customY,
   }) => CaptionDesign(
     size: size ?? this.size,
     position: position ?? this.position,
@@ -256,6 +268,10 @@ class CaptionDesign {
     highlightBackground: highlightBackground ?? this.highlightBackground,
     activeBackground: activeBackground ?? this.activeBackground,
     activeBlink: activeBlink ?? this.activeBlink,
+    activeHasOutline: activeHasOutline ?? this.activeHasOutline,
+    highlightHasOutline: highlightHasOutline ?? this.highlightHasOutline,
+    customX: customX ?? this.customX,
+    customY: customY ?? this.customY,
     backgroundColor: backgroundColor ?? this.backgroundColor,
     borderColor: borderColor ?? this.borderColor,
     boxHorizontalPadding: boxHorizontalPadding ?? this.boxHorizontalPadding,

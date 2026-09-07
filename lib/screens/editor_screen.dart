@@ -154,6 +154,42 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       });
     }
     final sidebarTapHandler = (EditorTool tool) {
+      if (tool == EditorTool.aiFit) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const AlertDialog(
+            content: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(color: Colors.white),
+                SizedBox(width: 20),
+                Text("AI Analyzing video...", style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+        );
+        Future.delayed(const Duration(seconds: 2), () {
+          Navigator.pop(context); // pop dialog
+          // Mock AI result: set position to center
+          updateDesign(design.copyWith(position: CaptionPosition.center, customX: null, customY: null));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('AI positioned captions to Center (Mock)')));
+        });
+        return;
+      }
+      if (tool == EditorTool.preview) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PlatformPreviewScreen(
+              controller: controller,
+              design: design,
+              transcription: transcription ?? project?.transcription,
+            ),
+          ),
+        );
+        return;
+      }
       if (tool == EditorTool.style) {
         showCustomizeSheet(context, ref);
         return;
@@ -1279,6 +1315,10 @@ enum EditorTool {
   highlight,
   highlightWords,
   activeWords,
+  aiFit,
+  preview,
+  aiFit,
+  preview,
 }
 
 class EditorToolRail extends StatelessWidget {
@@ -1289,6 +1329,8 @@ class EditorToolRail extends StatelessWidget {
   Widget build(BuildContext context) {
     const tools = [
       (EditorTool.style, Icons.tune_rounded, 'Customize'),
+      (EditorTool.aiFit, Icons.auto_awesome_rounded, 'AI Fit'),
+      (EditorTool.preview, Icons.preview_rounded, 'Preview'),
       (EditorTool.addText, Icons.edit_note_rounded, 'Edit Text'),
       (EditorTool.fonts, Icons.text_fields_rounded, 'Font'),
       (EditorTool.highlightWords, Icons.format_color_text_rounded, 'H. Words'),
@@ -1349,6 +1391,8 @@ class _EditorFloatingSidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     const tools = [
       (EditorTool.style, Icons.tune_rounded, 'Customize'),
+      (EditorTool.aiFit, Icons.auto_awesome_rounded, 'AI Fit'),
+      (EditorTool.preview, Icons.preview_rounded, 'Preview'),
       (EditorTool.addText, Icons.edit_note_rounded, 'Edit Text'),
       (EditorTool.fonts, Icons.text_fields_rounded, 'Font'),
       (EditorTool.highlightWords, Icons.format_color_text_rounded, 'H. Words'),
@@ -1447,6 +1491,7 @@ Future<void> showEditorToolSheet(
   bool customColorPage = false;
   String customColorTarget = 'activeColor';
   bool choosingHighlightFont = false;
+  bool choosingActiveFont = false;
   await showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
@@ -1830,6 +1875,20 @@ Future<void> showEditorToolSheet(
                     ],
                   ),
                   const SizedBox(height: 18),
+                  const SizedBox(height: 18),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Show Text Border', style: TextStyle(fontWeight: FontWeight.w700)),
+                      Switch(
+                        value: design.highlightHasOutline,
+                        onChanged: (val) => updateDesign(design.copyWith(highlightHasOutline: val)),
+                        activeColor: Colors.white,
+                        activeTrackColor: AppColors.primary,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18);
                   Row(
                     children: [
                       const Text('Highlight Size', style: TextStyle(fontWeight: FontWeight.w700)),
@@ -1899,12 +1958,124 @@ Future<void> showEditorToolSheet(
             },
           );
         } else if (tool == EditorTool.activeWords) {
-          content = SingleChildScrollView(
-            child: Column(
+          if (choosingActiveFont) {
+            content = Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Active Word Color', style: TextStyle(fontWeight: FontWeight.w700)),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                      onPressed: () => setSheetState(() => choosingActiveFont = false),
+                    ),
+                    const Text('Choose Active Font', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 270,
+                  child: GridView.builder(
+                    padding: const EdgeInsets.only(bottom: 28),
+                    itemCount: allFonts.length,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      childAspectRatio: 2.25,
+                    ),
+                    itemBuilder: (_, index) {
+                      final isSelected = (design.activeFont ?? design.font) == allFonts[index].font;
+                      return FontPreviewCard(
+                        choice: allFonts[index],
+                        selected: isSelected,
+                        onTap: () {
+                          updateDesign(design.copyWith(activeFont: allFonts[index].font));
+                          setSheetState(() => choosingActiveFont = false);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          } else {
+            final currentAFont = design.activeFont ?? design.font;
+            const featuredFonts = [
+              CaptionFont.anton,
+              CaptionFont.archivoBlack,
+              CaptionFont.poppins,
+              CaptionFont.montserrat,
+              CaptionFont.roboto,
+            ];
+            final visibleFonts = [
+              if (!featuredFonts.contains(currentAFont)) currentAFont,
+              ...featuredFonts,
+            ];
+
+            content = SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Active Font', style: TextStyle(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 38,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: visibleFonts.length + 1,
+                      itemBuilder: (_, index) {
+                        if (index == visibleFonts.length) {
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: ActionChip(
+                              label: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'More',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  SizedBox(width: 2),
+                                  Icon(Icons.chevron_right_rounded, size: 16, color: Colors.white),
+                                ],
+                              ),
+                              onPressed: () => setSheetState(() => choosingActiveFont = true),
+                              backgroundColor: AppColors.elevated,
+                              side: const BorderSide(color: AppColors.line),
+                            ),
+                          );
+                        }
+                        final f = visibleFonts[index];
+                        final isSel = (design.activeFont ?? design.font) == f;
+                        return Padding(
+                          padding: EdgeInsets.only(left: index == 0 ? 0 : 8),
+                          child: ChoiceChip(
+                            label: Text(
+                              f.name.toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: isSel ? Colors.black : Colors.white,
+                              ),
+                            ),
+                            selected: isSel,
+                            onSelected: (_) => updateDesign(design.copyWith(activeFont: f)),
+                            selectedColor: Colors.white,
+                            backgroundColor: AppColors.elevated,
+                            side: BorderSide(color: isSel ? Colors.white : AppColors.line),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  const Text('Active Word Color', style: TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 12,
@@ -1992,7 +2163,21 @@ Future<void> showEditorToolSheet(
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    const Text('Active Size', style: TextStyle(fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Show Text Border', style: TextStyle(fontWeight: FontWeight.w700)),
+                      Switch(
+                        value: design.activeHasOutline,
+                        onChanged: (val) => updateDesign(design.copyWith(activeHasOutline: val)),
+                        activeColor: Colors.white,
+                        activeTrackColor: AppColors.primary,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                const Text('Active Size', style: TextStyle(fontWeight: FontWeight.w700)),
                     const Spacer(),
                     Text('${(design.activeSize ?? design.size).round()} px', style: const TextStyle(color: AppColors.secondary)),
                   ],
@@ -2699,6 +2884,11 @@ class _CaptionTextEditorScreenState
                             transcription: transcription,
                             position: controller.value.position,
                             design: design,
+                            onDrag: (delta) {
+                              double currentX = design.customX ?? 24.0;
+                              double currentY = design.customY ?? (design.position == CaptionPosition.top ? 34.0 : design.position == CaptionPosition.bottom ? 140.0 : 80.0);
+                              updateDesign(design.copyWith(customX: currentX + delta.dx, customY: currentY + delta.dy));
+                            },
                           ),
                         ],
                       ),
@@ -3307,11 +3497,13 @@ class _CaptionOverlay extends StatelessWidget {
     required this.position,
     required this.design,
     this.onWordToggled,
+    this.onDrag,
   });
   final Map<String, dynamic>? transcription;
   final Duration position;
   final CaptionDesign design;
   final void Function(int globalIndex)? onWordToggled;
+  final void Function(Offset delta)? onDrag;
 
   @override
   Widget build(BuildContext context) {
@@ -3345,6 +3537,7 @@ class _CaptionOverlay extends StatelessWidget {
       final isSpoken = index == selectedWordIndex;
       final isEmphasized = group[index].isEmphasized;
       final isActive = isSpoken || isEmphasized;
+      final wordHasOutline = isEmphasized ? design.highlightHasOutline : isSpoken ? design.activeHasOutline : true;
       final word = CaptionWord(
         text: design.uppercase
             ? group[index].text.toUpperCase()
@@ -3363,6 +3556,7 @@ class _CaptionOverlay extends StatelessWidget {
           fontSize: (isEmphasized ? (design.highlightSize ?? design.activeSize ?? design.size) : isSpoken ? (design.activeSize ?? design.size) : design.size) * sizeMultiplier,
           font: isEmphasized ? (design.highlightFont ?? design.activeFont ?? design.font) : isSpoken ? (design.activeFont ?? design.font) : null,
           fontWeight: isEmphasized ? (design.highlightWeight ?? design.activeWeight ?? design.weight) : isSpoken ? (design.activeWeight ?? design.weight) : null,
+          hasOutline: wordHasOutline,
         ),
         isActive: isSpoken,
         effect: design.effect,
@@ -3512,29 +3706,39 @@ class _CaptionOverlay extends StatelessWidget {
             ),
             child: caption,
           );
-    final top = design.position == CaptionPosition.top
-        ? 34.0
-        : design.position == CaptionPosition.center
-        ? null
-        : null;
-    final bottom = design.position == CaptionPosition.bottom
-        ? 62.0
-        : design.position == CaptionPosition.center
-        ? null
-        : null;
+    final isCustomPosition = design.customX != null && design.customY != null;
+    final top = isCustomPosition ? design.customY : (design.position == CaptionPosition.top ? 34.0 : null);
+    final left = isCustomPosition ? design.customX : 24.0;
+    final right = isCustomPosition ? null : 24.0;
+    final bottom = isCustomPosition ? null : (design.position == CaptionPosition.bottom ? 62.0 : null);
+    
+    final child = Opacity(opacity: opacity, child: framedCaption);
+    
     return Positioned(
-      left: 24,
-      right: 24,
+      left: left,
+      right: right,
       top: top,
       bottom: bottom,
-      child: Align(
-        alignment: design.position == CaptionPosition.center
-            ? Alignment.center
-            : design.position == CaptionPosition.top
-            ? Alignment.topCenter
-            : Alignment.bottomCenter,
-        child: Opacity(opacity: opacity, child: framedCaption),
-      ),
+      child: onDrag != null 
+          ? GestureDetector(
+              onPanUpdate: (details) => onDrag!(details.delta),
+              child: isCustomPosition ? child : Align(
+                alignment: design.position == CaptionPosition.center
+                    ? Alignment.center
+                    : design.position == CaptionPosition.top
+                    ? Alignment.topCenter
+                    : Alignment.bottomCenter,
+                child: child,
+              ),
+            )
+          : (isCustomPosition ? child : Align(
+              alignment: design.position == CaptionPosition.center
+                  ? Alignment.center
+                  : design.position == CaptionPosition.top
+                  ? Alignment.topCenter
+                  : Alignment.bottomCenter,
+              child: child,
+            )),
     );
   }
 }
@@ -4115,6 +4319,7 @@ class _TemplateStyleCardState extends State<TemplateStyleCard>
                                         fontSize: (wordIsActive ? (design.activeSize ?? design.size) : design.size) * 0.7, // scale down for card
                                         font: wordIsActive ? (design.activeFont ?? design.font) : null,
                                         fontWeight: wordIsActive ? (design.activeWeight ?? design.weight) : null,
+                                        hasOutline: wordIsActive ? design.activeHasOutline : true,
                                       ),
                                     );
                                     final framedPreview = design.wordChip
@@ -4647,23 +4852,7 @@ Future<void> showCustomizeSheet(BuildContext context, WidgetRef ref) async {
                             )
                             .toList(),
                   ),
-                  const SizedBox(height: 22),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: FilledButton(
-                      onPressed: () => Navigator.pop(sheetContext),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
-                        shape: const StadiumBorder(),
-                      ),
-                      child: const Text(
-                        'Done',
-                        style: TextStyle(fontWeight: FontWeight.w800),
-                      ),
-                    ),
-                  ),
+
                 ],
               ),
             ),
@@ -5014,3 +5203,117 @@ String _captionColorHex(Color color) {
   return '#${value.substring(2)}';
 }
 
+
+
+class PlatformPreviewScreen extends StatelessWidget {
+  const PlatformPreviewScreen({
+    super.key,
+    required this.controller,
+    required this.design,
+    required this.transcription,
+  });
+
+  final VideoPlayerController? controller;
+  final CaptionDesign design;
+  final Map<String, dynamic>? transcription;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (controller != null)
+            GestureDetector(
+              onTap: () {
+                if (controller!.value.isPlaying) {
+                  controller!.pause();
+                } else {
+                  controller!.play();
+                }
+              },
+              child: VideoPlayer(controller!),
+            ),
+          if (controller != null)
+            AnimatedBuilder(
+              animation: controller!,
+              builder: (context, _) => _CaptionOverlay(
+                transcription: transcription,
+                position: controller!.value.position,
+                design: design,
+              ),
+            ),
+          
+          // Mock TikTok/Reels UI overlay
+          Positioned(
+            right: 12,
+            bottom: 120,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircleAvatar(
+                  radius: 22,
+                  backgroundColor: Colors.white24,
+                  child: Icon(Icons.person, color: Colors.white),
+                ),
+                const SizedBox(height: 24),
+                const Icon(Icons.favorite_rounded, color: Colors.white, size: 36),
+                const SizedBox(height: 6),
+                const Text('1.2M', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
+                const Icon(Icons.comment_rounded, color: Colors.white, size: 36),
+                const SizedBox(height: 6),
+                const Text('4,321', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
+                const Icon(Icons.share_rounded, color: Colors.white, size: 36),
+                const SizedBox(height: 6),
+                const Text('Share', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
+                const Icon(Icons.more_horiz_rounded, color: Colors.white, size: 36),
+              ],
+            ),
+          ),
+          
+          // Bottom mock description
+          Positioned(
+            left: 12,
+            bottom: 30,
+            right: 80,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('@username', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                const SizedBox(height: 8),
+                const Text('This is a preview of how your video will look on platforms like Reels and TikTok. #preview #kapshorts', 
+                  style: TextStyle(color: Colors.white), maxLines: 2, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    const Icon(Icons.music_note_rounded, color: Colors.white, size: 16),
+                    const SizedBox(width: 8),
+                    const Text('Original audio - username', style: TextStyle(color: Colors.white, fontSize: 13)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+          // Back button
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, shadows: [Shadow(color: Colors.black54, blurRadius: 4)]),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

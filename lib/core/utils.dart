@@ -56,6 +56,7 @@ TextStyle captionTextStyle(
   double? fontSize,
   CaptionFont? font,
   FontWeight? fontWeight,
+  bool hasOutline = true,
 }) {
   final usedFont = font ?? design.font;
   final base = switch (usedFont) {
@@ -106,7 +107,7 @@ TextStyle captionTextStyle(
     CaptionFont.teko => GoogleFonts.teko(),
     CaptionFont.firaSans => GoogleFonts.firaSans(),
   };
-  final outline = design.outlineWidth <= 0
+  final outline = (!hasOutline || design.outlineWidth <= 0)
       ? <Shadow>[]
       : [
           for (final offset in const [
