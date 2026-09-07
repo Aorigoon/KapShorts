@@ -154,43 +154,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       });
     }
     final sidebarTapHandler = (EditorTool tool) {
-      if (tool == EditorTool.aiFit) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => const AlertDialog(
-            content: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircularProgressIndicator(color: Colors.white),
-                SizedBox(width: 20),
-                Text("AI Analyzing video...", style: TextStyle(fontWeight: FontWeight.bold)),
-              ],
-            ),
-          ),
-        );
-        Future.delayed(const Duration(seconds: 2), () {
-          Navigator.pop(context); // pop dialog
-          final currentDesign = ref.read(captionDesignProvider);
-          ref.read(captionDesignProvider.notifier).state = currentDesign.copyWith(position: CaptionPosition.center, customX: null, customY: null);
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('AI positioned captions to Center (Mock)')));
-        });
-        return;
-      }
-      if (tool == EditorTool.preview) {
-        final currentDesign = ref.read(captionDesignProvider);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => PlatformPreviewScreen(
-              videoPath: project?.videoPath ?? '',
-              design: currentDesign,
-              transcription: transcription ?? project?.transcription,
-            ),
-          ),
-        );
-        return;
-      }
+
+
       if (tool == EditorTool.style) {
         showCustomizeSheet(context, ref);
         return;
@@ -1317,8 +1282,6 @@ enum EditorTool {
   highlight,
   highlightWords,
   activeWords,
-  aiFit,
-  preview,
 }
 
 class EditorToolRail extends StatelessWidget {
@@ -2559,12 +2522,131 @@ Future<void> showFullscreenPreview(
     );
     return;
   }
-  await Navigator.of(context).push(
-    MaterialPageRoute<void>(
-      builder: (_) => _FullscreenVideoPreview(
-        videoPath: videoPath,
-        transcription: transcription,
-        design: design,
+  
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (context) => Container(
+      padding: const EdgeInsets.all(24),
+      decoration: const BoxDecoration(
+        color: Color(0xFF1E1E1E),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('Select Preview Mode', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 24),
+          Wrap(
+            alignment: WrapAlignment.spaceEvenly,
+            spacing: 24,
+            runSpacing: 24,
+            children: [
+              _PlatformIcon(
+                icon: Icons.video_settings_rounded,
+                label: 'Original',
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => _FullscreenVideoPreview(
+                        videoPath: videoPath,
+                        transcription: transcription,
+                        design: design,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              _PlatformIcon(
+                icon: Icons.fullscreen_rounded,
+                label: 'Full',
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => PlatformPreviewScreen(
+                        videoPath: videoPath,
+                        transcription: transcription,
+                        design: design,
+                        platform: 'full',
+                      ),
+                    ),
+                  );
+                },
+              ),
+              _PlatformIcon(
+                icon: Icons.camera_alt_rounded,
+                label: 'Instagram',
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => PlatformPreviewScreen(
+                        videoPath: videoPath,
+                        transcription: transcription,
+                        design: design,
+                        platform: 'reels',
+                      ),
+                    ),
+                  );
+                },
+              ),
+              _PlatformIcon(
+                icon: Icons.facebook_rounded,
+                label: 'Facebook',
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => PlatformPreviewScreen(
+                        videoPath: videoPath,
+                        transcription: transcription,
+                        design: design,
+                        platform: 'facebook',
+                      ),
+                    ),
+                  );
+                },
+              ),
+              _PlatformIcon(
+                icon: Icons.tiktok,
+                label: 'TikTok',
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => PlatformPreviewScreen(
+                        videoPath: videoPath,
+                        transcription: transcription,
+                        design: design,
+                        platform: 'tiktok',
+                      ),
+                    ),
+                  );
+                },
+              ),
+              _PlatformIcon(
+                icon: Icons.play_arrow_rounded,
+                label: 'Shorts',
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => PlatformPreviewScreen(
+                        videoPath: videoPath,
+                        transcription: transcription,
+                        design: design,
+                        platform: 'shorts',
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+        ],
       ),
     ),
   );
@@ -3425,29 +3507,6 @@ class _VideoPreviewPlayerState extends State<VideoPreviewPlayer> {
     final selectedRatio = selected.ratio;
     final defaultRatio = value.aspectRatio == 0 ? 9 / 16 : value.aspectRatio;
     final radius = selected == PreviewAspect.full ? 6.0 : 22.0;
-    final playOverlay = Center(
-      child: AnimatedOpacity(
-        opacity: value.isPlaying ? 0 : 1,
-        duration: const Duration(milliseconds: 150),
-        child: Material(
-          color: Colors.white,
-          shape: const CircleBorder(),
-          child: InkWell(
-            onTap: _togglePlay,
-            customBorder: const CircleBorder(),
-            child: const SizedBox(
-              width: 64,
-              height: 64,
-              child: Icon(
-                Icons.play_arrow_rounded,
-                color: Colors.black,
-                size: 40,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
     Widget frameCanvas({required bool cover}) => Stack(
       fit: StackFit.expand,
       children: [
@@ -3468,13 +3527,17 @@ class _VideoPreviewPlayerState extends State<VideoPreviewPlayer> {
           position: position,
           design: widget.design,
           onWordToggled: widget.onWordToggled,
-          onDrag: widget.onDesignUpdate == null ? null : (delta) {
+          onDrag: widget.onDesignUpdate == null ? null : (delta, scale) {
             final currentX = widget.design.customX ?? 24.0;
             final currentY = widget.design.customY ?? (widget.design.position == CaptionPosition.top ? 34.0 : widget.design.position == CaptionPosition.bottom ? 140.0 : 80.0);
-            widget.onDesignUpdate!(widget.design.copyWith(customX: currentX + delta.dx, customY: currentY + delta.dy));
+            final currentScale = widget.design.customScale ?? 1.0;
+            widget.onDesignUpdate!(widget.design.copyWith(
+              customX: currentX + delta.dx, 
+              customY: currentY + delta.dy,
+              customScale: (currentScale + scale).clamp(0.2, 5.0),
+            ));
           },
         ),
-        playOverlay,
       ],
     );
     if (selected == PreviewAspect.full) {
@@ -3512,7 +3575,7 @@ class _CaptionOverlay extends StatelessWidget {
   final Duration position;
   final CaptionDesign design;
   final void Function(int globalIndex)? onWordToggled;
-  final void Function(Offset delta)? onDrag;
+  final void Function(Offset delta, double scale)? onDrag;
 
   @override
   Widget build(BuildContext context) {
@@ -3729,25 +3792,61 @@ class _CaptionOverlay extends StatelessWidget {
       top: top,
       bottom: bottom,
       child: onDrag != null 
-          ? GestureDetector(
-              onPanUpdate: (details) => onDrag!(details.delta),
-              child: isCustomPosition ? child : Align(
-                alignment: design.position == CaptionPosition.center
+          ? Transform.scale(
+              scale: design.customScale ?? 1.0,
+              child: Align(
+                alignment: isCustomPosition ? Alignment.topLeft : (
+                  design.position == CaptionPosition.center
                     ? Alignment.center
                     : design.position == CaptionPosition.top
                     ? Alignment.topCenter
-                    : Alignment.bottomCenter,
-                child: child,
+                    : Alignment.bottomCenter
+                ),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    GestureDetector(
+                      onPanUpdate: (details) => onDrag!(details.delta, 0.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white70, width: 2, style: BorderStyle.solid),
+                        ),
+                        child: child,
+                      ),
+                    ),
+                    Positioned(
+                      right: -12,
+                      bottom: -12,
+                      child: GestureDetector(
+                        onPanUpdate: (details) => onDrag!(Offset.zero, (details.delta.dx + details.delta.dy) * 0.005),
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.open_in_full_rounded, size: 14, color: Colors.black),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             )
-          : (isCustomPosition ? child : Align(
-              alignment: design.position == CaptionPosition.center
-                  ? Alignment.center
-                  : design.position == CaptionPosition.top
-                  ? Alignment.topCenter
-                  : Alignment.bottomCenter,
-              child: child,
-            )),
+          : Transform.scale(
+              scale: design.customScale ?? 1.0,
+              child: Align(
+                alignment: isCustomPosition ? Alignment.topLeft : (
+                  design.position == CaptionPosition.center
+                      ? Alignment.center
+                      : design.position == CaptionPosition.top
+                      ? Alignment.topCenter
+                      : Alignment.bottomCenter
+                ),
+                child: child,
+              ),
+            ),
     );
   }
 }
@@ -5220,11 +5319,13 @@ class PlatformPreviewScreen extends StatefulWidget {
     required this.videoPath,
     required this.design,
     required this.transcription,
+    required this.platform,
   });
 
   final String videoPath;
   final CaptionDesign design;
   final Map<String, dynamic>? transcription;
+  final String platform;
 
   @override
   State<PlatformPreviewScreen> createState() => _PlatformPreviewScreenState();
@@ -5274,7 +5375,15 @@ class _PlatformPreviewScreenState extends State<PlatformPreviewScreen> {
                 child: SizedBox(
                   width: _controller!.value.size.width,
                   height: _controller!.value.size.height,
+                  child: FittedBox(
+                fit: BoxFit.cover,
+                clipBehavior: Clip.hardEdge,
+                child: SizedBox(
+                  width: _controller!.value.size.width,
+                  height: _controller!.value.size.height,
                   child: VideoPlayer(_controller!),
+                ),
+              ),
                 ),
               ),
             ),
@@ -5355,6 +5464,32 @@ class _PlatformPreviewScreenState extends State<PlatformPreviewScreen> {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PlatformIcon extends StatelessWidget {
+  const _PlatformIcon({required this.icon, required this.label, required this.onTap, super.key});
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircleAvatar(
+            radius: 26,
+            backgroundColor: Colors.white12,
+            child: Icon(icon, color: Colors.white, size: 26),
+          ),
+          const SizedBox(height: 8),
+          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
         ],
       ),
     );

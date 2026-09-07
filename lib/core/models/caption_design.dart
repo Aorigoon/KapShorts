@@ -172,6 +172,7 @@ class CaptionDesign {
     this.highlightHasOutline = true,
     this.customX,
     this.customY,
+    this.customScale,
   });
   final double size;
   final CaptionPosition position;
@@ -195,6 +196,7 @@ class CaptionDesign {
   final bool highlightHasOutline;
   final double? customX;
   final double? customY;
+  final double? customScale;
   final Color? backgroundColor;
   final Color? borderColor;
   final double boxHorizontalPadding;
@@ -249,6 +251,7 @@ class CaptionDesign {
     bool? highlightHasOutline,
     double? customX,
     double? customY,
+    double? customScale,
   }) => CaptionDesign(
     size: size ?? this.size,
     position: position ?? this.position,
@@ -272,6 +275,8 @@ class CaptionDesign {
     highlightHasOutline: highlightHasOutline ?? this.highlightHasOutline,
     customX: customX ?? this.customX,
     customY: customY ?? this.customY,
+      customScale: customScale ?? this.customScale,
+    this.customScale,
     backgroundColor: backgroundColor ?? this.backgroundColor,
     borderColor: borderColor ?? this.borderColor,
     boxHorizontalPadding: boxHorizontalPadding ?? this.boxHorizontalPadding,
