@@ -335,6 +335,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                             playbackSpeed: _playbackSpeed,
                             previewAspect: _previewAspect,
                             onReplaceVideo: () => replaceVideoForProject(context, ref),
+                            onDesignUpdate: (d) => ref.read(captionDesignProvider.notifier).state = d,
                           ),
                         ),
                         _PreviewSimpleControls(
@@ -3465,6 +3466,11 @@ class _VideoPreviewPlayerState extends State<VideoPreviewPlayer> {
           position: position,
           design: widget.design,
           onWordToggled: widget.onWordToggled,
+          onDrag: widget.onDesignUpdate == null ? null : (delta) {
+            final currentX = widget.design.customX ?? 24.0;
+            final currentY = widget.design.customY ?? (widget.design.position == CaptionPosition.top ? 34.0 : widget.design.position == CaptionPosition.bottom ? 140.0 : 80.0);
+            widget.onDesignUpdate!(widget.design.copyWith(customX: currentX + delta.dx, customY: currentY + delta.dy));
+          },
         ),
         playOverlay,
       ],
@@ -5260,7 +5266,15 @@ class _PlatformPreviewScreenState extends State<PlatformPreviewScreen> {
                   _controller!.play();
                 }
               },
-              child: VideoPlayer(_controller!),
+              child: FittedBox(
+                fit: BoxFit.cover,
+                clipBehavior: Clip.hardEdge,
+                child: SizedBox(
+                  width: _controller!.value.size.width,
+                  height: _controller!.value.size.height,
+                  child: VideoPlayer(_controller!),
+                ),
+              ),
             ),
           if (_controller != null && _controller!.value.isInitialized)
             AnimatedBuilder(
