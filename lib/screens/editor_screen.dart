@@ -2522,21 +2522,22 @@ Future<void> showFullscreenPreview(
   showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
+    barrierColor: Colors.black87,
     builder: (context) => Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.only(top: 24, bottom: 40, left: 16, right: 16),
       decoration: const BoxDecoration(
-        color: Color(0xFF1E1E1E),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const Text('Select Preview Mode', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 24),
+          const SizedBox(height: 30),
           Wrap(
             alignment: WrapAlignment.spaceEvenly,
-            spacing: 24,
-            runSpacing: 24,
+            spacing: 32,
+            runSpacing: 32,
             children: [
               _PlatformIcon(
                 icon: Icons.video_settings_rounded,
@@ -2967,11 +2968,10 @@ class _CaptionTextEditorScreenState
                             onDrag: (delta, scale) {
                               double currentX = design.customX ?? 24.0;
                               double currentY = design.customY ?? (design.position == CaptionPosition.top ? 34.0 : design.position == CaptionPosition.bottom ? 140.0 : 80.0);
-                              double currentScale = design.customScale ?? 1.0;
                               ref.read(captionDesignProvider.notifier).state = design.copyWith(
                                 customX: currentX + delta.dx, 
                                 customY: currentY + delta.dy,
-                                customScale: (currentScale + scale).clamp(0.2, 5.0),
+                                customScale: scale,
                               );
                             },
                           ),
@@ -3531,11 +3531,10 @@ class _VideoPreviewPlayerState extends State<VideoPreviewPlayer> {
           onDrag: widget.onDesignUpdate == null ? null : (delta, scale) {
             final currentX = widget.design.customX ?? 24.0;
             final currentY = widget.design.customY ?? (widget.design.position == CaptionPosition.top ? 34.0 : widget.design.position == CaptionPosition.bottom ? 140.0 : 80.0);
-            final currentScale = widget.design.customScale ?? 1.0;
             widget.onDesignUpdate!(widget.design.copyWith(
               customX: currentX + delta.dx, 
               customY: currentY + delta.dy,
-              customScale: (currentScale + scale).clamp(0.2, 5.0),
+              customScale: scale,
             ));
           },
         ),
@@ -3562,6 +3561,99 @@ class _VideoPreviewPlayerState extends State<VideoPreviewPlayer> {
 
   void _togglePlay() =>
       _controller!.value.isPlaying ? _controller!.pause() : _controller!.play();
+}
+
+class _CaptionInteractable extends StatefulWidget {
+  final Widget child;
+  final CaptionDesign design;
+  final void Function(Offset delta, double scale) onUpdate;
+  final bool isCustomPosition;
+
+  const _CaptionInteractable({
+    required this.child,
+    required this.design,
+    required this.onUpdate,
+    required this.isCustomPosition,
+    super.key,
+  });
+
+  @override
+  State<_CaptionInteractable> createState() => _CaptionInteractableState();
+}
+
+class _CaptionInteractableState extends State<_CaptionInteractable> {
+  double _baseScale = 1.0;
+
+  Widget _buildCornerDot(int x, int y) {
+    return Positioned(
+      left: x < 0 ? -6 : null,
+      right: x > 0 ? -6 : null,
+      top: y < 0 ? -6 : null,
+      bottom: y > 0 ? -6 : null,
+      child: GestureDetector(
+        onPanUpdate: (details) {
+          double dx = details.delta.dx * x;
+          double dy = details.delta.dy * y;
+          double scaleChange = (dx + dy) * 0.005;
+          double currentScale = widget.design.customScale ?? 1.0;
+          widget.onUpdate(Offset.zero, (currentScale + scaleChange).clamp(0.2, 5.0));
+        },
+        child: Container(
+          width: 14,
+          height: 14,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.blueAccent, width: 2),
+            boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 2)],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.scale(
+      scale: widget.design.customScale ?? 1.0,
+      child: Align(
+        alignment: widget.isCustomPosition ? Alignment.topLeft : (
+          widget.design.position == CaptionPosition.center
+            ? Alignment.center
+            : widget.design.position == CaptionPosition.top
+            ? Alignment.topCenter
+            : Alignment.bottomCenter
+        ),
+        child: GestureDetector(
+          onScaleStart: (_) {
+            _baseScale = widget.design.customScale ?? 1.0;
+          },
+          onScaleUpdate: (details) {
+            if (details.pointerCount >= 2) {
+              widget.onUpdate(Offset.zero, (_baseScale * details.scale).clamp(0.2, 5.0));
+            } else {
+              widget.onUpdate(details.focalPointDelta, widget.design.customScale ?? 1.0);
+            }
+          },
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5, style: BorderStyle.dashed),
+                ),
+                child: widget.child,
+              ),
+              _buildCornerDot(-1, -1),
+              _buildCornerDot(1, -1),
+              _buildCornerDot(-1, 1),
+              _buildCornerDot(1, 1),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _CaptionOverlay extends StatelessWidget {
@@ -3793,47 +3885,11 @@ class _CaptionOverlay extends StatelessWidget {
       top: top,
       bottom: bottom,
       child: onDrag != null 
-          ? Transform.scale(
-              scale: design.customScale ?? 1.0,
-              child: Align(
-                alignment: isCustomPosition ? Alignment.topLeft : (
-                  design.position == CaptionPosition.center
-                    ? Alignment.center
-                    : design.position == CaptionPosition.top
-                    ? Alignment.topCenter
-                    : Alignment.bottomCenter
-                ),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    GestureDetector(
-                      onPanUpdate: (details) => onDrag!(details.delta, 0.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white70, width: 2, style: BorderStyle.solid),
-                        ),
-                        child: child,
-                      ),
-                    ),
-                    Positioned(
-                      right: -12,
-                      bottom: -12,
-                      child: GestureDetector(
-                        onPanUpdate: (details) => onDrag!(Offset.zero, (details.delta.dx + details.delta.dy) * 0.005),
-                        child: Container(
-                          width: 24,
-                          height: 24,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.open_in_full_rounded, size: 14, color: Colors.black),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+          ? _CaptionInteractable(
+              design: design,
+              onUpdate: onDrag!,
+              isCustomPosition: isCustomPosition,
+              child: child,
             )
           : Transform.scale(
               scale: design.customScale ?? 1.0,
@@ -5376,15 +5432,7 @@ class _PlatformPreviewScreenState extends State<PlatformPreviewScreen> {
                 child: SizedBox(
                   width: _controller!.value.size.width,
                   height: _controller!.value.size.height,
-                  child: FittedBox(
-                fit: BoxFit.cover,
-                clipBehavior: Clip.hardEdge,
-                child: SizedBox(
-                  width: _controller!.value.size.width,
-                  height: _controller!.value.size.height,
                   child: VideoPlayer(_controller!),
-                ),
-              ),
                 ),
               ),
             ),
@@ -5397,62 +5445,198 @@ class _PlatformPreviewScreenState extends State<PlatformPreviewScreen> {
                 design: widget.design,
               ),
             ),
-          
-          // Mock TikTok/Reels UI overlay
-          Positioned(
-            right: 12,
-            bottom: 120,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const CircleAvatar(
-                  radius: 22,
-                  backgroundColor: Colors.white24,
-                  child: Icon(Icons.person, color: Colors.white),
-                ),
-                const SizedBox(height: 24),
-                const Icon(Icons.favorite_rounded, color: Colors.white, size: 36),
-                const SizedBox(height: 6),
-                const Text('1.2M', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 20),
-                const Icon(Icons.comment_rounded, color: Colors.white, size: 36),
-                const SizedBox(height: 6),
-                const Text('4,321', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 20),
-                const Icon(Icons.share_rounded, color: Colors.white, size: 36),
-                const SizedBox(height: 6),
-                const Text('Share', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 20),
-                const Icon(Icons.more_horiz_rounded, color: Colors.white, size: 36),
-              ],
+            
+          if (widget.platform == 'reels') ...[
+            Positioned(
+              right: 12,
+              bottom: 120,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.favorite_outline_rounded, color: Colors.white, size: 32, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  const SizedBox(height: 6),
+                  const Text('1.2M', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  const SizedBox(height: 18),
+                  const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 30, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  const SizedBox(height: 6),
+                  const Text('4,321', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  const SizedBox(height: 18),
+                  const Icon(Icons.send_outlined, color: Colors.white, size: 30, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  const SizedBox(height: 6),
+                  const Text('Share', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  const SizedBox(height: 18),
+                  const Icon(Icons.more_horiz_rounded, color: Colors.white, size: 30, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  const SizedBox(height: 18),
+                  Container(
+                    width: 32, height: 32,
+                    decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 2), borderRadius: BorderRadius.circular(8), color: Colors.grey[800]),
+                    child: const Icon(Icons.music_note, color: Colors.white, size: 16),
+                  ),
+                ],
+              ),
             ),
-          ),
-          
-          // Bottom mock description
-          Positioned(
-            left: 12,
-            bottom: 30,
-            right: 80,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('@username', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(height: 8),
-                const Text('This is a preview of how your video will look on platforms like Reels and TikTok. #preview #kapshorts', 
-                  style: TextStyle(color: Colors.white), maxLines: 2, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    const Icon(Icons.music_note_rounded, color: Colors.white, size: 16),
-                    const SizedBox(width: 8),
-                    const Text('Original audio - username', style: TextStyle(color: Colors.white, fontSize: 13)),
-                  ],
-                ),
-              ],
+            Positioned(
+              left: 12, bottom: 30, right: 80,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const CircleAvatar(radius: 16, backgroundColor: Colors.white24, child: Icon(Icons.person, color: Colors.white, size: 18)),
+                      const SizedBox(width: 8),
+                      const Text('KapShot', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                      const SizedBox(width: 8),
+                      Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(border: Border.all(color: Colors.white), borderRadius: BorderRadius.circular(4)), child: const Text('Follow', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold))),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Text('Previewing video with KapShot captions! #reels #kapshot', style: TextStyle(color: Colors.white, fontSize: 14, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 10),
+                  const Row(children: [Icon(Icons.music_note_rounded, color: Colors.white, size: 14, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]), SizedBox(width: 6), Text('KapShot Original Audio', style: TextStyle(color: Colors.white, fontSize: 13, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]))]),
+                ],
+              ),
             ),
-          ),
+            Positioned(top: 40, right: 16, child: const Icon(Icons.camera_alt_outlined, color: Colors.white, size: 28, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+          ] else if (widget.platform == 'facebook') ...[
+            Positioned(
+              right: 12,
+              bottom: 120,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.thumb_up_alt_outlined, color: Colors.white, size: 32, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  const SizedBox(height: 6),
+                  const Text('1.2M', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  const SizedBox(height: 18),
+                  const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 30, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  const SizedBox(height: 6),
+                  const Text('4,321', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  const SizedBox(height: 18),
+                  const Icon(Icons.share_rounded, color: Colors.white, size: 30, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  const SizedBox(height: 6),
+                  const Text('Share', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                ],
+              ),
+            ),
+            Positioned(
+              left: 12, bottom: 30, right: 80,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const CircleAvatar(radius: 16, backgroundColor: Colors.white24, child: Icon(Icons.person, color: Colors.white, size: 18)),
+                      const SizedBox(width: 8),
+                      const Text('KapShot', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                      const SizedBox(width: 8),
+                      const Text('• Follow', style: TextStyle(color: Colors.blueAccent, fontSize: 14, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Text('Previewing video with KapShot captions! #facebookreels', style: TextStyle(color: Colors.white, fontSize: 14, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]), maxLines: 2, overflow: TextOverflow.ellipsis),
+                ],
+              ),
+            ),
+          ] else if (widget.platform == 'shorts') ...[
+            Positioned(
+              right: 12,
+              bottom: 120,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.thumb_up_alt_rounded, color: Colors.white, size: 32, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  const SizedBox(height: 6),
+                  const Text('1.2M', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  const SizedBox(height: 20),
+                  const Icon(Icons.thumb_down_alt_rounded, color: Colors.white, size: 32, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  const SizedBox(height: 6),
+                  const Text('Dislike', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  const SizedBox(height: 20),
+                  const Icon(Icons.comment_rounded, color: Colors.white, size: 32, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  const SizedBox(height: 6),
+                  const Text('4K', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  const SizedBox(height: 20),
+                  const Icon(Icons.share_rounded, color: Colors.white, size: 32, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  const SizedBox(height: 6),
+                  const Text('Share', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                ],
+              ),
+            ),
+            Positioned(
+              left: 12, bottom: 40, right: 80,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const CircleAvatar(radius: 16, backgroundColor: Colors.white24, child: Icon(Icons.person, color: Colors.white, size: 18)),
+                      const SizedBox(width: 8),
+                      const Text('@KapShot', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                      const SizedBox(width: 12),
+                      Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(16)), child: const Text('Subscribe', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold))),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Text('Testing YouTube Shorts Preview in KapShot! #shorts', style: TextStyle(color: Colors.white, fontSize: 14, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]), maxLines: 2, overflow: TextOverflow.ellipsis),
+                ],
+              ),
+            ),
+          ] else if (widget.platform == 'tiktok') ...[
+            Positioned(
+              right: 12,
+              bottom: 100,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircleAvatar(radius: 22, backgroundColor: Colors.white24, child: Icon(Icons.person, color: Colors.white)),
+                  const SizedBox(height: 24),
+                  const Icon(Icons.favorite_rounded, color: Colors.white, size: 36, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  const SizedBox(height: 6),
+                  const Text('1.2M', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  const SizedBox(height: 20),
+                  const Icon(Icons.comment_rounded, color: Colors.white, size: 36, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  const SizedBox(height: 6),
+                  const Text('4,321', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  const SizedBox(height: 20),
+                  const Icon(Icons.bookmark_rounded, color: Colors.white, size: 36, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  const SizedBox(height: 6),
+                  const Text('Save', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  const SizedBox(height: 20),
+                  const Icon(Icons.reply_rounded, color: Colors.white, size: 36, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  const SizedBox(height: 6),
+                  const Text('Share', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  const SizedBox(height: 20),
+                  const CircleAvatar(radius: 18, backgroundColor: Colors.grey, child: Icon(Icons.music_note, color: Colors.black)),
+                ],
+              ),
+            ),
+            Positioned(
+              left: 12, bottom: 30, right: 80,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('@KapShot', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  const SizedBox(height: 8),
+                  const Text('TikTok preview with KapShot! #tiktok #kapshot', style: TextStyle(color: Colors.white, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 12),
+                  const Row(children: [Icon(Icons.music_note_rounded, color: Colors.white, size: 16, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]), SizedBox(width: 8), Text('Original audio - KapShot', style: TextStyle(color: Colors.white, fontSize: 13, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]))]),
+                ],
+              ),
+            ),
+            Positioned(
+              top: 50, left: 0, right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Following', style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  const SizedBox(width: 16),
+                  const Text('For You', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                ],
+              ),
+            ),
+            Positioned(top: 50, right: 16, child: const Icon(Icons.search, color: Colors.white, size: 28, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+          ],
           
-          // Back button
           SafeArea(
             child: Align(
               alignment: Alignment.topLeft,
