@@ -3226,6 +3226,7 @@ class VideoPreviewPlayer extends StatefulWidget {
     required this.previewAspect,
     required this.onReplaceVideo,
     this.onWordToggled,
+    this.onDesignUpdate,
     super.key,
   });
   final String videoPath;
@@ -3238,6 +3239,7 @@ class VideoPreviewPlayer extends StatefulWidget {
   final ValueNotifier<PreviewAspect> previewAspect;
   final VoidCallback onReplaceVideo;
   final void Function(int globalIndex)? onWordToggled;
+  final ValueChanged<CaptionDesign>? onDesignUpdate;
 
   @override
   State<VideoPreviewPlayer> createState() => _VideoPreviewPlayerState();
@@ -3510,6 +3512,7 @@ class _CaptionOverlay extends StatelessWidget {
   final Duration position;
   final CaptionDesign design;
   final void Function(int globalIndex)? onWordToggled;
+  final ValueChanged<CaptionDesign>? onDesignUpdate;
   final void Function(Offset delta)? onDrag;
 
   @override
@@ -4455,6 +4458,7 @@ class HighlightWordOverview extends StatelessWidget {
   const HighlightWordOverview({
     required this.transcription,
     required this.onWordToggled,
+    this.onDesignUpdate,
     super.key,
   });
   final Map<String, dynamic>? transcription;
