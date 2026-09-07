@@ -1509,6 +1509,54 @@ Future<void> showEditorToolSheet(
           setSheetState(() {});
         }
 
+const allFonts = [
+            FontPreviewChoice(CaptionFont.roboto, 'Roboto', 'Roboto'),
+            FontPreviewChoice(CaptionFont.openSans, 'Open Sans', 'Open Sans'),
+            FontPreviewChoice(CaptionFont.lato, 'Lato', 'Lato'),
+            FontPreviewChoice(CaptionFont.ubuntu, 'Ubuntu', 'Ubuntu'),
+            FontPreviewChoice(CaptionFont.bebasNeue, 'Bebas Neue', 'Bebas Neue'),
+            FontPreviewChoice(CaptionFont.dancingScript, 'Dancing Script', 'Dancing Script'),
+            FontPreviewChoice(CaptionFont.cinzel, 'Cinzel', 'Cinzel'),
+            FontPreviewChoice(CaptionFont.josefinSans, 'Josefin Sans', 'Josefin Sans'),
+            FontPreviewChoice(CaptionFont.teko, 'Teko', 'Teko'),
+            FontPreviewChoice(CaptionFont.firaSans, 'Fira Sans', 'Fira Sans'),
+            FontPreviewChoice(CaptionFont.bungee, 'Bungee', 'BUNGEE'),
+            FontPreviewChoice(CaptionFont.chivo, 'Chivo', 'Chivo'),
+            FontPreviewChoice(CaptionFont.comfortaa, 'Comfortaa', 'Comfortaa'),
+            FontPreviewChoice(CaptionFont.cormorant, 'Cormorant', 'Cormorant'),
+            FontPreviewChoice(CaptionFont.fredoka, 'Fredoka One', 'Fredoka one'),
+            FontPreviewChoice(CaptionFont.leagueGothic, 'League Gothic', 'League Gothic'),
+            FontPreviewChoice(CaptionFont.lilitaOne, 'Lilita One', 'Lilita One'),
+            FontPreviewChoice(CaptionFont.lobster, 'Lobster', 'Lobster'),
+            FontPreviewChoice(CaptionFont.pacifico, 'Pacifico', 'Pacifico'),
+            FontPreviewChoice(CaptionFont.ptSansNarrow, 'PT Sans Narrow', 'PT Sans Narrow'),
+            FontPreviewChoice(CaptionFont.rubikWetPaint, 'Rubik Wet Paint', 'Rubik Wetpaint'),
+            FontPreviewChoice(CaptionFont.rye, 'Rye', 'Rye'),
+            FontPreviewChoice(CaptionFont.secularOne, 'Secular One', 'Secular one'),
+            FontPreviewChoice(CaptionFont.staatliches, 'Staatliches', 'STAATLICHES'),
+            FontPreviewChoice(CaptionFont.truculenta, 'Truculenta', 'Truculenta'),
+            FontPreviewChoice(CaptionFont.tiltWarp, 'Tilt Warp', 'Tilt Warp'),
+            FontPreviewChoice(CaptionFont.montserrat, 'Montserrat', 'Montserrat'),
+            FontPreviewChoice(CaptionFont.sriracha, 'Sriracha', 'Sriracha'),
+            FontPreviewChoice(CaptionFont.anton, 'Anton', 'Anton'),
+            FontPreviewChoice(CaptionFont.archivoBlack, 'Archivo Black', 'Archivo Black'),
+            FontPreviewChoice(CaptionFont.baloo2, 'Baloo 2', 'Baloo 2'),
+            FontPreviewChoice(CaptionFont.caveat, 'Caveat', 'Caveat'),
+            FontPreviewChoice(CaptionFont.dmSans, 'DM Sans', 'DM Sans'),
+            FontPreviewChoice(CaptionFont.inter, 'Inter', 'Inter'),
+            FontPreviewChoice(CaptionFont.jetBrainsMono, 'JetBrains Mono', 'JetBrains Mono'),
+            FontPreviewChoice(CaptionFont.manrope, 'Manrope', 'Manrope'),
+            FontPreviewChoice(CaptionFont.oswald, 'Oswald', 'Oswald'),
+            FontPreviewChoice(CaptionFont.permanentMarker, 'Permanent Marker', 'Permanent Marker'),
+            FontPreviewChoice(CaptionFont.playfair, 'Playfair Display', 'Playfair Display'),
+            FontPreviewChoice(CaptionFont.poppins, 'Poppins', 'Poppins'),
+            FontPreviewChoice(CaptionFont.righteous, 'Righteous', 'Righteous'),
+            FontPreviewChoice(CaptionFont.spaceGrotesk, 'Space Grotesk', 'Space Grotesk'),
+            FontPreviewChoice(CaptionFont.syne, 'Syne', 'Syne'),
+            FontPreviewChoice(CaptionFont.abril, 'Abril Fatface', 'Abril Fatface'),
+            FontPreviewChoice(CaptionFont.rubikMono, 'Rubik Mono One', 'Rubik Mono One'),
+            FontPreviewChoice(CaptionFont.pixel, 'Press Start 2P', 'Press Start 2P'),
+          ];
         if (customColorPage) {
           final currentColor = switch (customColorTarget) {
             'activeColor' => design.activeColor,
@@ -1624,54 +1672,7 @@ Future<void> showEditorToolSheet(
             ),
           );
         } else if (tool == EditorTool.highlight) {
-          const allFonts = [
-            FontPreviewChoice(CaptionFont.roboto, 'Roboto', 'Roboto'),
-            FontPreviewChoice(CaptionFont.openSans, 'Open Sans', 'Open Sans'),
-            FontPreviewChoice(CaptionFont.lato, 'Lato', 'Lato'),
-            FontPreviewChoice(CaptionFont.ubuntu, 'Ubuntu', 'Ubuntu'),
-            FontPreviewChoice(CaptionFont.bebasNeue, 'Bebas Neue', 'Bebas Neue'),
-            FontPreviewChoice(CaptionFont.dancingScript, 'Dancing Script', 'Dancing Script'),
-            FontPreviewChoice(CaptionFont.cinzel, 'Cinzel', 'Cinzel'),
-            FontPreviewChoice(CaptionFont.josefinSans, 'Josefin Sans', 'Josefin Sans'),
-            FontPreviewChoice(CaptionFont.teko, 'Teko', 'Teko'),
-            FontPreviewChoice(CaptionFont.firaSans, 'Fira Sans', 'Fira Sans'),
-            FontPreviewChoice(CaptionFont.bungee, 'Bungee', 'BUNGEE'),
-            FontPreviewChoice(CaptionFont.chivo, 'Chivo', 'Chivo'),
-            FontPreviewChoice(CaptionFont.comfortaa, 'Comfortaa', 'Comfortaa'),
-            FontPreviewChoice(CaptionFont.cormorant, 'Cormorant', 'Cormorant'),
-            FontPreviewChoice(CaptionFont.fredoka, 'Fredoka One', 'Fredoka one'),
-            FontPreviewChoice(CaptionFont.leagueGothic, 'League Gothic', 'League Gothic'),
-            FontPreviewChoice(CaptionFont.lilitaOne, 'Lilita One', 'Lilita One'),
-            FontPreviewChoice(CaptionFont.lobster, 'Lobster', 'Lobster'),
-            FontPreviewChoice(CaptionFont.pacifico, 'Pacifico', 'Pacifico'),
-            FontPreviewChoice(CaptionFont.ptSansNarrow, 'PT Sans Narrow', 'PT Sans Narrow'),
-            FontPreviewChoice(CaptionFont.rubikWetPaint, 'Rubik Wet Paint', 'Rubik Wetpaint'),
-            FontPreviewChoice(CaptionFont.rye, 'Rye', 'Rye'),
-            FontPreviewChoice(CaptionFont.secularOne, 'Secular One', 'Secular one'),
-            FontPreviewChoice(CaptionFont.staatliches, 'Staatliches', 'STAATLICHES'),
-            FontPreviewChoice(CaptionFont.truculenta, 'Truculenta', 'Truculenta'),
-            FontPreviewChoice(CaptionFont.tiltWarp, 'Tilt Warp', 'Tilt Warp'),
-            FontPreviewChoice(CaptionFont.montserrat, 'Montserrat', 'Montserrat'),
-            FontPreviewChoice(CaptionFont.sriracha, 'Sriracha', 'Sriracha'),
-            FontPreviewChoice(CaptionFont.anton, 'Anton', 'Anton'),
-            FontPreviewChoice(CaptionFont.archivoBlack, 'Archivo Black', 'Archivo Black'),
-            FontPreviewChoice(CaptionFont.baloo2, 'Baloo 2', 'Baloo 2'),
-            FontPreviewChoice(CaptionFont.caveat, 'Caveat', 'Caveat'),
-            FontPreviewChoice(CaptionFont.dmSans, 'DM Sans', 'DM Sans'),
-            FontPreviewChoice(CaptionFont.inter, 'Inter', 'Inter'),
-            FontPreviewChoice(CaptionFont.jetBrainsMono, 'JetBrains Mono', 'JetBrains Mono'),
-            FontPreviewChoice(CaptionFont.manrope, 'Manrope', 'Manrope'),
-            FontPreviewChoice(CaptionFont.oswald, 'Oswald', 'Oswald'),
-            FontPreviewChoice(CaptionFont.permanentMarker, 'Permanent Marker', 'Permanent Marker'),
-            FontPreviewChoice(CaptionFont.playfair, 'Playfair Display', 'Playfair Display'),
-            FontPreviewChoice(CaptionFont.poppins, 'Poppins', 'Poppins'),
-            FontPreviewChoice(CaptionFont.righteous, 'Righteous', 'Righteous'),
-            FontPreviewChoice(CaptionFont.spaceGrotesk, 'Space Grotesk', 'Space Grotesk'),
-            FontPreviewChoice(CaptionFont.syne, 'Syne', 'Syne'),
-            FontPreviewChoice(CaptionFont.abril, 'Abril Fatface', 'Abril Fatface'),
-            FontPreviewChoice(CaptionFont.rubikMono, 'Rubik Mono One', 'Rubik Mono One'),
-            FontPreviewChoice(CaptionFont.pixel, 'Press Start 2P', 'Press Start 2P'),
-          ];
+          
 
           if (choosingHighlightFont) {
             content = Column(
@@ -1888,7 +1889,7 @@ Future<void> showEditorToolSheet(
                       ),
                     ],
                   ),
-                  const SizedBox(height: 18);
+                  const SizedBox(height: 18),
                   Row(
                     children: [
                       const Text('Highlight Size', style: TextStyle(fontWeight: FontWeight.w700)),
@@ -2888,7 +2889,7 @@ class _CaptionTextEditorScreenState
                             onDrag: (delta) {
                               double currentX = design.customX ?? 24.0;
                               double currentY = design.customY ?? (design.position == CaptionPosition.top ? 34.0 : design.position == CaptionPosition.bottom ? 140.0 : 80.0);
-                              updateDesign(design.copyWith(customX: currentX + delta.dx, customY: currentY + delta.dy));
+                              ref.read(captionDesignProvider.notifier).state = design.copyWith(customX: currentX + delta.dx, customY: currentY + delta.dy);
                             },
                           ),
                         ],
