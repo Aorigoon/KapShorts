@@ -3606,7 +3606,7 @@ class _CaptionInteractableState extends State<_CaptionInteractable> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5, style: BorderStyle.dashed),
+                  border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5, style: BorderStyle.solid),
                 ),
                 child: widget.child,
               ),
