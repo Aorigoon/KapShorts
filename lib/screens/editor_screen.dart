@@ -2964,16 +2964,13 @@ class _CaptionTextEditorScreenState
                           _CaptionOverlay(
                             transcription: transcription,
                             position: controller.value.position,
-                            design: design,
-                            onDrag: (delta, scale) {
-                              double currentX = design.customX ?? 24.0;
-                              double currentY = design.customY ?? (design.position == CaptionPosition.top ? 34.0 : design.position == CaptionPosition.bottom ? 140.0 : 80.0);
-                              ref.read(captionDesignProvider.notifier).state = design.copyWith(
-                                customX: currentX + delta.dx, 
-                                customY: currentY + delta.dy,
-                                customScale: scale,
-                              );
-                            },
+                            design: design.copyWith(
+                              position: CaptionPosition.center,
+                              customX: null,
+                              customY: null,
+                              customScale: 1.0,
+                            ),
+                            // Position is fixed in the center for the Edit Text preview box
                           ),
                         ],
                       ),
@@ -3617,7 +3614,7 @@ class _CaptionInteractableState extends State<_CaptionInteractable> {
     return Transform.scale(
       scale: widget.design.customScale ?? 1.0,
       child: Align(
-        alignment: widget.isCustomPosition ? Alignment.topLeft : (
+        alignment: widget.isCustomPosition ? Alignment.center : (
           widget.design.position == CaptionPosition.center
             ? Alignment.center
             : widget.design.position == CaptionPosition.top
