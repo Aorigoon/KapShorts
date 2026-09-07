@@ -179,12 +179,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       }
       if (tool == EditorTool.preview) {
         final currentDesign = ref.read(captionDesignProvider);
-        final currentController = ref.read(videoPlayerProvider);
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => PlatformPreviewScreen(
-              controller: currentController,
+              videoPath: project?.videoPath ?? '',
               design: currentDesign,
               transcription: transcription ?? project?.transcription,
             ),
@@ -5207,17 +5206,43 @@ String _captionColorHex(Color color) {
 
 
 
-class PlatformPreviewScreen extends StatelessWidget {
+class PlatformPreviewScreen extends StatefulWidget {
   const PlatformPreviewScreen({
     super.key,
-    required this.controller,
+    required this.videoPath,
     required this.design,
     required this.transcription,
   });
 
-  final VideoPlayerController? controller;
+  final String videoPath;
   final CaptionDesign design;
   final Map<String, dynamic>? transcription;
+
+  @override
+  State<PlatformPreviewScreen> createState() => _PlatformPreviewScreenState();
+}
+
+class _PlatformPreviewScreenState extends State<PlatformPreviewScreen> {
+  VideoPlayerController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.videoPath.isNotEmpty) {
+      _controller = createVideoController(widget.videoPath);
+      _controller!.initialize().then((_) {
+        _controller!.setLooping(true);
+        _controller!.play();
+        if (mounted) setState(() {});
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -5226,24 +5251,24 @@ class PlatformPreviewScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          if (controller != null)
+          if (_controller != null && _controller!.value.isInitialized)
             GestureDetector(
               onTap: () {
-                if (controller!.value.isPlaying) {
-                  controller!.pause();
+                if (_controller!.value.isPlaying) {
+                  _controller!.pause();
                 } else {
-                  controller!.play();
+                  _controller!.play();
                 }
               },
-              child: VideoPlayer(controller!),
+              child: VideoPlayer(_controller!),
             ),
-          if (controller != null)
+          if (_controller != null && _controller!.value.isInitialized)
             AnimatedBuilder(
-              animation: controller!,
+              animation: _controller!,
               builder: (context, _) => _CaptionOverlay(
-                transcription: transcription,
-                position: controller!.value.position,
-                design: design,
+                transcription: widget.transcription,
+                position: _controller!.value.position,
+                design: widget.design,
               ),
             ),
           
