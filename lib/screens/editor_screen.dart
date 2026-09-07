@@ -1292,8 +1292,6 @@ class EditorToolRail extends StatelessWidget {
   Widget build(BuildContext context) {
     const tools = [
       (EditorTool.style, Icons.tune_rounded, 'Customize'),
-      (EditorTool.aiFit, Icons.auto_awesome_rounded, 'AI Fit'),
-      (EditorTool.preview, Icons.preview_rounded, 'Preview'),
       (EditorTool.addText, Icons.edit_note_rounded, 'Edit Text'),
       (EditorTool.fonts, Icons.text_fields_rounded, 'Font'),
       (EditorTool.highlightWords, Icons.format_color_text_rounded, 'H. Words'),
@@ -1354,8 +1352,6 @@ class _EditorFloatingSidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     const tools = [
       (EditorTool.style, Icons.tune_rounded, 'Customize'),
-      (EditorTool.aiFit, Icons.auto_awesome_rounded, 'AI Fit'),
-      (EditorTool.preview, Icons.preview_rounded, 'Preview'),
       (EditorTool.addText, Icons.edit_note_rounded, 'Edit Text'),
       (EditorTool.fonts, Icons.text_fields_rounded, 'Font'),
       (EditorTool.highlightWords, Icons.format_color_text_rounded, 'H. Words'),
@@ -2968,10 +2964,15 @@ class _CaptionTextEditorScreenState
                             transcription: transcription,
                             position: controller.value.position,
                             design: design,
-                            onDrag: (delta) {
+                            onDrag: (delta, scale) {
                               double currentX = design.customX ?? 24.0;
                               double currentY = design.customY ?? (design.position == CaptionPosition.top ? 34.0 : design.position == CaptionPosition.bottom ? 140.0 : 80.0);
-                              ref.read(captionDesignProvider.notifier).state = design.copyWith(customX: currentX + delta.dx, customY: currentY + delta.dy);
+                              double currentScale = design.customScale ?? 1.0;
+                              ref.read(captionDesignProvider.notifier).state = design.copyWith(
+                                customX: currentX + delta.dx, 
+                                customY: currentY + delta.dy,
+                                customScale: (currentScale + scale).clamp(0.2, 5.0),
+                              );
                             },
                           ),
                         ],
