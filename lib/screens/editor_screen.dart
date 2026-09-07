@@ -1670,7 +1670,19 @@ Future<void> showEditorToolSheet(
               ],
             );
           } else {
-            const topFonts = [CaptionFont.anton, CaptionFont.archivoBlack, CaptionFont.poppins];
+            const featuredFonts = [
+              CaptionFont.anton,
+              CaptionFont.archivoBlack,
+              CaptionFont.poppins,
+              CaptionFont.montserrat,
+              CaptionFont.roboto,
+            ];
+            final currentHFont = design.highlightFont ?? design.font;
+            final visibleFonts = [
+              if (!featuredFonts.contains(currentHFont)) currentHFont,
+              ...featuredFonts,
+            ];
+
             content = SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1697,10 +1709,14 @@ Future<void> showEditorToolSheet(
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      ...topFonts.map((f) {
+                  SizedBox(
+                    height: 38,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: visibleFonts.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                      itemBuilder: (_, index) {
+                        final f = visibleFonts[index];
                         final isSel = (design.highlightFont ?? design.font) == f;
                         return ChoiceChip(
                           label: Text(
@@ -1718,8 +1734,8 @@ Future<void> showEditorToolSheet(
                           backgroundColor: AppColors.elevated,
                           side: BorderSide(color: isSel ? Colors.white : AppColors.line),
                         );
-                      }),
-                    ],
+                      },
+                    ),
                   ),
                   const SizedBox(height: 18),
                   const Text('Highlight Text Color', style: TextStyle(fontWeight: FontWeight.w700)),
@@ -1728,7 +1744,7 @@ Future<void> showEditorToolSheet(
                     spacing: 12,
                     runSpacing: 10,
                     children: [
-                      ...baseRecent.take(5).map(
+                      ...baseRecent.take(7).map(
                         (color) => InkWell(
                           onTap: () => updateDesign(design.copyWith(highlightColor: color)),
                           borderRadius: BorderRadius.circular(20),
@@ -1746,26 +1762,13 @@ Future<void> showEditorToolSheet(
                           ),
                         ),
                       ),
-                      // Custom Rainbow Picker Button
-                      InkWell(
+                      _CustomColorPlusButton(
                         onTap: () {
                           setSheetState(() {
                             customColorTarget = 'highlightColor';
                             customColorPage = true;
                           });
                         },
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          width: 34,
-                          height: 34,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.line, width: 2),
-                            gradient: const SweepGradient(
-                              colors: [Colors.red, Colors.orange, Colors.yellow, Colors.green, Colors.blue, Colors.purple, Colors.red],
-                            ),
-                          ),
-                        ),
                       ),
                     ],
                   ),
@@ -1792,7 +1795,7 @@ Future<void> showEditorToolSheet(
                           child: const Icon(Icons.block, size: 16, color: AppColors.secondary),
                         ),
                       ),
-                      ...baseRecent.take(4).map(
+                      ...baseRecent.take(6).map(
                         (color) => GestureDetector(
                           onTap: () => updateDesign(design.copyWith(highlightBackground: color)),
                           child: Container(
@@ -1809,26 +1812,13 @@ Future<void> showEditorToolSheet(
                           ),
                         ),
                       ),
-                      // Custom Rainbow Picker Button
-                      InkWell(
+                      _CustomColorPlusButton(
                         onTap: () {
                           setSheetState(() {
                             customColorTarget = 'highlightBackground';
                             customColorPage = true;
                           });
                         },
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          width: 34,
-                          height: 34,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.line, width: 2),
-                            gradient: const SweepGradient(
-                              colors: [Colors.red, Colors.orange, Colors.yellow, Colors.green, Colors.blue, Colors.purple, Colors.red],
-                            ),
-                          ),
-                        ),
                       ),
                     ],
                   ),
@@ -1913,7 +1903,7 @@ Future<void> showEditorToolSheet(
                   spacing: 12,
                   runSpacing: 10,
                   children: [
-                    ...baseRecent.take(5).map(
+                    ...baseRecent.take(7).map(
                       (color) => InkWell(
                         onTap: () => updateDesign(design.copyWith(activeColor: color)),
                         borderRadius: BorderRadius.circular(20),
@@ -1931,26 +1921,13 @@ Future<void> showEditorToolSheet(
                         ),
                       ),
                     ),
-                    // Custom Rainbow Picker Button
-                    InkWell(
+                    _CustomColorPlusButton(
                       onTap: () {
                         setSheetState(() {
                           customColorTarget = 'activeColor';
                           customColorPage = true;
                         });
                       },
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        width: 34,
-                        height: 34,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.line, width: 2),
-                          gradient: const SweepGradient(
-                            colors: [Colors.red, Colors.orange, Colors.yellow, Colors.green, Colors.blue, Colors.purple, Colors.red],
-                          ),
-                        ),
-                      ),
                     ),
                   ],
                 ),
@@ -1978,7 +1955,7 @@ Future<void> showEditorToolSheet(
                         child: const Icon(Icons.block, size: 16, color: AppColors.secondary),
                       ),
                     ),
-                    ...baseRecent.take(4).map(
+                    ...baseRecent.take(6).map(
                       (color) => GestureDetector(
                         onTap: () => updateDesign(design.copyWith(activeBackground: color)),
                         child: Container(
@@ -1995,26 +1972,13 @@ Future<void> showEditorToolSheet(
                         ),
                       ),
                     ),
-                    // Custom Rainbow Picker Button
-                    InkWell(
+                    _CustomColorPlusButton(
                       onTap: () {
                         setSheetState(() {
                           customColorTarget = 'activeBackground';
                           customColorPage = true;
                         });
                       },
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        width: 34,
-                        height: 34,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.line, width: 2),
-                          gradient: const SweepGradient(
-                            colors: [Colors.red, Colors.orange, Colors.yellow, Colors.green, Colors.blue, Colors.purple, Colors.red],
-                          ),
-                        ),
-                      ),
                     ),
                   ],
                 ),
@@ -2246,50 +2210,68 @@ Future<void> showEditorToolSheet(
           );
         }
 
-        return SafeArea(
-          top: false,
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
-            constraints: BoxConstraints(
-              maxHeight:
-                  MediaQuery.sizeOf(sheetContext).height *
-                  (tool == EditorTool.templates
-                      ? .56
-                      : tool == EditorTool.fonts
-                      ? .50
-                      : tool == EditorTool.effects
-                      ? .68
-                      : .54),
+        return Theme(
+          data: Theme.of(sheetContext).copyWith(
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            focusColor: Colors.transparent,
+            hoverColor: Colors.transparent,
+            colorScheme: Theme.of(sheetContext).colorScheme.copyWith(
+              primary: Colors.white,
+              secondary: Colors.white,
+              surfaceTint: Colors.transparent,
             ),
-            decoration: const BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            chipTheme: Theme.of(sheetContext).chipTheme.copyWith(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              overlayColor: WidgetStateProperty.all(Colors.transparent),
             ),
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                Align(
-                  alignment: Alignment.center,
-                  child: Container(
-                    width: 42,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppColors.tertiary,
-                      borderRadius: BorderRadius.circular(4),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+              constraints: BoxConstraints(
+                maxHeight:
+                    MediaQuery.sizeOf(sheetContext).height *
+                    (tool == EditorTool.templates
+                        ? .56
+                        : tool == EditorTool.fonts
+                        ? .50
+                        : tool == EditorTool.effects
+                        ? .68
+                        : .54),
+              ),
+              decoration: const BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              ),
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      width: 42,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.tertiary,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  labels[tool]!,
-                  style: GoogleFonts.manrope(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
+                  const SizedBox(height: 20),
+                  Text(
+                    labels[tool]!,
+                    style: GoogleFonts.manrope(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 18),
-                content,
-              ],
+                  const SizedBox(height: 18),
+                  content,
+                ],
+              ),
             ),
           ),
         );
@@ -3568,6 +3550,52 @@ class _ModernRailIcon extends StatelessWidget {
       Icon(icon, size: 24, color: Colors.white);
 }
 
+class _CustomColorPlusButton extends StatelessWidget {
+  const _CustomColorPlusButton({required this.onTap, super.key});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        width: 34,
+        height: 34,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: const SweepGradient(
+            colors: [
+              Color(0xFFFF4D4D),
+              Color(0xFFFFD34E),
+              Color(0xFF72E06A),
+              Color(0xFF44C7FF),
+              Color(0xFF7858FF),
+              Color(0xFFFF5EBE),
+              Color(0xFFFF4D4D),
+            ],
+          ),
+          border: Border.all(color: Colors.white54),
+        ),
+        alignment: Alignment.center,
+        child: Container(
+          width: 21,
+          height: 21,
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.add_rounded,
+            size: 16,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class FontPreviewChoice {
   const FontPreviewChoice(this.font, this.label, this.preview);
   final CaptionFont font;
@@ -4569,46 +4597,12 @@ Future<void> showCustomizeSheet(BuildContext context, WidgetRef ref) async {
                           ),
                         ),
                       ),
-                      InkWell(
+                      _CustomColorPlusButton(
                         onTap: () {
                           colorBeforeCustomPage = design.color;
                           customColorIsHighlight = false;
                           setSheetState(() => customColorPage = true);
                         },
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          width: 34,
-                          height: 34,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: const SweepGradient(
-                              colors: [
-                                Color(0xFFFF4D4D),
-                                Color(0xFFFFD34E),
-                                Color(0xFF72E06A),
-                                Color(0xFF44C7FF),
-                                Color(0xFF7858FF),
-                                Color(0xFFFF5EBE),
-                                Color(0xFFFF4D4D),
-                              ],
-                            ),
-                            border: Border.all(color: Colors.white54),
-                          ),
-                          alignment: Alignment.center,
-                          child: Container(
-                            width: 21,
-                            height: 21,
-                            decoration: const BoxDecoration(
-                              color: AppColors.surface,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.add_rounded,
-                              size: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
                       ),
                     ],
                   ),
