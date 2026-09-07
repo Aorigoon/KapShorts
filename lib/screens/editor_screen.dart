@@ -2221,9 +2221,6 @@ Future<void> showEditorToolSheet(
               secondary: Colors.white,
               surfaceTint: Colors.transparent,
             ),
-            chipTheme: Theme.of(sheetContext).chipTheme.copyWith(
-              overlayColor: WidgetStateProperty.all(Colors.transparent),
-            ),
           ),
           child: SafeArea(
             top: false,
