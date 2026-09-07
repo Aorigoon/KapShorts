@@ -3512,7 +3512,6 @@ class _CaptionOverlay extends StatelessWidget {
   final Duration position;
   final CaptionDesign design;
   final void Function(int globalIndex)? onWordToggled;
-  final ValueChanged<CaptionDesign>? onDesignUpdate;
   final void Function(Offset delta)? onDrag;
 
   @override
@@ -4458,7 +4457,6 @@ class HighlightWordOverview extends StatelessWidget {
   const HighlightWordOverview({
     required this.transcription,
     required this.onWordToggled,
-    this.onDesignUpdate,
     super.key,
   });
   final Map<String, dynamic>? transcription;
