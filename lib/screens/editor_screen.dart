@@ -2222,8 +2222,6 @@ Future<void> showEditorToolSheet(
               surfaceTint: Colors.transparent,
             ),
             chipTheme: Theme.of(sheetContext).chipTheme.copyWith(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
               overlayColor: WidgetStateProperty.all(Colors.transparent),
             ),
           ),
