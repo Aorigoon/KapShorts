@@ -1819,7 +1819,6 @@ const allFonts = [
                     ],
                   ),
                   const SizedBox(height: 18),
-                  const SizedBox(height: 18),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -2093,22 +2092,21 @@ const allFonts = [
                 ),
                 const SizedBox(height: 20),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                      const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Show Text Border', style: TextStyle(fontWeight: FontWeight.w700)),
-                      Switch(
-                        value: design.activeHasOutline,
-                        onChanged: (val) => updateDesign(design.copyWith(activeHasOutline: val)),
-                        activeColor: Colors.black,
-                        activeTrackColor: Colors.white,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                const Text('Active Size', style: TextStyle(fontWeight: FontWeight.w700)),
+                    const Text('Show Text Border', style: TextStyle(fontWeight: FontWeight.w700)),
+                    Switch(
+                      value: design.activeHasOutline,
+                      onChanged: (val) => updateDesign(design.copyWith(activeHasOutline: val)),
+                      activeColor: Colors.black,
+                      activeTrackColor: Colors.white,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    const Text('Active Size', style: TextStyle(fontWeight: FontWeight.w700)),
                     const Spacer(),
                     Text('${(design.activeSize ?? design.size).round()} px', style: const TextStyle(color: AppColors.secondary)),
                   ],
