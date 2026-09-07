@@ -171,19 +171,21 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         );
         Future.delayed(const Duration(seconds: 2), () {
           Navigator.pop(context); // pop dialog
-          // Mock AI result: set position to center
-          updateDesign(design.copyWith(position: CaptionPosition.center, customX: null, customY: null));
+          final currentDesign = ref.read(captionDesignProvider);
+          ref.read(captionDesignProvider.notifier).state = currentDesign.copyWith(position: CaptionPosition.center, customX: null, customY: null);
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('AI positioned captions to Center (Mock)')));
         });
         return;
       }
       if (tool == EditorTool.preview) {
+        final currentDesign = ref.read(captionDesignProvider);
+        final currentController = ref.read(videoPlayerProvider);
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => PlatformPreviewScreen(
-              controller: controller,
-              design: design,
+              controller: currentController,
+              design: currentDesign,
               transcription: transcription ?? project?.transcription,
             ),
           ),
@@ -1315,8 +1317,6 @@ enum EditorTool {
   highlight,
   highlightWords,
   activeWords,
-  aiFit,
-  preview,
   aiFit,
   preview,
 }
