@@ -1827,8 +1827,8 @@ const allFonts = [
                       Switch(
                         value: design.highlightHasOutline,
                         onChanged: (val) => updateDesign(design.copyWith(highlightHasOutline: val)),
-                        activeColor: Colors.white,
-                        activeTrackColor: AppColors.primary,
+                        activeColor: Colors.black,
+                        activeTrackColor: Colors.white,
                       ),
                     ],
                   ),
@@ -2102,8 +2102,8 @@ const allFonts = [
                       Switch(
                         value: design.activeHasOutline,
                         onChanged: (val) => updateDesign(design.copyWith(activeHasOutline: val)),
-                        activeColor: Colors.white,
-                        activeTrackColor: AppColors.primary,
+                        activeColor: Colors.black,
+                        activeTrackColor: Colors.white,
                       ),
                     ],
                   ),
@@ -2130,8 +2130,8 @@ const allFonts = [
                     Switch(
                       value: design.activeBlink,
                       onChanged: (v) => updateDesign(design.copyWith(activeBlink: v)),
-                      activeColor: Colors.white,
-                      activeTrackColor: AppColors.line,
+                      activeColor: Colors.black,
+                      activeTrackColor: Colors.white,
                     ),
                   ],
                 ),
