@@ -1688,51 +1688,58 @@ Future<void> showEditorToolSheet(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      const Text('Highlight Font', style: TextStyle(fontWeight: FontWeight.w700)),
-                      const Spacer(),
-                      InkWell(
-                        onTap: () => setSheetState(() => choosingHighlightFont = true),
-                        borderRadius: BorderRadius.circular(12),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          child: Row(
-                            children: [
-                              Text('More', style: TextStyle(color: AppColors.secondary, fontWeight: FontWeight.w600, fontSize: 12)),
-                              SizedBox(width: 4),
-                              Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.secondary),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  const Text('Highlight Font', style: TextStyle(fontWeight: FontWeight.w700)),
                   const SizedBox(height: 10),
                   SizedBox(
                     height: 38,
-                    child: ListView.separated(
+                    child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: visibleFonts.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                      itemCount: visibleFonts.length + 1,
                       itemBuilder: (_, index) {
+                        if (index == visibleFonts.length) {
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: ActionChip(
+                              label: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'More',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  SizedBox(width: 2),
+                                  Icon(Icons.chevron_right_rounded, size: 16, color: Colors.white),
+                                ],
+                              ),
+                              onPressed: () => setSheetState(() => choosingHighlightFont = true),
+                              backgroundColor: AppColors.elevated,
+                              side: const BorderSide(color: AppColors.line),
+                            ),
+                          );
+                        }
                         final f = visibleFonts[index];
                         final isSel = (design.highlightFont ?? design.font) == f;
-                        return ChoiceChip(
-                          label: Text(
-                            f.name.toUpperCase(),
-                            style: captionTextStyle(
-                              design,
-                              font: f,
-                              fontSize: 11,
-                              color: isSel ? Colors.black : Colors.white,
+                        return Padding(
+                          padding: EdgeInsets.only(left: index == 0 ? 0 : 8),
+                          child: ChoiceChip(
+                            label: Text(
+                              f.name.toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: isSel ? Colors.black : Colors.white,
+                              ),
                             ),
+                            selected: isSel,
+                            onSelected: (_) => updateDesign(design.copyWith(highlightFont: f)),
+                            selectedColor: Colors.white,
+                            backgroundColor: AppColors.elevated,
+                            side: BorderSide(color: isSel ? Colors.white : AppColors.line),
                           ),
-                          selected: isSel,
-                          onSelected: (_) => updateDesign(design.copyWith(highlightFont: f)),
-                          selectedColor: Colors.white,
-                          backgroundColor: AppColors.elevated,
-                          side: BorderSide(color: isSel ? Colors.white : AppColors.line),
                         );
                       },
                     ),
@@ -1744,7 +1751,7 @@ Future<void> showEditorToolSheet(
                     spacing: 12,
                     runSpacing: 10,
                     children: [
-                      ...baseRecent.take(7).map(
+                      ...baseRecent.take(6).map(
                         (color) => InkWell(
                           onTap: () => updateDesign(design.copyWith(highlightColor: color)),
                           borderRadius: BorderRadius.circular(20),
@@ -1795,7 +1802,7 @@ Future<void> showEditorToolSheet(
                           child: const Icon(Icons.block, size: 16, color: AppColors.secondary),
                         ),
                       ),
-                      ...baseRecent.take(6).map(
+                      ...baseRecent.take(5).map(
                         (color) => GestureDetector(
                           onTap: () => updateDesign(design.copyWith(highlightBackground: color)),
                           child: Container(
@@ -1903,7 +1910,7 @@ Future<void> showEditorToolSheet(
                   spacing: 12,
                   runSpacing: 10,
                   children: [
-                    ...baseRecent.take(7).map(
+                    ...baseRecent.take(6).map(
                       (color) => InkWell(
                         onTap: () => updateDesign(design.copyWith(activeColor: color)),
                         borderRadius: BorderRadius.circular(20),
@@ -1955,7 +1962,7 @@ Future<void> showEditorToolSheet(
                         child: const Icon(Icons.block, size: 16, color: AppColors.secondary),
                       ),
                     ),
-                    ...baseRecent.take(6).map(
+                    ...baseRecent.take(5).map(
                       (color) => GestureDetector(
                         onTap: () => updateDesign(design.copyWith(activeBackground: color)),
                         child: Container(
