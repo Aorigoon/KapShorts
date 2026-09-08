@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'controllers/projects_controller.dart';
 
+final testModeProvider = StateProvider<bool>((ref) => false);
+
 final projectsProvider = ChangeNotifierProvider<ProjectsController>(
   (_) => ProjectsController(),
 );
@@ -27,9 +29,11 @@ final captionRecentColorsProvider = StateProvider<List<Color>>(
 );
 
 class CreditsNotifier extends StateNotifier<int> {
-  CreditsNotifier() : super(60) {
+  CreditsNotifier(this.ref) : super(60) {
     _load();
   }
+
+  final Ref ref;
 
   static const String _key = 'user_credits';
 
@@ -41,6 +45,7 @@ class CreditsNotifier extends StateNotifier<int> {
   }
 
   Future<bool> deductCredits(int amount) async {
+    if (ref.read(testModeProvider)) return true; // Test mode bypass
     if (state < amount) return false;
     state = state - amount;
     try {
@@ -60,5 +65,5 @@ class CreditsNotifier extends StateNotifier<int> {
 }
 
 final creditsProvider = StateNotifierProvider<CreditsNotifier, int>(
-  (_) => CreditsNotifier(),
+  (ref) => CreditsNotifier(ref),
 );
