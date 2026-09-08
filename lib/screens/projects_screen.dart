@@ -119,67 +119,10 @@ class _ProjectsHeader extends StatelessWidget {
             ),
           ),
         ),
-        const TestModeToggle(),
-        const SizedBox(width: 8),
         const CreditBadge(),
         const SizedBox(width: 8),
         const ProButton(),
       ],
-    );
-  }
-}
-
-class TestModeToggle extends ConsumerWidget {
-  const TestModeToggle({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isTestMode = ref.watch(testModeProvider);
-    return GestureDetector(
-      onTap: () {
-        ref.read(testModeProvider.notifier).state = !isTestMode;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(isTestMode ? 'Test Mode OFF (Credits will be used)' : 'Test Mode ON (Unlimited Credits)'),
-            duration: const Duration(seconds: 2),
-            backgroundColor: isTestMode ? Colors.redAccent : Colors.green,
-          ),
-        );
-      },
-      child: Container(
-        height: 38,
-        padding: const EdgeInsets.symmetric(horizontal: 13),
-        decoration: BoxDecoration(
-          color: isTestMode ? Colors.green.withOpacity(0.2) : const Color(0xFF1E1F26),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isTestMode ? Colors.green : Colors.white.withOpacity(0.14),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isTestMode ? Icons.bug_report_rounded : Icons.bug_report_outlined,
-              color: isTestMode ? Colors.green : Colors.white54,
-              size: 19,
-            ),
-            if (isTestMode) ...[
-              const SizedBox(width: 5),
-              Text(
-                'TEST',
-                style: GoogleFonts.manrope(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 13,
-                  color: Colors.green,
-                  letterSpacing: 0.2,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
     );
   }
 }
@@ -190,6 +133,7 @@ class CreditBadge extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final credits = ref.watch(creditsProvider);
+    final isTestMode = ref.watch(testModeProvider);
     return Container(
       height: 38,
       padding: const EdgeInsets.symmetric(horizontal: 13),
@@ -210,15 +154,25 @@ class CreditBadge extends ConsumerWidget {
             size: 19,
           ),
           const SizedBox(width: 5),
-          Text(
-            '$credits',
-            style: GoogleFonts.manrope(
-              fontWeight: FontWeight.w800,
-              fontSize: 15,
-              color: Colors.white,
-              letterSpacing: 0.2,
+          if (isTestMode)
+            const Padding(
+              padding: EdgeInsets.only(top: 2),
+              child: Icon(
+                Icons.all_inclusive_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+            )
+          else
+            Text(
+              '$credits',
+              style: GoogleFonts.manrope(
+                fontWeight: FontWeight.w800,
+                fontSize: 15,
+                color: Colors.white,
+                letterSpacing: 0.2,
+              ),
             ),
-          ),
         ],
       ),
     );
