@@ -1307,7 +1307,7 @@ class EditorToolRail extends StatelessWidget {
     const tools = [
       (EditorTool.style, Icons.tune_rounded, 'Customize'),
       (EditorTool.addText, Icons.edit_note_rounded, 'Edit Text'),
-      (EditorTool.canvas, Icons.format_size_rounded, 'Canvas'),
+      (EditorTool.canvas, Icons.design_services_rounded, 'Canvas'),
       (EditorTool.fonts, Icons.text_fields_rounded, 'Font'),
       (EditorTool.highlightWords, Icons.format_color_text_rounded, 'H. Words'),
       (EditorTool.highlight, Icons.highlight_rounded, 'Highlight'),
@@ -1368,7 +1368,7 @@ class _EditorFloatingSidebar extends StatelessWidget {
     const tools = [
       (EditorTool.style, Icons.tune_rounded, 'Customize'),
       (EditorTool.addText, Icons.edit_note_rounded, 'Edit Text'),
-      (EditorTool.canvas, Icons.format_size_rounded, 'Canvas'),
+      (EditorTool.canvas, Icons.design_services_rounded, 'Canvas'),
       (EditorTool.fonts, Icons.text_fields_rounded, 'Font'),
       (EditorTool.highlightWords, Icons.format_color_text_rounded, 'H. Words'),
       (EditorTool.highlight, Icons.highlight_rounded, 'Highlight'),
@@ -2177,87 +2177,167 @@ const allFonts = [
           );
           }
         } else if (tool == EditorTool.canvas) {
-          content = Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.elevated,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.touch_app_rounded, color: Colors.white70, size: 20),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Drag captions directly on the video to move them. Use the sliders below for fine-tuning.',
-                        style: TextStyle(color: Colors.white70, fontSize: 13),
+          final textController = TextEditingController();
+          content = StatefulBuilder(
+            builder: (ctx, setLocal) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Type a word to customize its size and baseline position.', style: TextStyle(color: AppColors.secondary, fontSize: 13)),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: AppColors.elevated,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: textController,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                            decoration: const InputDecoration(
+                              hintText: 'Word to edit...',
+                              hintStyle: TextStyle(color: AppColors.secondary, fontSize: 14),
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            final word = textController.text.trim().replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toLowerCase();
+                            if (word.isEmpty) return;
+                            final newSizes = Map<String, double>.from(design.wordSizeOverrides);
+                            final newOffsets = Map<String, double>.from(design.wordBaselineOffsets);
+                            if (!newSizes.containsKey(word)) newSizes[word] = design.size;
+                            if (!newOffsets.containsKey(word)) newOffsets[word] = 0;
+                            updateDesign(design.copyWith(wordSizeOverrides: newSizes, wordBaselineOffsets: newOffsets));
+                            textController.clear();
+                            setLocal(() {});
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Text('Add', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 13)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (design.wordSizeOverrides.isNotEmpty) ...[
+                    const SizedBox(height: 14),
+                    const Text('Word Overrides', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.secondary)),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 220,
+                      child: ListView(
+                        children: [
+                          for (final word in design.wordSizeOverrides.keys.toList()) ...[
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 10),
+                              padding: const EdgeInsets.fromLTRB(14, 10, 10, 12),
+                              decoration: BoxDecoration(
+                                color: AppColors.elevated,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          '"$word"',
+                                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          final offsets = Map<String, double>.from(design.wordBaselineOffsets);
+                                          offsets[word] = (offsets[word] ?? 0) == 0 ? 8.0 : 0.0;
+                                          updateDesign(design.copyWith(wordBaselineOffsets: offsets));
+                                          setLocal(() {});
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: (design.wordBaselineOffsets[word] ?? 0) > 0
+                                                ? Colors.white
+                                                : AppColors.surface,
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: (design.wordBaselineOffsets[word] ?? 0) > 0
+                                                  ? Colors.white
+                                                  : AppColors.line,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            'Sub',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w700,
+                                              color: (design.wordBaselineOffsets[word] ?? 0) > 0
+                                                  ? Colors.black
+                                                  : Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      GestureDetector(
+                                        onTap: () {
+                                          final newSizes = Map<String, double>.from(design.wordSizeOverrides)..remove(word);
+                                          final newOffsets = Map<String, double>.from(design.wordBaselineOffsets)..remove(word);
+                                          updateDesign(design.copyWith(wordSizeOverrides: newSizes, wordBaselineOffsets: newOffsets));
+                                          setLocal(() {});
+                                        },
+                                        child: const Icon(Icons.close_rounded, size: 18, color: AppColors.secondary),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        '${(design.wordSizeOverrides[word] ?? design.size).round()} px',
+                                        style: const TextStyle(fontSize: 12, color: AppColors.secondary),
+                                      ),
+                                      Expanded(
+                                        child: Slider(
+                                          value: design.wordSizeOverrides[word] ?? design.size,
+                                          min: 12,
+                                          max: 80,
+                                          divisions: 34,
+                                          activeColor: Colors.white,
+                                          inactiveColor: AppColors.line,
+                                          onChanged: (val) {
+                                            final newSizes = Map<String, double>.from(design.wordSizeOverrides);
+                                            newSizes[word] = val;
+                                            updateDesign(design.copyWith(wordSizeOverrides: newSizes));
+                                            setLocal(() {});
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                   ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  const Text('Horizontal (X)', style: TextStyle(fontWeight: FontWeight.w700)),
-                  const Spacer(),
-                  Text('${design.customX?.round() ?? 0}', style: const TextStyle(color: AppColors.secondary)),
                 ],
-              ),
-              Slider(
-                value: design.customX ?? 0,
-                min: -300,
-                max: 300,
-                activeColor: Colors.white,
-                inactiveColor: AppColors.line,
-                onChanged: (val) => updateDesign(design.copyWith(customX: val)),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Text('Vertical (Y)', style: TextStyle(fontWeight: FontWeight.w700)),
-                  const Spacer(),
-                  Text('${design.customY?.round() ?? 0}', style: const TextStyle(color: AppColors.secondary)),
-                ],
-              ),
-              Slider(
-                value: design.customY ?? 0,
-                min: -500,
-                max: 500,
-                activeColor: Colors.white,
-                inactiveColor: AppColors.line,
-                onChanged: (val) => updateDesign(design.copyWith(customY: val)),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Text('Scale', style: TextStyle(fontWeight: FontWeight.w700)),
-                  const Spacer(),
-                  Text('${(design.customScale ?? 1.0).toStringAsFixed(2)}x', style: const TextStyle(color: AppColors.secondary)),
-                ],
-              ),
-              Slider(
-                value: design.customScale ?? 1.0,
-                min: 0.2,
-                max: 3.0,
-                activeColor: Colors.white,
-                inactiveColor: AppColors.line,
-                onChanged: (val) => updateDesign(design.copyWith(customScale: val)),
-              ),
-              const SizedBox(height: 12),
-              Center(
-                child: TextButton.icon(
-                  onPressed: () => updateDesign(design.copyWith(customX: null, customY: null, customScale: 1.0)),
-                  icon: const Icon(Icons.refresh_rounded, size: 16),
-                  label: const Text('Reset positions'),
-                  style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
-                ),
-              ),
-            ],
+              );
+            },
           );
         } else if (tool == EditorTool.templates) {
           const templates = ['Triple Pop', 'Ali Abdaal Tri', 'Podcast Minimal', 'Emphasis Outline', 'Clean Box', 'Bubble', 'Hormozi Bold', 'MrBeast Impact', 'Karaoke Bar', 'Gold Shadow', 'Neon Highlight', 'Double Pop', 'Left Ladder', 'Stacked Punch', 'Soft Talk', 'Coral Punch', 'Electric Wave', 'Mono Signal', 'Halo Words', 'Marker Pop', 'Nightline', 'Retro Offset', 'Quiet Outline', 'Cloud Float', 'Fire Starter', 'Solar Build', 'Hard Echo', 'Midnight Chip', 'Focus Pixel', 'Velvet Three', 'Ember Karaoke', 'Prism Stack', 'Noir Plate', 'Signal Tag', 'Mint Outline', 'Horizon Slide', 'Paper Stamp', 'Cinema Serif', 'Script Bloom', 'Poster Ink', 'Block Parade', 'Prism Grotesk', 'Arcade Pulse', 'Luxe Title', 'Velvet Script', 'Classic Cut', 'Reel Candy', 'Blackout Bold', 'Pixel Snap', 'Sunbeam Serif', 'Doodle Yellow', 'Bubble Chrome', 'Clean Digital', 'Film Noir', 'Sunset Script', 'Viva Poster', 'Soda Pop', 'Urban Mono', 'Chrome Marker', 'Neon Serif', 'Storybook Script', 'Punchline Sans', 'Warm Stage', 'Blink Pop', 'Karaoke Fill', 'Bold Box', 'Minimal Clean', 'Neon Glow', 'Typewriter', 'Bounce', 'Podcast Clean', 'MrBeast Action', 'Ali Abdaal Minimal', 'Ali Abdaal Highlight'];
@@ -3863,6 +3943,12 @@ class _CaptionOverlay extends StatelessWidget {
       final isEmphasized = group[index].isEmphasized;
       final isActive = isSpoken || isEmphasized;
       final wordHasOutline = isEmphasized ? design.highlightHasOutline : isSpoken ? design.activeHasOutline : true;
+      
+      final cleanWord = group[index].text.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toLowerCase();
+      final overrideSize = design.wordSizeOverrides.isNotEmpty ? design.wordSizeOverrides[cleanWord] : null;
+      final overrideBaseline = design.wordBaselineOffsets.isNotEmpty ? (design.wordBaselineOffsets[cleanWord] ?? 0.0) : 0.0;
+      final effectiveSize = overrideSize ?? (isEmphasized ? (design.highlightSize ?? design.activeSize ?? design.size) : isSpoken ? (design.activeSize ?? design.size) : design.size);
+
       final word = CaptionWord(
         text: design.uppercase
             ? group[index].text.toUpperCase()
@@ -3878,7 +3964,7 @@ class _CaptionOverlay extends StatelessWidget {
               : isSpoken
               ? design.activeColor
               : design.color,
-          fontSize: (isEmphasized ? (design.highlightSize ?? design.activeSize ?? design.size) : isSpoken ? (design.activeSize ?? design.size) : design.size) * sizeMultiplier,
+          fontSize: effectiveSize * sizeMultiplier,
           font: isEmphasized ? (design.highlightFont ?? design.activeFont ?? design.font) : isSpoken ? (design.activeFont ?? design.font) : null,
           fontWeight: isEmphasized ? (design.highlightWeight ?? design.activeWeight ?? design.weight) : isSpoken ? (design.activeWeight ?? design.weight) : null,
           hasOutline: wordHasOutline,
@@ -3892,7 +3978,7 @@ class _CaptionOverlay extends StatelessWidget {
                       double.infinity,
                     ))
                 .clamp(0.0, 1.0),
-        textSize: design.size * sizeMultiplier,
+        textSize: effectiveSize * sizeMultiplier,
         doubleLayer: design.doubleLayer,
         hardShadow: design.hardShadow,
       );
@@ -3908,30 +3994,30 @@ class _CaptionOverlay extends StatelessWidget {
       final widget = design.wordChip
           ? Container(
               padding: EdgeInsets.symmetric(
-                horizontal: design.size * .24,
-                vertical: design.size * .11,
+                horizontal: effectiveSize * .24,
+                vertical: effectiveSize * .11,
               ),
               decoration: BoxDecoration(
                 color: chipBg,
-                borderRadius: BorderRadius.circular(design.size * .18),
+                borderRadius: BorderRadius.circular(effectiveSize * .18),
               ),
               child: word,
             )
           : (isEmphasized && design.highlightBackground != null && design.highlightBackground!.alpha > 0)
           ? Container(
-              padding: EdgeInsets.symmetric(horizontal: design.size * .18, vertical: design.size * .06),
+              padding: EdgeInsets.symmetric(horizontal: effectiveSize * .18, vertical: effectiveSize * .06),
               decoration: BoxDecoration(
                 color: design.highlightBackground,
-                borderRadius: BorderRadius.circular(design.size * .14),
+                borderRadius: BorderRadius.circular(effectiveSize * .14),
               ),
               child: word,
             )
           : (isSpoken && design.activeBackground != null && design.activeBackground!.alpha > 0)
           ? Container(
-              padding: EdgeInsets.symmetric(horizontal: design.size * .18, vertical: design.size * .06),
+              padding: EdgeInsets.symmetric(horizontal: effectiveSize * .18, vertical: effectiveSize * .06),
               decoration: BoxDecoration(
                 color: design.activeBackground,
-                borderRadius: BorderRadius.circular(design.size * .14),
+                borderRadius: BorderRadius.circular(effectiveSize * .14),
               ),
               child: word,
             )
@@ -3939,11 +4025,17 @@ class _CaptionOverlay extends StatelessWidget {
       final wrapped = (isSpoken && design.activeBlink)
           ? _BlinkingWidget(child: widget)
           : widget;
+      
+      final positionedWord = overrideBaseline > 0 
+          ? Transform.translate(offset: Offset(0, effectiveSize * 0.4), child: wrapped) 
+          : wrapped;
+
       return GestureDetector(
         onTap: () => onWordToggled?.call(group[index].globalIndex),
-        child: wrapped,
+        child: positionedWord,
       );
     }
+
 
     final wordsLayout = switch (design.layout) {
       CaptionLayout.inline => Wrap(
