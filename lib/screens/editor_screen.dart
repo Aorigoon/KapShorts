@@ -2177,60 +2177,80 @@ const allFonts = [
           );
           }
         } else if (tool == EditorTool.canvas) {
-          final textController = TextEditingController();
+          final rawSegments = ref.read(transcriptionProvider)?['segments'] ?? ref.read(projectsProvider).selected?.transcription?['segments'];
+          final uniqueWords = <String>{};
+          if (rawSegments is List) {
+            for (final seg in rawSegments) {
+              if (seg is Map && seg['words'] is List) {
+                for (final w in seg['words']) {
+                  if (w is Map && w['text'] != null) {
+                    final clean = w['text'].toString().trim().replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toLowerCase();
+                    if (clean.isNotEmpty) uniqueWords.add(clean);
+                  }
+                }
+              }
+            }
+          }
+          final wordsList = uniqueWords.toList();
+
           content = StatefulBuilder(
             builder: (ctx, setLocal) {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Type a word to customize its size and baseline position.', style: TextStyle(color: AppColors.secondary, fontSize: 13)),
+                  const Text('Tap any word from your video to customize its size and baseline.', style: TextStyle(color: AppColors.secondary, fontSize: 13)),
                   const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: AppColors.elevated,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: textController,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                            decoration: const InputDecoration(
-                              hintText: 'Word to edit...',
-                              hintStyle: TextStyle(color: AppColors.secondary, fontSize: 14),
-                              border: InputBorder.none,
-                              isDense: true,
-                              contentPadding: EdgeInsets.zero,
-                            ),
-                          ),
+                  if (wordsList.isNotEmpty)
+                    Container(
+                      height: 110,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.elevated,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: SingleChildScrollView(
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: wordsList.map((word) {
+                            final isSelected = design.wordSizeOverrides.containsKey(word);
+                            return GestureDetector(
+                              onTap: () {
+                                final newSizes = Map<String, double>.from(design.wordSizeOverrides);
+                                final newOffsets = Map<String, double>.from(design.wordBaselineOffsets);
+                                if (isSelected) {
+                                  newSizes.remove(word);
+                                  newOffsets.remove(word);
+                                } else {
+                                  newSizes[word] = design.size;
+                                  newOffsets[word] = 0;
+                                }
+                                updateDesign(design.copyWith(wordSizeOverrides: newSizes, wordBaselineOffsets: newOffsets));
+                                setLocal(() {});
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: isSelected ? Colors.white : AppColors.surface,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: isSelected ? Colors.white : AppColors.line),
+                                ),
+                                child: Text(
+                                  word,
+                                  style: TextStyle(
+                                    color: isSelected ? Colors.black : Colors.white,
+                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            final word = textController.text.trim().replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toLowerCase();
-                            if (word.isEmpty) return;
-                            final newSizes = Map<String, double>.from(design.wordSizeOverrides);
-                            final newOffsets = Map<String, double>.from(design.wordBaselineOffsets);
-                            if (!newSizes.containsKey(word)) newSizes[word] = design.size;
-                            if (!newOffsets.containsKey(word)) newOffsets[word] = 0;
-                            updateDesign(design.copyWith(wordSizeOverrides: newSizes, wordBaselineOffsets: newOffsets));
-                            textController.clear();
-                            setLocal(() {});
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text('Add', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 13)),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
                   if (design.wordSizeOverrides.isNotEmpty) ...[
                     const SizedBox(height: 14),
                     const Text('Word Overrides', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.secondary)),
@@ -2339,6 +2359,8 @@ const allFonts = [
               );
             },
           );
+        }
+
         } else if (tool == EditorTool.templates) {
           const templates = ['Triple Pop', 'Ali Abdaal Tri', 'Podcast Minimal', 'Emphasis Outline', 'Clean Box', 'Bubble', 'Hormozi Bold', 'MrBeast Impact', 'Karaoke Bar', 'Gold Shadow', 'Neon Highlight', 'Double Pop', 'Left Ladder', 'Stacked Punch', 'Soft Talk', 'Coral Punch', 'Electric Wave', 'Mono Signal', 'Halo Words', 'Marker Pop', 'Nightline', 'Retro Offset', 'Quiet Outline', 'Cloud Float', 'Fire Starter', 'Solar Build', 'Hard Echo', 'Midnight Chip', 'Focus Pixel', 'Velvet Three', 'Ember Karaoke', 'Prism Stack', 'Noir Plate', 'Signal Tag', 'Mint Outline', 'Horizon Slide', 'Paper Stamp', 'Cinema Serif', 'Script Bloom', 'Poster Ink', 'Block Parade', 'Prism Grotesk', 'Arcade Pulse', 'Luxe Title', 'Velvet Script', 'Classic Cut', 'Reel Candy', 'Blackout Bold', 'Pixel Snap', 'Sunbeam Serif', 'Doodle Yellow', 'Bubble Chrome', 'Clean Digital', 'Film Noir', 'Sunset Script', 'Viva Poster', 'Soda Pop', 'Urban Mono', 'Chrome Marker', 'Neon Serif', 'Storybook Script', 'Punchline Sans', 'Warm Stage', 'Blink Pop', 'Karaoke Fill', 'Bold Box', 'Minimal Clean', 'Neon Glow', 'Typewriter', 'Bounce', 'Podcast Clean', 'MrBeast Action', 'Ali Abdaal Minimal', 'Ali Abdaal Highlight'];
           content = SizedBox(
