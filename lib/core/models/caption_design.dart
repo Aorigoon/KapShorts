@@ -173,6 +173,8 @@ class CaptionDesign {
     this.customX,
     this.customY,
     this.customScale,
+    this.wordSizeOverrides = const {},
+    this.wordBaselineOffsets = const {},
   });
   final double size;
   final CaptionPosition position;
@@ -212,6 +214,10 @@ class CaptionDesign {
   final bool wordChip;
   final Color chipColor;
   final bool hardShadow;
+  /// Canvas tool: per-word font size overrides. Key = word text (lowercase).
+  final Map<String, double> wordSizeOverrides;
+  /// Canvas tool: per-word baseline shift (positive = down / subscript). Key = word text (lowercase).
+  final Map<String, double> wordBaselineOffsets;
 
   CaptionDesign copyWith({
     double? size,
@@ -252,6 +258,8 @@ class CaptionDesign {
     double? customX,
     double? customY,
     double? customScale,
+    Map<String, double>? wordSizeOverrides,
+    Map<String, double>? wordBaselineOffsets,
   }) => CaptionDesign(
     size: size ?? this.size,
     position: position ?? this.position,
@@ -291,7 +299,10 @@ class CaptionDesign {
     wordChip: wordChip ?? this.wordChip,
     chipColor: chipColor ?? this.chipColor,
     hardShadow: hardShadow ?? this.hardShadow,
+    wordSizeOverrides: wordSizeOverrides ?? this.wordSizeOverrides,
+    wordBaselineOffsets: wordBaselineOffsets ?? this.wordBaselineOffsets,
   );
+
 
   static CaptionDesign fromTemplate(String template) => switch (template) {
     'Podcast Minimal' => const CaptionDesign(

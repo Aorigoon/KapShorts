@@ -1282,6 +1282,7 @@ enum EditorTool {
   highlight,
   highlightWords,
   activeWords,
+  canvas,
 }
 
 class EditorToolRail extends StatelessWidget {
@@ -1293,6 +1294,7 @@ class EditorToolRail extends StatelessWidget {
     const tools = [
       (EditorTool.style, Icons.tune_rounded, 'Customize'),
       (EditorTool.addText, Icons.edit_note_rounded, 'Edit Text'),
+      (EditorTool.canvas, Icons.format_size_rounded, 'Canvas'),
       (EditorTool.fonts, Icons.text_fields_rounded, 'Font'),
       (EditorTool.highlightWords, Icons.format_color_text_rounded, 'H. Words'),
       (EditorTool.highlight, Icons.highlight_rounded, 'Highlight'),
@@ -1353,6 +1355,7 @@ class _EditorFloatingSidebar extends StatelessWidget {
     const tools = [
       (EditorTool.style, Icons.tune_rounded, 'Customize'),
       (EditorTool.addText, Icons.edit_note_rounded, 'Edit Text'),
+      (EditorTool.canvas, Icons.format_size_rounded, 'Canvas'),
       (EditorTool.fonts, Icons.text_fields_rounded, 'Font'),
       (EditorTool.highlightWords, Icons.format_color_text_rounded, 'H. Words'),
       (EditorTool.highlight, Icons.highlight_rounded, 'Highlight'),
@@ -1446,6 +1449,7 @@ Future<void> showEditorToolSheet(
     EditorTool.effects: 'Effects',
     EditorTool.overlay: 'Overlay',
     EditorTool.captions: 'Captions',
+    EditorTool.canvas: 'Canvas',
   };
   bool customColorPage = false;
   String customColorTarget = 'activeColor';
@@ -2159,6 +2163,187 @@ const allFonts = [
             ),
           );
           }
+        } else if (tool == EditorTool.canvas) {
+          final textController = TextEditingController();
+          final words = design.wordSizeOverrides.keys.toList();
+          content = StatefulBuilder(
+            builder: (ctx, setLocal) {
+              final allWords = design.wordSizeOverrides.keys.toList();
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: AppColors.elevated,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: textController,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                            decoration: const InputDecoration(
+                              hintText: 'Type a word to customize…',
+                              hintStyle: TextStyle(color: AppColors.secondary, fontSize: 14),
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            final word = textController.text.trim().toLowerCase();
+                            if (word.isEmpty) return;
+                            final newSizes = Map<String, double>.from(design.wordSizeOverrides);
+                            final newOffsets = Map<String, double>.from(design.wordBaselineOffsets);
+                            if (!newSizes.containsKey(word)) newSizes[word] = design.size;
+                            if (!newOffsets.containsKey(word)) newOffsets[word] = 0;
+                            updateDesign(design.copyWith(wordSizeOverrides: newSizes, wordBaselineOffsets: newOffsets));
+                            textController.clear();
+                            setLocal(() {});
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Text('Add', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 13)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (design.wordSizeOverrides.isNotEmpty) ...[
+                    const SizedBox(height: 14),
+                    const Text('Word Overrides', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.secondary)),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 220,
+                      child: ListView(
+                        children: [
+                          for (final word in design.wordSizeOverrides.keys.toList()) ...[
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 10),
+                              padding: const EdgeInsets.fromLTRB(14, 10, 10, 12),
+                              decoration: BoxDecoration(
+                                color: AppColors.elevated,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          '"$word"',
+                                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                                        ),
+                                      ),
+                                      // Subscript toggle
+                                      GestureDetector(
+                                        onTap: () {
+                                          final offsets = Map<String, double>.from(design.wordBaselineOffsets);
+                                          offsets[word] = (offsets[word] ?? 0) == 0 ? 8.0 : 0.0;
+                                          updateDesign(design.copyWith(wordBaselineOffsets: offsets));
+                                          setLocal(() {});
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: (design.wordBaselineOffsets[word] ?? 0) > 0
+                                                ? Colors.white
+                                                : AppColors.surface,
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: (design.wordBaselineOffsets[word] ?? 0) > 0
+                                                  ? Colors.white
+                                                  : AppColors.line,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            'Sub',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w700,
+                                              color: (design.wordBaselineOffsets[word] ?? 0) > 0
+                                                  ? Colors.black
+                                                  : Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      // Remove button
+                                      GestureDetector(
+                                        onTap: () {
+                                          final newSizes = Map<String, double>.from(design.wordSizeOverrides)..remove(word);
+                                          final newOffsets = Map<String, double>.from(design.wordBaselineOffsets)..remove(word);
+                                          updateDesign(design.copyWith(wordSizeOverrides: newSizes, wordBaselineOffsets: newOffsets));
+                                          setLocal(() {});
+                                        },
+                                        child: const Icon(Icons.close_rounded, size: 18, color: AppColors.secondary),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        '${(design.wordSizeOverrides[word] ?? design.size).round()} px',
+                                        style: const TextStyle(fontSize: 12, color: AppColors.secondary),
+                                      ),
+                                      Expanded(
+                                        child: Slider(
+                                          value: design.wordSizeOverrides[word] ?? design.size,
+                                          min: 12,
+                                          max: 80,
+                                          divisions: 34,
+                                          activeColor: Colors.white,
+                                          inactiveColor: AppColors.line,
+                                          onChanged: (val) {
+                                            final newSizes = Map<String, double>.from(design.wordSizeOverrides);
+                                            newSizes[word] = val;
+                                            updateDesign(design.copyWith(wordSizeOverrides: newSizes));
+                                            setLocal(() {});
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ] else ...[
+                    const SizedBox(height: 24),
+                    Center(
+                      child: Column(
+                        children: [
+                          Icon(Icons.format_size_rounded, size: 40, color: Colors.white.withValues(alpha: .2)),
+                          const SizedBox(height: 10),
+                          const Text(
+                            'Add words above to set\nindividual sizes & subscript.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: AppColors.secondary, fontSize: 13, height: 1.5),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                ],
+              );
+            },
+          );
         } else if (tool == EditorTool.templates) {
           const templates = ['Triple Pop', 'Ali Abdaal Tri', 'Podcast Minimal', 'Emphasis Outline', 'Clean Box', 'Bubble', 'Hormozi Bold', 'MrBeast Impact', 'Karaoke Bar', 'Gold Shadow', 'Neon Highlight', 'Double Pop', 'Left Ladder', 'Stacked Punch', 'Soft Talk', 'Coral Punch', 'Electric Wave', 'Mono Signal', 'Halo Words', 'Marker Pop', 'Nightline', 'Retro Offset', 'Quiet Outline', 'Cloud Float', 'Fire Starter', 'Solar Build', 'Hard Echo', 'Midnight Chip', 'Focus Pixel', 'Velvet Three', 'Ember Karaoke', 'Prism Stack', 'Noir Plate', 'Signal Tag', 'Mint Outline', 'Horizon Slide', 'Paper Stamp', 'Cinema Serif', 'Script Bloom', 'Poster Ink', 'Block Parade', 'Prism Grotesk', 'Arcade Pulse', 'Luxe Title', 'Velvet Script', 'Classic Cut', 'Reel Candy', 'Blackout Bold', 'Pixel Snap', 'Sunbeam Serif', 'Doodle Yellow', 'Bubble Chrome', 'Clean Digital', 'Film Noir', 'Sunset Script', 'Viva Poster', 'Soda Pop', 'Urban Mono', 'Chrome Marker', 'Neon Serif', 'Storybook Script', 'Punchline Sans', 'Warm Stage', 'Blink Pop', 'Karaoke Fill', 'Bold Box', 'Minimal Clean', 'Neon Glow', 'Typewriter', 'Bounce', 'Podcast Clean', 'MrBeast Action', 'Ali Abdaal Minimal', 'Ali Abdaal Highlight'];
           content = SizedBox(
@@ -2351,12 +2536,14 @@ const allFonts = [
               constraints: BoxConstraints(
                 maxHeight:
                     MediaQuery.sizeOf(sheetContext).height *
-                    (tool == EditorTool.templates
+                     (tool == EditorTool.templates
                         ? .56
                         : tool == EditorTool.fonts
                         ? .50
                         : tool == EditorTool.effects
                         ? .68
+                        : tool == EditorTool.canvas
+                        ? .65
                         : .54),
               ),
               decoration: const BoxDecoration(
@@ -2487,136 +2674,179 @@ Future<void> showFullscreenPreview(
     );
     return;
   }
-  
+
+  final platforms = [
+    (
+      label: 'Original',
+      sub: 'Native aspect ratio',
+      icon: Icons.crop_free_rounded,
+      color: const Color(0xFF4A90E2),
+      platform: 'original',
+    ),
+    (
+      label: 'Full Screen',
+      sub: 'Fit entire display',
+      icon: Icons.fullscreen_rounded,
+      color: const Color(0xFF6C63FF),
+      platform: 'full',
+    ),
+    (
+      label: 'Instagram',
+      sub: 'Reels · 9:16',
+      icon: Icons.camera_alt_rounded,
+      color: const Color(0xFFE1306C),
+      platform: 'reels',
+    ),
+    (
+      label: 'Facebook',
+      sub: 'Reels · 9:16',
+      icon: Icons.facebook_rounded,
+      color: const Color(0xFF1877F2),
+      platform: 'facebook',
+    ),
+    (
+      label: 'TikTok',
+      sub: 'For You · 9:16',
+      icon: Icons.music_note_rounded,
+      color: const Color(0xFF010101),
+      platform: 'tiktok',
+    ),
+    (
+      label: 'Shorts',
+      sub: 'YouTube · 9:16',
+      icon: Icons.play_circle_filled_rounded,
+      color: const Color(0xFFFF0000),
+      platform: 'shorts',
+    ),
+  ];
+
   showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
-    barrierColor: Colors.black87,
-    builder: (context) => Container(
-      padding: const EdgeInsets.only(top: 24, bottom: 40, left: 16, right: 16),
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text('Select Preview Mode', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 30),
-          Wrap(
-            alignment: WrapAlignment.spaceEvenly,
-            spacing: 32,
-            runSpacing: 32,
-            children: [
-              _PlatformIcon(
-                icon: Icons.video_settings_rounded,
-                label: 'Original',
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => _FullscreenVideoPreview(
-                        videoPath: videoPath,
-                        transcription: transcription,
-                        design: design,
-                      ),
-                    ),
-                  );
-                },
+    isScrollControlled: true,
+    builder: (ctx) => SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                width: 42, height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.tertiary,
+                  borderRadius: BorderRadius.circular(4),
+                ),
               ),
-              _PlatformIcon(
-                icon: Icons.fullscreen_rounded,
-                label: 'Full',
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => PlatformPreviewScreen(
-                        videoPath: videoPath,
-                        transcription: transcription,
-                        design: design,
-                        platform: 'full',
-                      ),
-                    ),
-                  );
-                },
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Container(
+                  width: 40, height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: .10),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.smart_display_rounded, size: 20),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Preview', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+                      Text('Pick a platform to preview on', style: TextStyle(color: AppColors.secondary, fontSize: 12)),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  icon: const Icon(Icons.close_rounded, color: AppColors.secondary),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: platforms.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 1.05,
               ),
-              _PlatformIcon(
-                icon: Icons.camera_alt_rounded,
-                label: 'Instagram',
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => PlatformPreviewScreen(
-                        videoPath: videoPath,
-                        transcription: transcription,
-                        design: design,
-                        platform: 'reels',
-                      ),
+              itemBuilder: (_, i) {
+                final p = platforms[i];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    if (p.platform == 'original') {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => _FullscreenVideoPreview(
+                            videoPath: videoPath,
+                            transcription: transcription,
+                            design: design,
+                          ),
+                        ),
+                      );
+                    } else {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => PlatformPreviewScreen(
+                            videoPath: videoPath,
+                            transcription: transcription,
+                            design: design,
+                            platform: p.platform,
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.elevated,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.white.withValues(alpha: .08)),
                     ),
-                  );
-                },
-              ),
-              _PlatformIcon(
-                icon: Icons.facebook_rounded,
-                label: 'Facebook',
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => PlatformPreviewScreen(
-                        videoPath: videoPath,
-                        transcription: transcription,
-                        design: design,
-                        platform: 'facebook',
-                      ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 42, height: 42,
+                          decoration: BoxDecoration(
+                            color: p.color.withValues(alpha: .18),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(p.icon, color: p.color, size: 22),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(p.label, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+                        const SizedBox(height: 2),
+                        Text(p.sub, style: const TextStyle(color: AppColors.secondary, fontSize: 10)),
+                      ],
                     ),
-                  );
-                },
-              ),
-              _PlatformIcon(
-                icon: Icons.tiktok,
-                label: 'TikTok',
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => PlatformPreviewScreen(
-                        videoPath: videoPath,
-                        transcription: transcription,
-                        design: design,
-                        platform: 'tiktok',
-                      ),
-                    ),
-                  );
-                },
-              ),
-              _PlatformIcon(
-                icon: Icons.play_arrow_rounded,
-                label: 'Shorts',
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => PlatformPreviewScreen(
-                        videoPath: videoPath,
-                        transcription: transcription,
-                        design: design,
-                        platform: 'shorts',
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-        ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     ),
   );
 }
+
 
 class _FullscreenVideoPreview extends StatefulWidget {
   const _FullscreenVideoPreview({
@@ -5413,194 +5643,340 @@ class _PlatformPreviewScreenState extends State<PlatformPreviewScreen> {
             ),
             
           if (widget.platform == 'reels') ...[
+            // Instagram top bar
             Positioned(
-              right: 12,
-              bottom: 120,
+              top: 0, left: 0, right: 0,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    children: [
+                      const Text('Reels', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 20, shadows: [Shadow(blurRadius: 6, color: Colors.black54)])),
+                      const Spacer(),
+                      const Icon(Icons.camera_alt_outlined, color: Colors.white, size: 26, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Right side actions
+            Positioned(
+              right: 10, bottom: 100,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.favorite_outline_rounded, color: Colors.white, size: 32, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
-                  const SizedBox(height: 6),
-                  const Text('1.2M', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  _PlatformAction(icon: Icons.favorite_border_rounded, label: '1.2M'),
                   const SizedBox(height: 18),
-                  const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 30, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
-                  const SizedBox(height: 6),
-                  const Text('4,321', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  _PlatformAction(icon: Icons.chat_bubble_outline_rounded, label: '4.3K'),
                   const SizedBox(height: 18),
-                  const Icon(Icons.send_outlined, color: Colors.white, size: 30, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
-                  const SizedBox(height: 6),
-                  const Text('Share', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  _PlatformAction(icon: Icons.send_rounded, label: 'Share'),
                   const SizedBox(height: 18),
-                  const Icon(Icons.more_horiz_rounded, color: Colors.white, size: 30, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                  _PlatformAction(icon: Icons.more_horiz_rounded, label: ''),
                   const SizedBox(height: 18),
                   Container(
-                    width: 32, height: 32,
-                    decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 2), borderRadius: BorderRadius.circular(8), color: Colors.grey[800]),
-                    child: const Icon(Icons.music_note, color: Colors.white, size: 16),
+                    width: 34, height: 34,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 2),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.grey[800],
+                    ),
+                    child: const Icon(Icons.music_note_rounded, color: Colors.white, size: 16),
                   ),
                 ],
               ),
             ),
+            // Bottom info
             Positioned(
-              left: 12, bottom: 30, right: 80,
+              left: 14, bottom: 24, right: 68,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
                     children: [
-                      const CircleAvatar(radius: 16, backgroundColor: Colors.white24, child: Icon(Icons.person, color: Colors.white, size: 18)),
+                      Container(
+                        width: 34, height: 34,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.5),
+                          color: Colors.white24,
+                        ),
+                        child: const Icon(Icons.person, color: Colors.white, size: 18),
+                      ),
                       const SizedBox(width: 8),
-                      const Text('KapShot', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
-                      const SizedBox(width: 8),
-                      Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(border: Border.all(color: Colors.white), borderRadius: BorderRadius.circular(4)), child: const Text('Follow', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold))),
+                      const Text('kapshot.app', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                      const SizedBox(width: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                        decoration: BoxDecoration(border: Border.all(color: Colors.white70), borderRadius: BorderRadius.circular(5)),
+                        child: const Text('Follow', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  const Text('Previewing video with KapShot captions! #reels #kapshot', style: TextStyle(color: Colors.white, fontSize: 14, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]), maxLines: 2, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 10),
-                  const Row(children: [Icon(Icons.music_note_rounded, color: Colors.white, size: 14, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]), SizedBox(width: 6), Text('KapShot Original Audio', style: TextStyle(color: Colors.white, fontSize: 13, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]))]),
+                  const SizedBox(height: 8),
+                  const Text('Caption preview with KapShot ✨ #reels #kapshot #captions', style: TextStyle(color: Colors.white, fontSize: 13, shadows: [Shadow(blurRadius: 3, color: Colors.black54)]), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 8),
+                  Row(children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(20)),
+                      child: const Row(children: [
+                        Icon(Icons.music_note_rounded, color: Colors.white, size: 12),
+                        SizedBox(width: 4),
+                        Text('KapShot Original Audio', style: TextStyle(color: Colors.white, fontSize: 12)),
+                      ]),
+                    ),
+                  ]),
                 ],
               ),
             ),
-            Positioned(top: 40, right: 16, child: const Icon(Icons.camera_alt_outlined, color: Colors.white, size: 28, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
           ] else if (widget.platform == 'facebook') ...[
+            // Facebook top bar
             Positioned(
-              right: 12,
-              bottom: 120,
+              top: 0, left: 0, right: 0,
+              child: SafeArea(
+                child: Container(
+                  color: Colors.black54,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                      const SizedBox(width: 12),
+                      const Text('Facebook Reels', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
+                      const Spacer(),
+                      const Icon(Icons.more_vert_rounded, color: Colors.white),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Right actions
+            Positioned(
+              right: 10, bottom: 100,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.thumb_up_alt_outlined, color: Colors.white, size: 32, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
-                  const SizedBox(height: 6),
-                  const Text('1.2M', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  _PlatformAction(icon: Icons.thumb_up_rounded, label: '1.2M'),
                   const SizedBox(height: 18),
-                  const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 30, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
-                  const SizedBox(height: 6),
-                  const Text('4,321', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  _PlatformAction(icon: Icons.chat_bubble_outline_rounded, label: '4.3K'),
                   const SizedBox(height: 18),
-                  const Icon(Icons.share_rounded, color: Colors.white, size: 30, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
-                  const SizedBox(height: 6),
-                  const Text('Share', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  _PlatformAction(icon: Icons.share_rounded, label: 'Share'),
+                  const SizedBox(height: 18),
+                  _PlatformAction(icon: Icons.more_horiz_rounded, label: ''),
                 ],
               ),
             ),
+            // Bottom info
             Positioned(
-              left: 12, bottom: 30, right: 80,
+              left: 14, bottom: 24, right: 68,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
                     children: [
-                      const CircleAvatar(radius: 16, backgroundColor: Colors.white24, child: Icon(Icons.person, color: Colors.white, size: 18)),
+                      Stack(
+                        children: [
+                          const CircleAvatar(radius: 17, backgroundColor: Colors.white24, child: Icon(Icons.person, color: Colors.white, size: 18)),
+                          Positioned(
+                            bottom: 0, right: 0,
+                            child: Container(
+                              width: 14, height: 14,
+                              decoration: const BoxDecoration(color: Color(0xFF1877F2), shape: BoxShape.circle),
+                              child: const Icon(Icons.facebook_rounded, color: Colors.white, size: 10),
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(width: 8),
-                      const Text('KapShot', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                      const Text('KapShot', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
                       const SizedBox(width: 8),
-                      const Text('• Follow', style: TextStyle(color: Colors.blueAccent, fontSize: 14, fontWeight: FontWeight.bold)),
+                      const Text('· Follow', style: TextStyle(color: Color(0xFF4EABF8), fontSize: 13, fontWeight: FontWeight.w700)),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  const Text('Previewing video with KapShot captions! #facebookreels', style: TextStyle(color: Colors.white, fontSize: 14, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 8),
+                  const Text('Caption preview with KapShot! #facebookreels #captions', style: TextStyle(color: Colors.white, fontSize: 13, shadows: [Shadow(blurRadius: 3, color: Colors.black54)]), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 8),
+                  Row(children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(20)),
+                      child: const Row(children: [
+                        Icon(Icons.music_note_rounded, color: Colors.white, size: 12),
+                        SizedBox(width: 4),
+                        Text('KapShot Audio', style: TextStyle(color: Colors.white, fontSize: 12)),
+                      ]),
+                    ),
+                  ]),
                 ],
               ),
             ),
           ] else if (widget.platform == 'shorts') ...[
+            // Shorts top bar
             Positioned(
-              right: 12,
-              bottom: 120,
+              top: 0, left: 0, right: 0,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: Row(
+                    children: [
+                      const Text('Shorts', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 20, shadows: [Shadow(blurRadius: 6, color: Colors.black54)])),
+                      const Spacer(),
+                      const Icon(Icons.search_rounded, color: Colors.white, size: 26, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Right actions
+            Positioned(
+              right: 10, bottom: 110,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.thumb_up_alt_rounded, color: Colors.white, size: 32, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
-                  const SizedBox(height: 6),
-                  const Text('1.2M', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
-                  const SizedBox(height: 20),
-                  const Icon(Icons.thumb_down_alt_rounded, color: Colors.white, size: 32, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
-                  const SizedBox(height: 6),
-                  const Text('Dislike', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
-                  const SizedBox(height: 20),
-                  const Icon(Icons.comment_rounded, color: Colors.white, size: 32, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
-                  const SizedBox(height: 6),
-                  const Text('4K', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
-                  const SizedBox(height: 20),
-                  const Icon(Icons.share_rounded, color: Colors.white, size: 32, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
-                  const SizedBox(height: 6),
-                  const Text('Share', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  _PlatformAction(icon: Icons.thumb_up_rounded, label: '1.2M'),
+                  const SizedBox(height: 14),
+                  _PlatformAction(icon: Icons.thumb_down_alt_rounded, label: 'Dislike'),
+                  const SizedBox(height: 14),
+                  _PlatformAction(icon: Icons.comment_rounded, label: '4K'),
+                  const SizedBox(height: 14),
+                  _PlatformAction(icon: Icons.share_rounded, label: 'Share'),
+                  const SizedBox(height: 14),
+                  _PlatformAction(icon: Icons.more_vert_rounded, label: ''),
                 ],
               ),
             ),
+            // Bottom info
             Positioned(
-              left: 12, bottom: 40, right: 80,
+              left: 14, bottom: 28, right: 68,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
                     children: [
                       const CircleAvatar(radius: 16, backgroundColor: Colors.white24, child: Icon(Icons.person, color: Colors.white, size: 18)),
                       const SizedBox(width: 8),
-                      const Text('@KapShot', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
-                      const SizedBox(width: 12),
-                      Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(16)), child: const Text('Subscribe', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold))),
+                      const Text('@KapShot', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                      const SizedBox(width: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(20)),
+                        child: const Text('Subscribe', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  const Text('Testing YouTube Shorts Preview in KapShot! #shorts', style: TextStyle(color: Colors.white, fontSize: 14, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 8),
+                  const Text('YouTube Shorts preview powered by KapShot! #shorts', style: TextStyle(color: Colors.white, fontSize: 13, shadows: [Shadow(blurRadius: 3, color: Colors.black54)]), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 8),
+                  // Progress bar
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(2),
+                    child: LinearProgressIndicator(
+                      value: _controller != null ? (_controller!.value.position.inMilliseconds / (_controller!.value.duration.inMilliseconds + 1)) : 0.3,
+                      backgroundColor: Colors.white30,
+                      color: Colors.white,
+                      minHeight: 2,
+                    ),
+                  ),
                 ],
               ),
             ),
           ] else if (widget.platform == 'tiktok') ...[
+            // TikTok top bar
             Positioned(
-              right: 12,
-              bottom: 100,
+              top: 0, left: 0, right: 0,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Following', style: TextStyle(color: Colors.white60, fontSize: 15, fontWeight: FontWeight.w600, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                      const SizedBox(width: 20),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('For You', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                          Container(height: 2, width: 40, color: Colors.white, margin: const EdgeInsets.only(top: 3)),
+                        ],
+                      ),
+                      const SizedBox(width: 20),
+                      const Text('Friends', style: TextStyle(color: Colors.white60, fontSize: 15, fontWeight: FontWeight.w600, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                      const Spacer(),
+                      const Icon(Icons.search_rounded, color: Colors.white, size: 26, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Right actions
+            Positioned(
+              right: 10, bottom: 90,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const CircleAvatar(radius: 22, backgroundColor: Colors.white24, child: Icon(Icons.person, color: Colors.white)),
-                  const SizedBox(height: 24),
-                  const Icon(Icons.favorite_rounded, color: Colors.white, size: 36, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
-                  const SizedBox(height: 6),
-                  const Text('1.2M', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
-                  const SizedBox(height: 20),
-                  const Icon(Icons.comment_rounded, color: Colors.white, size: 36, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
-                  const SizedBox(height: 6),
-                  const Text('4,321', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
-                  const SizedBox(height: 20),
-                  const Icon(Icons.bookmark_rounded, color: Colors.white, size: 36, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
-                  const SizedBox(height: 6),
-                  const Text('Save', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
-                  const SizedBox(height: 20),
-                  const Icon(Icons.reply_rounded, color: Colors.white, size: 36, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
-                  const SizedBox(height: 6),
-                  const Text('Share', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
-                  const SizedBox(height: 20),
-                  const CircleAvatar(radius: 18, backgroundColor: Colors.grey, child: Icon(Icons.music_note, color: Colors.black)),
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      const CircleAvatar(radius: 22, backgroundColor: Colors.white24, child: Icon(Icons.person, color: Colors.white, size: 22)),
+                      Positioned(
+                        bottom: -8, left: 8,
+                        child: Container(
+                          width: 22, height: 22,
+                          decoration: const BoxDecoration(color: Color(0xFFFF0050), shape: BoxShape.circle),
+                          child: const Icon(Icons.add, color: Colors.white, size: 14),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 26),
+                  _PlatformAction(icon: Icons.favorite_rounded, label: '1.2M'),
+                  const SizedBox(height: 18),
+                  _PlatformAction(icon: Icons.comment_rounded, label: '4,321'),
+                  const SizedBox(height: 18),
+                  _PlatformAction(icon: Icons.bookmark_rounded, label: 'Save'),
+                  const SizedBox(height: 18),
+                  _PlatformAction(icon: Icons.reply_rounded, label: 'Share'),
+                  const SizedBox(height: 18),
+                  // Spinning music disc
+                  Container(
+                    width: 38, height: 38,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white30, width: 5),
+                      color: Colors.grey[900],
+                    ),
+                    child: const Icon(Icons.music_note_rounded, color: Colors.white, size: 18),
+                  ),
                 ],
               ),
             ),
+            // Bottom info
             Positioned(
-              left: 12, bottom: 30, right: 80,
+              left: 14, bottom: 24, right: 68,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('@KapShot', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
-                  const SizedBox(height: 8),
-                  const Text('TikTok preview with KapShot! #tiktok #kapshot', style: TextStyle(color: Colors.white, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]), maxLines: 2, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 12),
-                  const Row(children: [Icon(Icons.music_note_rounded, color: Colors.white, size: 16, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]), SizedBox(width: 8), Text('Original audio - KapShot', style: TextStyle(color: Colors.white, fontSize: 13, shadows: [Shadow(blurRadius: 4, color: Colors.black54)]))]),
+                  const Text('@kapshot.app', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
+                  const SizedBox(height: 6),
+                  const Text('TikTok preview with KapShot captions 🔥 #tiktok #kapshot', style: TextStyle(color: Colors.white, fontSize: 13, shadows: [Shadow(blurRadius: 3, color: Colors.black54)]), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 10),
+                  Row(children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(20)),
+                      child: const Row(children: [
+                        Icon(Icons.music_note_rounded, color: Colors.white, size: 13),
+                        SizedBox(width: 6),
+                        Text('Original audio · KapShot', style: TextStyle(color: Colors.white, fontSize: 12)),
+                      ]),
+                    ),
+                  ]),
                 ],
               ),
             ),
-            Positioned(
-              top: 50, left: 0, right: 0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Following', style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
-                  const SizedBox(width: 16),
-                  const Text('For You', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
-                ],
-              ),
-            ),
-            Positioned(top: 50, right: 16, child: const Icon(Icons.search, color: Colors.white, size: 28, shadows: [Shadow(blurRadius: 4, color: Colors.black54)])),
           ],
           
           SafeArea(
@@ -5643,6 +6019,34 @@ class _PlatformIcon extends StatelessWidget {
           Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
         ],
       ),
+    );
+  }
+}
+
+class _PlatformAction extends StatelessWidget {
+  const _PlatformAction({required this.icon, required this.label});
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: Colors.white, size: 30, shadows: const [Shadow(blurRadius: 4, color: Colors.black54)]),
+        if (label.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              shadows: [Shadow(blurRadius: 4, color: Colors.black54)],
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
