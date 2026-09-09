@@ -1,3 +1,5 @@
+import '../core/models/caption_models.dart' as models;
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
@@ -78,7 +80,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
            return;
         }
         
-        final words = resolveCaptionWords(project.transcription).map((w) => CaptionWord(text: w.text, startMs: (w.start * 1000).round(), endMs: (w.end * 1000).round())).toList();
+        final words = resolveCaptionWords(project.transcription).map((w) => models.CaptionWord(text: w.text, startMs: (w.start * 1000).round(), endMs: (w.end * 1000).round())).toList();
         final design = ref.read(captionDesignProvider);
         
         // Use srt or ass depending on what burnCaptions supports
