@@ -133,7 +133,7 @@ class _TranscribingScreenState extends ConsumerState<TranscribingScreen>
         });
       }
       await Future<void>.delayed(const Duration(milliseconds: 450));
-      if (mounted) context.go('/editor');
+      if (mounted) context.pushReplacement('/editor');
     } on WorkerTranscriptionException catch (error) {
       progressTimer?.cancel();
       improvementTaglineTimer?.cancel();

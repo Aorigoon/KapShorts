@@ -44,7 +44,7 @@ Future<File?> createReelFrame(String videoPath, int timeMs) async {
 void showAppMessage(BuildContext context, String text) =>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(text),
+        content: Text(text, style: const TextStyle(color: Colors.white, fontSize: 14)),
         backgroundColor: AppColors.elevated,
         behavior: SnackBarBehavior.floating,
       ),

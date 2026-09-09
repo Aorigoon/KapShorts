@@ -257,7 +257,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                     SizedBox(
                       height: 38,
                       child: FilledButton(
-                        onPressed: () => context.go('/export'),
+                        onPressed: () => context.push('/export'),
                         style: FilledButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black,
@@ -4149,7 +4149,13 @@ class _CaptionOverlay extends StatelessWidget {
     final right = isCustomPosition ? null : 24.0;
     final bottom = isCustomPosition ? null : (design.position == CaptionPosition.bottom ? 62.0 : null);
     
-    final child = Opacity(opacity: opacity, child: framedCaption);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final constrainedCaption = ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: screenWidth - 48.0),
+      child: framedCaption,
+    );
+    
+    final child = Opacity(opacity: opacity, child: constrainedCaption);
     
     return Positioned(
       left: left,

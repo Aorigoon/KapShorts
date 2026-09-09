@@ -293,7 +293,7 @@ class ProjectsGrid extends ConsumerWidget {
               child: InkWell(
                 onTap: () async {
                   await ref.read(projectsProvider).select(project);
-                  if (context.mounted) context.go('/editor');
+                  if (context.mounted) context.push('/editor');
                 },
                 onLongPress: () => showProjectActionsSheet(context, ref, project),
                 onDoubleTap: () => showProjectActionsSheet(context, ref, project),
@@ -528,7 +528,7 @@ class _NewProjectSheetState extends ConsumerState<NewProjectSheet> {
           .addVideo(name: file.name, path: file.xFile.path);
       if (mounted) {
         Navigator.pop(context);
-        context.go('/transcribing');
+        context.push('/transcribing');
       }
     } on PlatformException {
       if (mounted) {
@@ -577,7 +577,7 @@ class _NewProjectSheetState extends ConsumerState<NewProjectSheet> {
           .addVideo(name: savedFile.name, path: output.path);
       if (mounted) {
         Navigator.pop(context);
-        context.go('/transcribing');
+        context.push('/transcribing');
       }
     } on HttpException catch (error) {
       if (mounted) showAppMessage(context, error.message);

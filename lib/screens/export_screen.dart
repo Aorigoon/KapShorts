@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import '../core/app_colors.dart';
 import '../core/providers.dart';
 import '../core/utils.dart';
+import '../core/services/subtitle_export_service.dart';
 class ExportScreen extends ConsumerStatefulWidget {
   const ExportScreen({super.key});
 
@@ -52,7 +53,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
             context,
             target == null
                 ? 'Caption save canceled.'
-                : 'Caption file saved successfully.',
+                : 'Caption file saved successfully at $target.',
           );
         }
       } else {
@@ -62,17 +63,42 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
             showAppMessage(context, 'Original video file is unavailable.');
           return;
         }
-        final root =
-            await getExternalStorageDirectory() ??
-            await getApplicationDocumentsDirectory();
+        
+        final root = await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
         final exports = Directory('${root.path}/SubReel Exports');
         await exports.create(recursive: true);
-        await source.copy('${exports.path}/${_exportStem(project.name)}.mp4');
-        if (mounted)
-          showAppMessage(
-            context,
-            'Original video copy saved in SubReel Exports.',
-          );
+        final outputPath = '${exports.path}/${_exportStem(project.name)}.mp4';
+        
+        final service = SubtitleExportService();
+        final srtContent = _buildCaptionSrt(project.transcription);
+        if (srtContent.isEmpty) {
+           if (mounted) showAppMessage(context, 'No captions to burn. Saving original video.');
+           await source.copy(outputPath);
+           if (mounted) showAppMessage(context, 'Video saved in SubReel Exports.');
+           return;
+        }
+        
+        final words = resolveCaptionWords(project.transcription).map((w) => CaptionWord(text: w.text, startMs: (w.start * 1000).round(), endMs: (w.end * 1000).round())).toList();
+        final design = ref.read(captionDesignProvider);
+        
+        // Use srt or ass depending on what burnCaptions supports
+        // Wait, SubtitleExportService burnCaptions requires an ASS file, but we don't have CaptionStyle easily available from CaptionDesign.
+        // Let's just create an srt file and pass it to ffmpeg directly, or use writeSrt.
+        final srtFile = await service.writeSrt(name: project.name, words: words);
+        
+        final escapedSrtPath = srtFile.path.replaceAll("'", "\'").replaceAll(":", "\\:");
+        final command = '-y -i "${source.path}" -vf "subtitles=\'$escapedSrtPath\'" -c:a copy "$outputPath"';
+        final session = await FFmpegKit.execute(command);
+        final returnCode = await session.getReturnCode();
+        
+        if (!returnCode!.isValueSuccess()) {
+           if (mounted) showAppMessage(context, 'Failed to burn captions.');
+           return;
+        }
+        
+        if (mounted) {
+          showAppMessage(context, 'Video exported to SubReel Exports folder.');
+        }
       }
     } catch (_) {
       if (mounted)
@@ -119,10 +145,10 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: ExportOption(
-                  label: 'Video copy',
+                  label: 'Export video',
                   icon: Icons.movie_outlined,
-                  selected: output == 'Video copy (.mp4)',
-                  onTap: () => setState(() => output = 'Video copy (.mp4)'),
+                  selected: output == 'Export video (.mp4)',
+                  onTap: () => setState(() => output = 'Export video (.mp4)'),
                 ),
               ),
             ],
@@ -131,7 +157,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
           Text(
             output == 'Caption file (.srt)'
                 ? 'Save timed captions as a standard .srt subtitle file.'
-                : 'Save a local copy of the original imported video.',
+                : 'Export a new video with hardcoded captions.',
             style: const TextStyle(
               color: AppColors.secondary,
               height: 1.45,
@@ -162,7 +188,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
                   : Text(
                       output == 'Caption file (.srt)'
                           ? 'Save caption file'
-                          : 'Save video copy',
+                          : 'Export video',
                       style: TextStyle(
                         fontWeight: FontWeight.w800,
                         fontSize: 16,
