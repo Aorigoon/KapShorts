@@ -38,16 +38,16 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
-      - name: Build Release APK
+      - name: Build ARM64 Release APK
         run: |
-          flutter build apk --release
-          cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/KapShorts-Release.apk
+          flutter build apk --release --target-platform android-arm64
+          cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/KapShorts-arm64-v8a.apk
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: KapShorts-Release-APK
-          path: build/app/outputs/flutter-apk/KapShorts-Release.apk
+          name: KapShorts-arm64-v8a-APK
+          path: build/app/outputs/flutter-apk/KapShorts-arm64-v8a.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -56,6 +56,6 @@ jobs:
           name: KapShorts Release v1.0.${{ github.run_number }}
           draft: false
           prerelease: false
-          files: build/app/outputs/flutter-apk/KapShorts-Release.apk
+          files: build/app/outputs/flutter-apk/KapShorts-arm64-v8a.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
