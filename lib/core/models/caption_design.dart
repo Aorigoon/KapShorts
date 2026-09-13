@@ -305,6 +305,28 @@ class CaptionDesign {
 
 
   static CaptionDesign fromTemplate(String template) => switch (template) {
+    'Real Estate' => const CaptionDesign(
+      size: 32,
+      position: CaptionPosition.center,
+      color: Colors.white,
+      activeColor: Color(0xFFFFD15C), // Premium Gold/Yellow
+      weight: FontWeight.w800,
+      font: CaptionFont.montserrat,
+      effect: CaptionEffect.slideUp, // Pop/Slide in
+      layout: CaptionLayout.ladder, // Stacks downwards/staggered
+      outlineWidth: 2, // Slight drop shadow for readability
+      maxWordsPerLine: 4,
+    ),
+    'Base Pro Style' => const CaptionDesign(
+      size: 28,
+      position: CaptionPosition.center,
+      color: Colors.white,
+      activeColor: Color(0xFFFFD15C),
+      weight: FontWeight.w800,
+      effect: CaptionEffect.bounce,
+      font: CaptionFont.montserrat,
+      outlineWidth: 2,
+    ),
     'Podcast Minimal' => const CaptionDesign(
       size: 25,
       position: CaptionPosition.center,
