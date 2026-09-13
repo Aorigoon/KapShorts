@@ -3789,8 +3789,8 @@ class _VideoPreviewPlayerState extends State<VideoPreviewPlayer> {
           design: widget.design,
           onWordToggled: widget.onWordToggled,
           onDrag: widget.onDesignUpdate == null ? null : (delta, scale) {
-            final currentX = widget.design.customX ?? 24.0;
-            final currentY = widget.design.customY ?? (widget.design.position == CaptionPosition.top ? 34.0 : widget.design.position == CaptionPosition.bottom ? 140.0 : 80.0);
+            final currentX = widget.design.customX ?? 0.0;
+            final currentY = widget.design.customY ?? 0.0;
             widget.onDesignUpdate!(widget.design.copyWith(
               customX: currentX + delta.dx, 
               customY: currentY + delta.dy,
@@ -3876,40 +3876,35 @@ class _CaptionInteractableState extends State<_CaptionInteractable> {
   Widget build(BuildContext context) {
     return Transform.scale(
       scale: widget.design.customScale ?? 1.0,
-      child: Align(
-        alignment: widget.isCustomPosition ? Alignment.center : (
-          widget.design.position == CaptionPosition.center
-            ? Alignment.center
-            : widget.design.position == CaptionPosition.top
-            ? Alignment.topCenter
-            : Alignment.bottomCenter
-        ),
-        child: GestureDetector(
-          onScaleStart: (_) {
-            _baseScale = widget.design.customScale ?? 1.0;
-          },
-          onScaleUpdate: (details) {
-            if (details.pointerCount >= 2) {
-              widget.onUpdate(Offset.zero, (_baseScale * details.scale).clamp(0.2, 5.0));
-            } else {
-              widget.onUpdate(details.focalPointDelta, widget.design.customScale ?? 1.0);
-            }
-          },
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5, style: BorderStyle.solid),
-                ),
-                child: widget.child,
+      child: GestureDetector(
+        onScaleStart: (_) {
+          _baseScale = widget.design.customScale ?? 1.0;
+        },
+        onScaleUpdate: (details) {
+          if (details.pointerCount >= 2) {
+            widget.onUpdate(Offset.zero, (_baseScale * details.scale).clamp(0.2, 5.0));
+          } else {
+            // Because Transform.scale is applied here, we might need to adjust the delta
+            // But focalPointDelta is in global screen coordinates, and we are updating customX/Y 
+            // which are applied in Transform.translate OUTSIDE this scale! 
+            // So focalPointDelta is perfectly 1:1 with screen pixels!
+            widget.onUpdate(details.focalPointDelta, widget.design.customScale ?? 1.0);
+          }
+        },
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5, style: BorderStyle.solid),
               ),
-              _buildCornerDot(-1, -1),
-              _buildCornerDot(1, -1),
-              _buildCornerDot(-1, 1),
-              _buildCornerDot(1, 1),
-            ],
-          ),
+              child: widget.child,
+            ),
+            _buildCornerDot(-1, -1),
+            _buildCornerDot(1, -1),
+            _buildCornerDot(-1, 1),
+            _buildCornerDot(1, 1),
+          ],
         ),
       ),
     );
@@ -4143,45 +4138,49 @@ class _CaptionOverlay extends StatelessWidget {
             ),
             child: caption,
           );
-    final isCustomPosition = design.customX != null && design.customY != null;
-    final top = isCustomPosition ? design.customY : (design.position == CaptionPosition.top ? 34.0 : null);
-    final left = isCustomPosition ? design.customX : 24.0;
-    final right = isCustomPosition ? null : 24.0;
-    final bottom = isCustomPosition ? null : (design.position == CaptionPosition.bottom ? 62.0 : null);
-    
     final screenWidth = MediaQuery.of(context).size.width;
     final constrainedCaption = ConstrainedBox(
       constraints: BoxConstraints(maxWidth: screenWidth - 48.0),
       child: framedCaption,
     );
     
-    final child = Opacity(opacity: opacity, child: constrainedCaption);
+    final childWithOpacity = Opacity(opacity: opacity, child: constrainedCaption);
     
-    return Positioned(
-      left: left,
-      right: right,
-      top: top,
-      bottom: bottom,
-      child: onDrag != null 
-          ? _CaptionInteractable(
-              design: design,
-              onUpdate: onDrag!,
-              isCustomPosition: isCustomPosition,
-              child: child,
-            )
-          : Transform.scale(
-              scale: design.customScale ?? 1.0,
-              child: Align(
-                alignment: isCustomPosition ? Alignment.topLeft : (
-                  design.position == CaptionPosition.center
-                      ? Alignment.center
-                      : design.position == CaptionPosition.top
-                      ? Alignment.topCenter
-                      : Alignment.bottomCenter
-                ),
-                child: child,
-              ),
-            ),
+    final alignment = design.position == CaptionPosition.center
+        ? Alignment.center
+        : design.position == CaptionPosition.top
+            ? Alignment.topCenter
+            : Alignment.bottomCenter;
+            
+    // Padding to mimic the original left/right/top/bottom
+    final padding = EdgeInsets.only(
+      left: 24.0, 
+      right: 24.0, 
+      top: design.position == CaptionPosition.top ? 34.0 : 0.0, 
+      bottom: design.position == CaptionPosition.bottom ? 62.0 : 0.0,
+    );
+
+    return Positioned.fill(
+      child: Padding(
+        padding: padding,
+        child: Align(
+          alignment: alignment,
+          child: Transform.translate(
+            offset: Offset(design.customX ?? 0.0, design.customY ?? 0.0),
+            child: onDrag != null 
+                ? _CaptionInteractable(
+                    design: design,
+                    onUpdate: onDrag!,
+                    isCustomPosition: false,
+                    child: childWithOpacity,
+                  )
+                : Transform.scale(
+                    scale: design.customScale ?? 1.0,
+                    child: childWithOpacity,
+                  ),
+          ),
+        ),
+      ),
     );
   }
 }
