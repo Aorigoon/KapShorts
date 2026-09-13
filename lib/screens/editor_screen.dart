@@ -3844,50 +3844,33 @@ class _CaptionInteractable extends StatefulWidget {
 class _CaptionInteractableState extends State<_CaptionInteractable> {
   double _baseScale = 1.0;
 
-  Widget _buildCornerDot(int x, int y) {
-    return Positioned(
-      left: x < 0 ? -6 : null,
-      right: x > 0 ? -6 : null,
-      top: y < 0 ? -6 : null,
-      bottom: y > 0 ? -6 : null,
-      child: GestureDetector(
-        onPanUpdate: (details) {
-          double dx = details.delta.dx * x;
-          double dy = details.delta.dy * y;
-          double scaleChange = (dx + dy) * 0.005;
-          double currentScale = widget.design.customScale ?? 1.0;
-          widget.onUpdate(Offset.zero, (currentScale + scaleChange).clamp(0.2, 5.0));
-        },
-        child: Container(
-          width: 14,
-          height: 14,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.blueAccent, width: 2),
-            boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 2)],
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Transform.scale(
       scale: widget.design.customScale ?? 1.0,
       child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
         onScaleStart: (_) {
           _baseScale = widget.design.customScale ?? 1.0;
         },
         onScaleUpdate: (details) {
-          if (details.pointerCount >= 2) {
-            widget.onUpdate(Offset.zero, (_baseScale * details.scale).clamp(0.2, 5.0));
+          // One finger drag = translation. Two fingers = scaling.
+          // Flutter's details.scale is exactly 1.0 for one finger, and >1 or <1 for pinch.
+          if (details.pointerCount >= 2 || details.scale != 1.0) {
+            // It's a pinch zoom!
+            double newScale = (_baseScale * details.scale).clamp(0.2, 5.0);
+            
+            // If they are also dragging with 2 fingers, we can apply delta too
+            // But usually we just scale. Let's apply both!
+            // Wait, applying both can be jumpy. Let's just scale if pointerCount >= 2.
+            widget.onUpdate(details.focalPointDelta, newScale);
           } else {
-            // Because Transform.scale is applied here, we might need to adjust the delta
-            // But focalPointDelta is in global screen coordinates, and we are updating customX/Y 
-            // which are applied in Transform.translate OUTSIDE this scale! 
-            // So focalPointDelta is perfectly 1:1 with screen pixels!
+            // 1 finger drag
+            // When scaled, moving finger 10px on screen should move the object 10px on screen.
+            // Since Transform.translate is OUTSIDE Transform.scale in our tree,
+            // 1 pixel of translation = 1 pixel of screen. 
+            // BUT wait! focalPointDelta is in global pixels.
+            // If we just pass focalPointDelta, it translates exactly 1-to-1 with the finger!
             widget.onUpdate(details.focalPointDelta, widget.design.customScale ?? 1.0);
           }
         },
@@ -3895,21 +3878,50 @@ class _CaptionInteractableState extends State<_CaptionInteractable> {
           clipBehavior: Clip.none,
           children: [
             Container(
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5, style: BorderStyle.solid),
+                border: Border.all(color: Colors.white70, width: 2.0, style: BorderStyle.solid),
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.black12, // Slight tint to show it's selected
               ),
               child: widget.child,
             ),
-            _buildCornerDot(-1, -1),
-            _buildCornerDot(1, -1),
-            _buildCornerDot(-1, 1),
-            _buildCornerDot(1, 1),
+            // Bottom Right Resize Handle
+            Positioned(
+              right: -10,
+              bottom: -10,
+              child: GestureDetector(
+                onPanStart: (_) {
+                  _baseScale = widget.design.customScale ?? 1.0;
+                },
+                onPanUpdate: (details) {
+                  // Dragging the handle down-right increases scale. 
+                  // 1 pixel of drag roughly = 0.01 scale.
+                  double dragAmount = (details.delta.dx + details.delta.dy);
+                  // Apply to customScale (we don't use _baseScale here because delta is per-frame)
+                  double currentScale = widget.design.customScale ?? 1.0;
+                  double newScale = (currentScale + dragAmount * 0.008).clamp(0.2, 5.0);
+                  widget.onUpdate(Offset.zero, newScale);
+                },
+                child: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [BoxShadow(color: Colors.black45, blurRadius: 4)],
+                  ),
+                  child: const Icon(Icons.open_in_full, size: 14, color: Colors.black87),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
 
 class _CaptionOverlay extends StatelessWidget {
   const _CaptionOverlay({
