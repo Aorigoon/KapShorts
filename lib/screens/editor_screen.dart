@@ -3895,12 +3895,11 @@ class _CaptionInteractableState extends State<_CaptionInteractable> {
                   _baseScale = widget.design.customScale ?? 1.0;
                 },
                 onPanUpdate: (details) {
-                  // Dragging the handle down-right increases scale. 
-                  // 1 pixel of drag roughly = 0.01 scale.
+                  // Dragging the handle down-right increases scale.
+                  // Increase sensitivity to 0.015 for smoother, faster feeling.
                   double dragAmount = (details.delta.dx + details.delta.dy);
-                  // Apply to customScale (we don't use _baseScale here because delta is per-frame)
                   double currentScale = widget.design.customScale ?? 1.0;
-                  double newScale = (currentScale + dragAmount * 0.008).clamp(0.2, 5.0);
+                  double newScale = (currentScale + dragAmount * 0.015).clamp(0.2, 5.0);
                   widget.onUpdate(Offset.zero, newScale);
                 },
                 child: Container(
@@ -4173,25 +4172,37 @@ class _CaptionOverlay extends StatelessWidget {
     );
 
     return Positioned.fill(
-      child: Padding(
-        padding: padding,
-        child: Align(
-          alignment: alignment,
-          child: Transform.translate(
-            offset: Offset(design.customX ?? 0.0, design.customY ?? 0.0),
-            child: onDrag != null 
-                ? _CaptionInteractable(
-                    design: design,
-                    onUpdate: onDrag!,
-                    isCustomPosition: false,
-                    child: childWithOpacity,
-                  )
-                : Transform.scale(
-                    scale: design.customScale ?? 1.0,
-                    child: childWithOpacity,
-                  ),
-          ),
-        ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth > 0 ? constraints.maxWidth : MediaQuery.of(context).size.width;
+          final height = constraints.maxHeight > 0 ? constraints.maxHeight : MediaQuery.of(context).size.height;
+          
+          return Padding(
+            padding: padding,
+            child: Align(
+              alignment: alignment,
+              child: Transform.translate(
+                // Use customX and customY as percentages of the video box size!
+                offset: Offset((design.customX ?? 0.0) * width, (design.customY ?? 0.0) * height),
+                child: onDrag != null 
+                    ? _CaptionInteractable(
+                        design: design,
+                        onUpdate: (delta, scale) {
+                          // Convert pixel movement to percentage movement
+                          final ratioDelta = Offset(delta.dx / width, delta.dy / height);
+                          onDrag!(ratioDelta, scale);
+                        },
+                        isCustomPosition: false,
+                        child: childWithOpacity,
+                      )
+                    : Transform.scale(
+                        scale: design.customScale ?? 1.0,
+                        child: childWithOpacity,
+                      ),
+              ),
+            ),
+          );
+        }
       ),
     );
   }
