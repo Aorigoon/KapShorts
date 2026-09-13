@@ -3843,6 +3843,7 @@ class _CaptionInteractable extends StatefulWidget {
 
 class _CaptionInteractableState extends State<_CaptionInteractable> {
   double _baseScale = 1.0;
+  Offset _startGlobalPosition = Offset.zero;
 
   @override
   Widget build(BuildContext context) {
@@ -3891,15 +3892,20 @@ class _CaptionInteractableState extends State<_CaptionInteractable> {
               right: -10,
               bottom: -10,
               child: GestureDetector(
-                onPanStart: (_) {
+                onPanStart: (details) {
                   _baseScale = widget.design.customScale ?? 1.0;
+                  _startGlobalPosition = details.globalPosition;
                 },
                 onPanUpdate: (details) {
-                  // Dragging the handle down-right increases scale.
-                  // Increase sensitivity to 0.015 for smoother, faster feeling.
-                  double dragAmount = (details.delta.dx + details.delta.dy);
-                  double currentScale = widget.design.customScale ?? 1.0;
-                  double newScale = (currentScale + dragAmount * 0.015).clamp(0.2, 5.0);
+                  // Use global coordinates to avoid local coordinate scaling bugs!
+                  // When the widget scales, its local coordinate system changes, which ruins details.delta
+                  double dx = details.globalPosition.dx - _startGlobalPosition.dx;
+                  double dy = details.globalPosition.dy - _startGlobalPosition.dy;
+                  double dragAmount = (dx + dy);
+                  
+                  // Calculate absolute new scale based on base scale + physical finger movement
+                  // 0.006 multiplier maps physical screen pixels nicely to scale factor
+                  double newScale = (_baseScale + dragAmount * 0.006).clamp(0.2, 5.0);
                   widget.onUpdate(Offset.zero, newScale);
                 },
                 child: Container(
