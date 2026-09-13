@@ -38,23 +38,16 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
-      - name: Build Universal APK
+      - name: Build Release APK
         run: |
           flutter build apk --release
-          cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/KapShorts-universal.apk
+          cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/KapShorts-Release.apk
 
-      - name: Build Split APKs
-        run: |
-          flutter build apk --split-per-abi --release
-          [ -f build/app/outputs/flutter-apk/app-arm64-v8a-release.apk ] && cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk build/app/outputs/flutter-apk/KapShorts-arm64-v8a.apk || true
-          [ -f build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk ] && cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk build/app/outputs/flutter-apk/KapShorts-armeabi-v7a.apk || true
-
-      - name: Upload Build Artifacts
+      - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: KapShorts-APKs
-          path: |
-            build/app/outputs/flutter-apk/KapShorts-*.apk
+          name: KapShorts-Release-APK
+          path: build/app/outputs/flutter-apk/KapShorts-Release.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -63,7 +56,6 @@ jobs:
           name: KapShorts Release v1.0.${{ github.run_number }}
           draft: false
           prerelease: false
-          files: |
-            build/app/outputs/flutter-apk/KapShorts-*.apk
+          files: build/app/outputs/flutter-apk/KapShorts-Release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
